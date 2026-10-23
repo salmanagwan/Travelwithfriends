@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trip Globe</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+/* Playful light map: warm sand land, bright lagoon water, soft greens, white roads */
+:root{
+  --land:#f6efe2; --land-2:#efe4cf; --water:#7fcbf0; --water-line:#5bb6e3;
+  --green:#bfe6a8; --wood:#a8dc93; --sand:#fbe7b5; --building:#efd9c2;
+  --road:#ffffff; --road-edge:#e6d3b8; --road-major:#ffd98a;
+  --label:#33304a; --halo:#ffffff; --border:#b48ad6;
+  --ink:#1f1d2e; --muted:#6b6880; --panel:rgba(255,255,255,.92); --line:rgba(31,29,46,.1);
+  --accent:#ff6b4a; --space:#cfe9f7;
+  --sans:"Figtree", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--space);font-family:var(--sans);color:var(--ink);overflow:hidden;-webkit-tap-highlight-color:transparent}
+#map{position:fixed;inset:0}
+.maplibregl-ctrl-attrib{font-size:10px}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:5;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.brand{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 14px;box-shadow:0 6px 20px rgba(31,29,46,.08)}
+.brand h1{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}
+.brand p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.btns{display:flex;gap:8px;pointer-events:auto}
+.icon-btn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 20px rgba(31,29,46,.08);font:700 13px var(--sans)}
+.icon-btn svg{width:20px;height:20px}
+
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:5;pointer-events:none;display:flex;flex-direction:column;gap:10px;
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+.sheet{pointer-events:auto;align-self:center;width:calc(100% - 32px);max-width:520px;background:var(--panel);border:1px solid var(--line);
+  border-radius:22px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(31,29,46,.15);animation:up .3s ease}
+@keyframes up{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.sheet .emoji{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:28px;flex:none}
+.sheet .info{flex:1;min-width:0}
+.sheet .name{font-size:18px;font-weight:800}
+.sheet .meta{font-size:13px;color:var(--muted);margin-top:2px}
+.close{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:transparent;cursor:pointer;flex:none;color:var(--ink)}
+.chips{pointer-events:auto;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:9px 14px 9px 10px;
+  font:700 13px var(--sans);color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(31,29,46,.08)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.pin{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;transform-origin:bottom center;transition:transform .2s ease}
+.pin .bubble{width:40px;height:40px;border-radius:50% 50% 50% 6px;transform:rotate(-45deg);display:grid;place-items:center;border:3px solid #fff;box-shadow:0 6px 14px rgba(31,29,46,.25)}
+.pin .bubble span{transform:rotate(45deg);font-size:19px;line-height:1}
+.pin .lbl{margin-top:4px;font:800 11px var(--sans);color:var(--ink);background:#fff;border-radius:999px;padding:3px 8px;box-shadow:0 2px 6px rgba(31,29,46,.15);white-space:nowrap}
+.pin.active{transform:scale(1.2)}
+.pin:hover{transform:scale(1.1)}
+.pin.active:hover{transform:scale(1.2)}
+.err{position:fixed;inset:auto 16px 50% 16px;z-index:9;background:#fff;border-radius:16px;padding:16px;text-align:center;font-size:14px;display:none}
+@media (prefers-reduced-motion: reduce){.pin,.sheet{transition:none;animation:none}}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<header class="top">
+  <div class="brand"><h1>Trip Globe</h1><p>Drag, pinch, tap a pin</p></div>
+  <div class="btns">
+    <button class="icon-btn" id="tilt" aria-label="Toggle 3D tilt">3D</button>
+    <button class="icon-btn" id="reset" aria-label="Back to globe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="bottom">
+  <div class="sheet" id="sheet" hidden>
+    <div class="emoji" id="sEmoji"></div>
+    <div class="info"><div class="name" id="sName"></div><div class="meta" id="sMeta"></div></div>
+    <button class="close" id="sClose" aria-label="Close">✕</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</div>
+<div class="err" id="err">Couldn't load the map. Check your internet connection and reload.</div>
+
+<script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+<script>
+// Dummy data. Swap for your own places.
+const PLACES = [
+  {id:"goa",      name:"Goa",      country:"India",     emoji:"🏖️", color:"#ffb84a", lng:73.75,  lat:15.55},
+  {id:"leh",      name:"Leh",      country:"India",     emoji:"🏔️", color:"#8fb8ff", lng:77.58,  lat:34.15},
+  {id:"bali",     name:"Bali",     country:"Indonesia", emoji:"🌴", color:"#5fd39a", lng:115.26, lat:-8.51},
+  {id:"bangkok",  name:"Bangkok",  country:"Thailand",  emoji:"🛺", color:"#ff7aa8", lng:100.50, lat:13.75},
+  {id:"tokyo",    name:"Tokyo",    country:"Japan",     emoji:"🍣", color:"#ff6b4a", lng:139.69, lat:35.68},
+  {id:"dubai",    name:"Dubai",    country:"UAE",       emoji:"🏜️", color:"#f5c542", lng:55.27,  lat:25.20},
+  {id:"istanbul", name:"Istanbul", country:"Türkiye",   emoji:"🕌", color:"#b48ad6", lng:28.98,  lat:41.01},
+  {id:"lisbon",   name:"Lisbon",   country:"Portugal",  emoji:"🚋", color:"#4ac0e0", lng:-9.14,  lat:38.72}
+];
+const HOME = {center:[78,18], zoom:1.6, pitch:0, bearing:0};
+const v = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Recolour OpenFreeMap's Liberty style into a softer, playful palette
+function restyle(style){
+  const C = {land:v("--land"),land2:v("--land-2"),water:v("--water"),wline:v("--water-line"),green:v("--green"),wood:v("--wood"),
+    sand:v("--sand"),building:v("--building"),road:v("--road"),edge:v("--road-edge"),major:v("--road-major"),label:v("--label"),halo:v("--halo"),border:v("--border")};
+  style.projection = {type:"globe"};
+  style.sky = {"sky-color":v("--space"),"horizon-color":"#ffffff","atmosphere-blend":["interpolate",["linear"],["zoom"],0,1,5,1,7,0]};
+  for (const L of style.layers){
+    const id = L.id, p = (L.paint ||= {});
+    if (L.type === "raster"){ p["raster-opacity"] = 0; continue; }
+    if (L.type === "background"){ p["background-color"] = C.land; continue; }
+    if (L.type === "fill"){
+      if (/water/.test(id)) p["fill-color"] = C.water;
+      else if (/wood|forest/.test(id)) p["fill-color"] = C.wood;
+      else if (/park|grass|landcover|meadow|farm/.test(id)) p["fill-color"] = C.green;
+      else if (/sand|beach/.test(id)) p["fill-color"] = C.sand;
+      else if (/building/.test(id)) p["fill-color"] = C.building;
+      else if (/landuse|residential/.test(id)) p["fill-color"] = C.land2;
+      delete p["fill-pattern"]; delete p["fill-outline-color"];
+      continue;
+    }
+    if (L.type === "fill-extrusion"){ p["fill-extrusion-color"] = C.building; p["fill-extrusion-opacity"] = .85; continue; }
+    if (L.type === "line"){
+      if (/water/.test(id)) p["line-color"] = C.wline;
+      else if (/boundary|admin/.test(id)){ p["line-color"] = C.border; p["line-dasharray"] = [2,2]; }
+      else if (/casing/.test(id)) p["line-color"] = C.edge;
+      else if (/motorway|trunk|primary/.test(id)) p["line-color"] = C.major;
+      else if (/road|bridge|tunnel|street|path|minor|secondary|tertiary/.test(id)) p["line-color"] = C.road;
+      continue;
+    }
+    if (L.type === "symbol"){
+      if (L.layout && L.layout["text-field"]){ p["text-color"] = C.label; p["text-halo-color"] = C.halo; p["text-halo-width"] = 1.6; }
+      if (/water|ocean|sea|lake/.test(id)) p["text-color"] = "#2a7fb0";
+    }
+  }
+  return style;
+}
+
+let map;
+(async () => {
+  try{
+    const res = await fetch("https://tiles.openfreemap.org/styles/liberty");
+    if(!res.ok) throw new Error(res.status);
+    const style = restyle(await res.json());
+    map = new maplibregl.Map({container:"map", style, ...HOME, minZoom:0.8, maxZoom:18, attributionControl:{compact:true}});
+    map.touchZoomRotate.disableRotation();
+    setup();
+  }catch(e){ document.getElementById("err").style.display = "block"; }
+})();
+
+function setup(){
+  const sheet = document.getElementById("sheet"), chipsEl = document.getElementById("chips");
+  const markers = {}, chips = {}; let active = null;
+
+  function select(p){
+    if(active){ markers[active].getElement().classList.remove("active"); chips[active].setAttribute("aria-pressed","false"); }
+    active = p ? p.id : null;
+    if(!p){ sheet.hidden = true; return; }
+    markers[p.id].getElement().classList.add("active");
+    chips[p.id].setAttribute("aria-pressed","true");
+    chips[p.id].scrollIntoView({behavior:reduce?"auto":"smooth",inline:"center",block:"nearest"});
+    const e = document.getElementById("sEmoji"); e.textContent = p.emoji; e.style.background = p.color + "33";
+    document.getElementById("sName").textContent = p.name;
+    document.getElementById("sMeta").textContent = p.country + " · sample place";
+    sheet.hidden = false;
+    map.flyTo({center:[p.lng,p.lat], zoom:11, pitch:45, duration:reduce?0:2600, essential:true});
+  }
+
+  for (const p of PLACES){
+    const el = document.createElement("button");
+    el.className = "pin"; el.setAttribute("aria-label", p.name);
+    el.innerHTML = `<div class="bubble" style="background:${p.color}"><span>${p.emoji}</span></div><div class="lbl">${p.name}</div>`;
+    el.addEventListener("click", ev => { ev.stopPropagation(); select(p); });
+    markers[p.id] = new maplibregl.Marker({element:el, anchor:"bottom"}).setLngLat([p.lng,p.lat]).addTo(map);
+
+    const c = document.createElement("button");
+    c.className = "chip"; c.setAttribute("aria-pressed","false");
+    c.innerHTML = `<span>${p.emoji}</span>${p.name}`;
+    c.addEventListener("click", () => select(p));
+    chips[p.id] = c; chipsEl.appendChild(c);
+  }
+
+  document.getElementById("sClose").onclick = () => select(null);
+  document.getElementById("reset").onclick = () => { select(null); map.flyTo({...HOME, duration:reduce?0:2000, essential:true}); };
+  document.getElementById("tilt").onclick = () => map.easeTo({pitch: map.getPitch() > 10 ? 0 : 55, duration:reduce?0:600});
+}
+</script>
+</body>
+</html>
