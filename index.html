@@ -187,6 +187,41 @@ function setup(){
     chips[p.id] = c; chipsEl.appendChild(c);
   }
 
+
+  // Route line: Goa to Leh as a great-circle arc that draws itself in
+  const ROUTE = ["goa","leh"];
+  function arc(a, b, n = 64){
+    const r = Math.PI/180, d = 180/Math.PI;
+    const [l1,p1] = [a[0]*r,a[1]*r], [l2,p2] = [b[0]*r,b[1]*r];
+    const w = 2*Math.asin(Math.sqrt(Math.sin((p2-p1)/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin((l2-l1)/2)**2));
+    const out = [];
+    for (let i = 0; i <= n; i++){
+      const f = i/n, A = Math.sin((1-f)*w)/Math.sin(w), B = Math.sin(f*w)/Math.sin(w);
+      const x = A*Math.cos(p1)*Math.cos(l1) + B*Math.cos(p2)*Math.cos(l2);
+      const y = A*Math.cos(p1)*Math.sin(l1) + B*Math.cos(p2)*Math.sin(l2);
+      const z = A*Math.sin(p1) + B*Math.sin(p2);
+      out.push([Math.atan2(y,x)*d, Math.atan2(z,Math.hypot(x,y))*d]);
+    }
+    return out;
+  }
+  const stops = ROUTE.map(id => PLACES.find(p => p.id === id));
+  const full = stops.slice(1).flatMap((s,i) => arc([stops[i].lng,stops[i].lat],[s.lng,s.lat]).slice(i ? 1 : 0));
+  const line = c => ({type:"Feature", geometry:{type:"LineString", coordinates:c}});
+  map.on("load", () => {
+    map.addSource("route", {type:"geojson", data: line(full.slice(0,2))});
+    map.addLayer({id:"route-casing", type:"line", source:"route", layout:{"line-cap":"round","line-join":"round"},
+      paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],1,5,8,9]}});
+    map.addLayer({id:"route", type:"line", source:"route", layout:{"line-cap":"round","line-join":"round"},
+      paint:{"line-color":v("--accent"),"line-width":["interpolate",["linear"],["zoom"],1,2.5,8,5],"line-dasharray":[1,1.6]}});
+    if (reduce){ map.getSource("route").setData(line(full)); return; }
+    const t0 = performance.now(), dur = 1800;
+    (function step(t){
+      const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3);
+      map.getSource("route").setData(line(full.slice(0, Math.max(2, Math.ceil(e*full.length)))));
+      if (k < 1) requestAnimationFrame(step);
+    })(t0);
+  });
+
   document.getElementById("sClose").onclick = () => select(null);
   document.getElementById("reset").onclick = () => { select(null); map.flyTo({...HOME, duration:reduce?0:2000, essential:true}); };
   document.getElementById("tilt").onclick = () => map.easeTo({pitch: map.getPitch() > 10 ? 0 : 55, duration:reduce?0:600});
