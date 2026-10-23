@@ -211,11 +211,18 @@ function setup(){
     if (map.getSource("route")) return;
     map.addSource("route", {type:"geojson", data: line(full.slice(0,2))});
     map.addLayer({id:"route-casing", type:"line", source:"route", layout:{"line-cap":"round","line-join":"round"},
-      paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],1,5,8,9]}});
+      paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],1,6,8,11]}});
     map.addLayer({id:"route", type:"line", source:"route", layout:{"line-cap":"round","line-join":"round"},
-      paint:{"line-color":v("--accent"),"line-width":["interpolate",["linear"],["zoom"],1,2.5,8,5],"line-dasharray":[1,1.6]}});
-    if (reduce){ map.getSource("route").setData(line(full)); return; }
-    const t0 = performance.now(), dur = 1800;
+      paint:{"line-color":v("--accent"),"line-width":["interpolate",["linear"],["zoom"],1,3.5,8,6],"line-dasharray":[2,1.4]}});
+    // Frame the whole route, then draw it in once the camera arrives
+    const b = full.reduce((bb,c) => bb.extend(c), new maplibregl.LngLatBounds(full[0], full[0]));
+    const pad = {top:130, bottom:150, left:60, right:60};
+    if (reduce){ map.fitBounds(b, {padding:pad, duration:0}); map.getSource("route").setData(line(full)); return; }
+    map.fitBounds(b, {padding:pad, duration:2200, essential:true});
+    map.once("moveend", draw);
+  }
+  function draw(){
+    const t0 = performance.now(), dur = 1600;
     (function step(t){
       const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3);
       map.getSource("route").setData(line(full.slice(0, Math.max(2, Math.ceil(e*full.length)))));
