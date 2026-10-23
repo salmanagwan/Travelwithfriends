@@ -207,7 +207,8 @@ function setup(){
   const stops = ROUTE.map(id => PLACES.find(p => p.id === id));
   const full = stops.slice(1).flatMap((s,i) => arc([stops[i].lng,stops[i].lat],[s.lng,s.lat]).slice(i ? 1 : 0));
   const line = c => ({type:"Feature", geometry:{type:"LineString", coordinates:c}});
-  map.on("load", () => {
+  function addRoute(){
+    if (map.getSource("route")) return;
     map.addSource("route", {type:"geojson", data: line(full.slice(0,2))});
     map.addLayer({id:"route-casing", type:"line", source:"route", layout:{"line-cap":"round","line-join":"round"},
       paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],1,5,8,9]}});
@@ -220,7 +221,9 @@ function setup(){
       map.getSource("route").setData(line(full.slice(0, Math.max(2, Math.ceil(e*full.length)))));
       if (k < 1) requestAnimationFrame(step);
     })(t0);
-  });
+  }
+  // "load" can stall on a slow tile, so draw as soon as the style is ready
+  if (map.isStyleLoaded()) addRoute(); else map.once("style.load", addRoute);
 
   document.getElementById("sClose").onclick = () => select(null);
   document.getElementById("reset").onclick = () => { select(null); map.flyTo({...HOME, duration:reduce?0:2000, essential:true}); };
