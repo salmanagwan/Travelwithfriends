@@ -34,10 +34,11 @@ body{background:var(--space);font-family:var(--sans);color:var(--ink);overflow:h
 .icon-btn svg{width:20px;height:20px}
 
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:5;pointer-events:none;display:flex;flex-direction:column;gap:10px;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 .sheet{pointer-events:auto;align-self:center;width:calc(100% - 32px);max-width:520px;background:var(--panel);border:1px solid var(--line);
   border-radius:22px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(31,29,46,.15);animation:up .3s ease}
 @keyframes up{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.sheet[hidden]{display:none}
 .sheet .emoji{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:28px;flex:none}
 .sheet .info{flex:1;min-width:0}
 .sheet .name{font-size:18px;font-weight:800}
@@ -105,10 +106,15 @@ function restyle(style){
   const C = {land:v("--land"),land2:v("--land-2"),water:v("--water"),wline:v("--water-line"),green:v("--green"),wood:v("--wood"),
     sand:v("--sand"),building:v("--building"),road:v("--road"),edge:v("--road-edge"),major:v("--road-major"),label:v("--label"),halo:v("--halo"),border:v("--border")};
   style.projection = {type:"globe"};
-  style.sky = {"sky-color":v("--space"),"horizon-color":"#ffffff","atmosphere-blend":["interpolate",["linear"],["zoom"],0,1,5,1,7,0]};
+  style.sky = {"sky-color":v("--space"),"horizon-color":v("--space"),"atmosphere-blend":["interpolate",["linear"],["zoom"],0,1,5,1,7,0]};
   for (const L of style.layers){
     const id = L.id, p = (L.paint ||= {});
-    if (L.type === "raster"){ p["raster-opacity"] = 0; continue; }
+    if (L.type === "raster"){
+      // Low-zoom relief imagery carries the oceans; soften it, then fade out as streets appear
+      p["raster-opacity"] = ["interpolate",["linear"],["zoom"],5,1,7,0];
+      p["raster-saturation"] = 0.35; p["raster-brightness-min"] = 0.22; p["raster-contrast"] = -0.1;
+      continue;
+    }
     if (L.type === "background"){ p["background-color"] = C.land; continue; }
     if (L.type === "fill"){
       if (/water/.test(id)) p["fill-color"] = C.water;
@@ -130,7 +136,7 @@ function restyle(style){
       continue;
     }
     if (L.type === "symbol"){
-      if (L.layout && L.layout["text-field"]){ p["text-color"] = C.label; p["text-halo-color"] = C.halo; p["text-halo-width"] = 1.6; }
+      if (L.layout && L.layout["text-field"] && !/shield/.test(id)){ L.layout["text-field"] = ["coalesce",["get","name:en"],["get","name:latin"],["get","name"]]; p["text-color"] = C.label; p["text-halo-color"] = C.halo; p["text-halo-width"] = 1.6; }
       if (/water|ocean|sea|lake/.test(id)) p["text-color"] = "#2a7fb0";
     }
   }
