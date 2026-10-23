@@ -222,8 +222,8 @@ function setup(){
       if (k < 1) requestAnimationFrame(step);
     })(t0);
   }
-  // "load" can stall on a slow tile, so draw as soon as the style is ready
-  if (map.isStyleLoaded()) addRoute(); else map.once("style.load", addRoute);
+  // "load" can stall on a slow tile, so poll until the style is ready
+  (function tryRoute(){ if (map.isStyleLoaded()) { try { addRoute(); } catch(e){ console.error("route", e); } } else setTimeout(tryRoute, 200); })();
 
   document.getElementById("sClose").onclick = () => select(null);
   document.getElementById("reset").onclick = () => { select(null); map.flyTo({...HOME, duration:reduce?0:2000, essential:true}); };
