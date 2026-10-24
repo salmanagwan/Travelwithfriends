@@ -232,12 +232,12 @@ body.locked{overflow:hidden}
 .poll3d span,.sheetArt span{display:block;position:relative;overflow:hidden;transform:rotate(25deg)}
 .poll3d span{width:72px;height:72px}
 .poll3d img,.sheetArt img{position:absolute;left:-17.57%;top:-16.32%;width:131.17%;height:131.17%;max-width:none}
-.track{position:relative;width:calc(100% - 28px);max-width:364px;height:98px;touch-action:pan-y}
+.track{position:relative;width:calc(100% - 28px);max-width:364px;height:98px;touch-action:pan-y;transition:height .3s}
 .bar{position:absolute;left:8px;right:0;top:39.5px;height:4px;border-radius:50px;background:#f5f5f5}
 .bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:50px;background:var(--accent);opacity:.9}
 .dot{position:absolute;top:35.5px;width:12px;height:12px;margin-left:-6px;border-radius:50px;background:#f5f5f5;transition:background .25s,transform .25s}
 .dot.mine{background:var(--accent)}
-.opt{position:absolute;top:55.5px;transform:translateX(-50%);font-weight:700;font-size:20px;letter-spacing:-1px;line-height:1.3;text-align:center;white-space:nowrap;color:var(--text-primary);font-variation-settings:"opsz" 14;padding:0 4px;border-radius:8px;transition:color .2s}
+.opt{position:absolute;top:55.5px;transform:translateX(-50%);font-weight:700;font-size:20px;letter-spacing:-1px;line-height:1.3;text-align:center;white-space:normal;width:max-content;overflow-wrap:normal;color:var(--text-primary);font-variation-settings:"opsz" 14;padding:0 4px;border-radius:8px;transition:color .2s}
 .opt em{display:block;font-style:normal;font-size:16px;line-height:1.2;letter-spacing:0}
 .opt.mine{color:var(--accent)}
 .track.many .opt{font-size:16px;letter-spacing:-.6px}
@@ -256,7 +256,7 @@ body.locked{overflow:hidden}
 /* ---------- Create a Poll sheet (Figma "Add a poll" / "Poll Value Added") ---------- */
 .scrim{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.7);opacity:0;transition:opacity .35s}
 .scrim.show{opacity:1}
-.sheet{position:fixed;z-index:121;left:50%;bottom:8px;width:min(412px,calc(100vw - 16px));height:min(635px,calc(100dvh - 28px));transform:translate(-50%,calc(100% + 40px));
+.sheet{position:fixed;z-index:121;left:50%;bottom:8px;width:min(412px,calc(100vw - 16px));height:auto;max-height:calc(100dvh - 28px);transform:translate(-50%,calc(100% + 40px));
   transition:transform .5s cubic-bezier(.2,.9,.25,1),height .3s,bottom .25s;display:flex;flex-direction:column}
 .sheet.show{transform:translate(-50%,0)}
 .sheet.drag{transition:none}
@@ -265,7 +265,8 @@ body.locked{overflow:hidden}
 .sheetEdge{position:absolute;inset:0;background:#efefef;pointer-events:none}
 .grab{position:relative;height:40px;flex:none;cursor:grab;touch-action:none}
 .grab::before{content:"";position:absolute;left:50%;top:8px;width:80px;height:6px;margin-left:-40px;border-radius:3px;background:#ececec}
-.sheetArt{position:absolute;right:10px;top:-21px;width:96px;height:96px;display:grid;place-items:center;pointer-events:none;z-index:2;filter:drop-shadow(0 8px 16px rgba(240,60,40,.25))}
+.sheetClip{position:absolute;inset:0;pointer-events:none;z-index:2}
+.sheetArt{position:absolute;right:-8px;top:-18px;width:96px;height:96px;display:grid;place-items:center;filter:drop-shadow(0 8px 16px rgba(240,60,40,.25))}
 .sheetArt span{width:80px;height:80px;transform:rotate(20deg)}
 .sheetBody{position:relative;flex:1;min-height:0;overflow-y:auto;padding:0 24px 16px;display:flex;flex-direction:column;gap:40px;scrollbar-width:none}
 .sheetBody::-webkit-scrollbar{display:none}
@@ -282,8 +283,17 @@ body.locked{overflow:hidden}
 .optRow input{width:100%;border:0;outline:0;background:#f8f5ff;padding:16px 44px;text-align:center;font:500 20px/1.3 var(--sans);letter-spacing:-1px;color:var(--text-primary);caret-color:var(--accent);transition:background .2s;font-variation-settings:"opsz" 14}
 .optRow input::placeholder{color:#a0a4ab}
 .optRow input:focus{background:#efe7ff}
-.optRow .x{position:absolute;right:12px;top:50%;width:28px;height:28px;margin-top:-14px;border-radius:50%;display:grid;place-items:center;color:#6b6f76;font-size:18px;line-height:1}
+.optRow .x{position:absolute;right:10px;top:29px;width:40px;height:40px;margin-top:-20px;border-radius:50%;display:grid;place-items:center;color:#6b6f76}
+.optRow .x svg{width:22px;height:22px}
 .optRow .x:active{background:rgba(0,0,0,.06)}
+.err{display:none;margin-top:6px;font-size:13px;font-weight:500;letter-spacing:-.1px;color:#e5484d;text-align:center}
+.bad .err{display:block}
+.optRow.bad input,.optRow.bad input:focus{background:#fdeced;color:#d93036}
+.qWrap.bad textarea{color:#d93036}
+.qWrap.bad .qLine{background:#e5484d!important;width:100%}
+.qWrap .err{margin-top:0}
+.shake{animation:shake .32s}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
 .addMore{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;height:58px;font:500 20px var(--sans);letter-spacing:-1px;color:#6b6f76}
 .addMore svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .addMore[hidden]{display:none}
@@ -412,7 +422,7 @@ body.locked{overflow:hidden}
 <form class="sheet" id="pollSheet" hidden role="dialog" aria-modal="true" aria-labelledby="pollTitle" autocomplete="off">
   <div class="sheetBg" data-sq="32"></div>
   <div class="sheetEdge" data-ring="32"></div>
-  <div class="sheetArt" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
+  <div class="sheetClip" data-sq="32" aria-hidden="true"><div class="sheetArt"><span><img src="assets/poll-3d.png" alt=""></span></div></div>
   <div class="grab" id="pollGrab" aria-hidden="true"></div>
   <div class="sheetBody">
     <div class="sheetTitle">
@@ -420,8 +430,9 @@ body.locked{overflow:hidden}
       <p>Publish a poll to align your friends</p>
     </div>
     <div class="qWrap" id="qWrap">
-      <textarea id="pollQuestion" rows="1" maxlength="80" placeholder="Write your question" aria-label="Question"></textarea>
+      <textarea id="pollQuestion" rows="1" placeholder="Write your question" aria-label="Question" aria-describedby="qErr"></textarea>
       <div class="qLine"></div>
+      <p class="err" id="qErr" role="alert"></p>
     </div>
     <div class="opts">
       <div class="opts" id="pollOpts"></div>
@@ -869,7 +880,17 @@ function layoutTrack(){
   if (!poll || !track.clientWidth) return;
   const xs = optX();
   track.querySelectorAll(".dot").forEach((d, i) => d.style.left = xs[i] + "px");
-  track.querySelectorAll(".opt").forEach((d, i) => d.style.left = xs[i] + "px");
+  const W = track.clientWidth; let bottom = 0;
+  track.querySelectorAll(".opt").forEach((d, i) => {
+    d.style.left = xs[i] + "px";
+    const gap = Math.min(i > 0 ? xs[i] - xs[i - 1] : Infinity, i < xs.length - 1 ? xs[i + 1] - xs[i] : Infinity);
+    const maxW = Math.min(gap - 8, 2 * (W - xs[i] + 12));
+    d.style.maxWidth = maxW + "px"; d.style.fontSize = "";
+    let fs = parseFloat(getComputedStyle(d).fontSize);
+    while (d.scrollWidth > maxW + 1 && fs > 14){ fs -= 1; d.style.fontSize = fs + "px"; }
+    bottom = Math.max(bottom, d.offsetTop + d.offsetHeight);
+  });
+  track.style.height = Math.max(98, bottom + 4) + "px";
   track.querySelectorAll(".voters").forEach((d, i) => d.style.left = xs[i] + "px");
   placeMe(poll.mine < 0 ? startX() : xs[poll.mine]);
 }
@@ -920,12 +941,16 @@ const sheet = document.getElementById("pollSheet"), scrim = document.getElementB
 const qWrap = document.getElementById("qWrap"), qEl = document.getElementById("pollQuestion");
 const optsEl = document.getElementById("pollOpts"), addMore = document.getElementById("addMore"), createBtn = document.getElementById("createPoll");
 const MAX_OPTS = 3;
+// Limits chosen so the live card never breaks: the question fits in two lines, each option fits under its dot.
+const Q_MAX = 45, OPT_MAX = 12, OPT_WORDS = 2;
+const sheetBody = sheet.querySelector(".sheetBody");
+const X_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>`;
 
 function addOption(focus){
   const n = optsEl.children.length; if (n >= MAX_OPTS) return;
   const row = document.createElement("div"); row.className = "optRow" + (n >= 2 ? " enter" : "");
-  row.innerHTML = `<input type="text" maxlength="24" placeholder="Option ${n + 1}" aria-label="Option ${n + 1}" data-sq="16" enterkeyhint="next">` +
-    (n >= 2 ? `<button type="button" class="x" aria-label="Remove option">×</button>` : "");
+  row.innerHTML = `<input type="text" placeholder="Option ${n + 1}" aria-label="Option ${n + 1}" data-sq="16" enterkeyhint="next">` +
+    (n >= 2 ? `<button type="button" class="x" aria-label="Remove option">${X_ICON}</button>` : "") + `<p class="err" role="alert"></p>`;
   optsEl.appendChild(row); watchSq(row);
   requestAnimationFrame(() => row.classList.remove("enter"));
   if (focus) row.querySelector("input").focus();
@@ -937,13 +962,55 @@ function syncSheet(){
   createBtn.disabled = !(qEl.value.trim() && filled >= 2);
   qWrap.classList.toggle("filled", !!qEl.value.trim());
   addMore.hidden = optsEl.children.length >= MAX_OPTS;
+  fitSheet();
 }
 function growQ(){ qEl.style.height = "auto"; qEl.style.height = qEl.scrollHeight + "px"; }
 
+// The sheet hugs its content, so adding Option 3 or a second line grows it upward
+function maxSheetH(){ const vv = window.visualViewport, kb = vv ? Math.max(0, innerHeight - vv.height - vv.offsetTop) : 0;
+  return kb > 0 ? vv.height - 20 : innerHeight - 28; }
+function fitSheet(instant){
+  if (sheet.hidden) return;
+  const prev = sheet.offsetHeight;
+  sheet.style.height = "auto"; sheetBody.style.flex = "none";
+  const nat = sheet.offsetHeight;
+  sheetBody.style.flex = "";
+  const next = Math.min(nat, maxSheetH());
+  if (instant || !prev){ sheet.style.height = next + "px"; return; }
+  sheet.style.height = prev + "px"; void sheet.offsetHeight;
+  sheet.style.height = next + "px";
+}
+
+// Block anything past the limit and say why
+function check(el, isQ){
+  // flags and emoji at the end don't count toward the limit, even half-typed ones
+  const v = el.value, name = isQ ? v : v.replace(/[\s\p{Regional_Indicator}\p{Extended_Pictographic}\uFE0F\u200D]+$/u, "");
+  if ([...name.trim()].length > (isQ ? Q_MAX : OPT_MAX)) return `Max ${isQ ? Q_MAX : OPT_MAX} characters`;
+  if (!isQ && name.trim().split(/\s+/).filter(Boolean).length > OPT_WORDS) return `Keep it to ${OPT_WORDS} words`;
+  return null;
+}
+function flag(box, el, msg){
+  const err = box.querySelector(".err");
+  if (msg){
+    err.textContent = msg; box.classList.add("bad");
+    el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
+    if (navigator.vibrate) navigator.vibrate(15);
+    clearTimeout(box._t); box._t = setTimeout(() => { box.classList.remove("bad"); fitSheet(); }, 2600);
+  } else box.classList.remove("bad");
+}
+sheet.addEventListener("focusout", e => { const box = e.target.closest(".optRow,.qWrap"); if (box && box.classList.contains("bad")){ box.classList.remove("bad"); fitSheet(); } });
+function guard(el, isQ, box){
+  const msg = check(el, isQ);
+  if (msg){ const pos = Math.max(0, (el.selectionStart || 0) - (el.value.length - (el._last || "").length)); el.value = el._last || ""; try { el.setSelectionRange(pos, pos); } catch(e){} }
+  else el._last = el.value;
+  flag(box, el, msg);
+}
+
 function openPoll(){
-  qEl.value = ""; growQ(); optsEl.innerHTML = ""; addOption(); addOption();
-  sheet.style.transform = "";
-  scrim.hidden = false; sheet.hidden = false; growQ();
+  qEl.value = ""; qEl._last = ""; qWrap.classList.remove("bad"); optsEl.innerHTML = "";
+  sheet.style.transform = ""; sheet.style.height = "";
+  scrim.hidden = false; sheet.hidden = false;
+  addOption(); addOption(); growQ(); fitSheet(true);
   requestAnimationFrame(() => requestAnimationFrame(() => { scrim.classList.add("show"); sheet.classList.add("show"); }));
   document.body.classList.add("locked");
   history.pushState({poll: true}, "", "#poll");
@@ -961,9 +1028,9 @@ scrim.addEventListener("click", () => closePoll());
 window.addEventListener("popstate", () => closePoll(true));
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePoll(); });
 
-qEl.addEventListener("input", () => { growQ(); syncSheet(); });
+qEl.addEventListener("input", () => { guard(qEl, true, qWrap); growQ(); syncSheet(); });
 qEl.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); optsEl.querySelector("input").focus(); } });
-optsEl.addEventListener("input", syncSheet);
+optsEl.addEventListener("input", e => { if (e.target.matches("input")) guard(e.target, false, e.target.parentElement); syncSheet(); });
 optsEl.addEventListener("keydown", e => {
   if (e.key !== "Enter" || !e.target.matches("input")) return;
   e.preventDefault();
@@ -972,13 +1039,14 @@ optsEl.addEventListener("keydown", e => {
 });
 optsEl.addEventListener("click", e => { const x = e.target.closest(".x"); if (!x) return; x.parentElement.remove(); renumber(); syncSheet(); });
 addMore.addEventListener("click", () => addOption(true));
+window.addEventListener("resize", () => fitSheet(true));
 
 // The "typing" look from Figma: footer gets a hairline and the sheet rides above the keyboard
 sheet.addEventListener("focusin", e => { if (e.target.matches("input,textarea")) sheet.classList.add("typing"); });
 sheet.addEventListener("focusout", () => setTimeout(() => { if (!sheet.contains(document.activeElement) || !document.activeElement.matches("input,textarea")) sheet.classList.remove("typing"); }, 0));
 if (window.visualViewport){
   const fit = () => { const vv = visualViewport, kb = Math.max(0, innerHeight - vv.height - vv.offsetTop);
-    sheet.style.bottom = (kb + 8) + "px"; sheet.style.height = kb > 0 ? `min(635px, ${vv.height - 20}px)` : ""; };
+    sheet.style.bottom = (kb + 8) + "px"; fitSheet(true); };
   visualViewport.addEventListener("resize", fit); visualViewport.addEventListener("scroll", fit);
 }
 
