@@ -233,27 +233,69 @@ body.locked{overflow:hidden}
 .poll3d span,.sheetArt span{display:block;position:relative;overflow:hidden;transform:rotate(25deg)}
 .poll3d span{width:72px;height:72px}
 .poll3d img,.sheetArt img{position:absolute;left:-17.57%;top:-16.32%;width:131.17%;height:131.17%;max-width:none}
-.track{position:relative;width:calc(100% - 28px);max-width:364px;height:98px;touch-action:pan-y;transition:height .3s}
-.bar{position:absolute;left:8px;right:0;top:39.5px;height:4px;border-radius:50px;background:#f5f5f5}
-.bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:50px;background:var(--accent);opacity:.9}
-.dot{position:absolute;top:35.5px;width:12px;height:12px;margin-left:-6px;border-radius:50px;background:#f5f5f5;transition:background .25s,transform .25s}
-.dot.mine{background:var(--accent)}
-.opt{position:absolute;top:55.5px;transform:translateX(-50%);font-weight:700;font-size:20px;letter-spacing:-1px;line-height:1.3;text-align:center;white-space:normal;width:max-content;overflow-wrap:normal;color:var(--text-primary);font-variation-settings:"opsz" 14;padding:0 4px;border-radius:8px;transition:color .2s}
+.track{position:relative;width:calc(100% - 28px);max-width:364px;height:98px;touch-action:pan-y;transition:height .5s cubic-bezier(.2,.9,.25,1)}
+.bar{position:absolute;left:8px;right:0;top:39.5px;height:4px;border-radius:50px;background:#f5f5f5;transition:opacity .35s,transform .45s cubic-bezier(.4,0,.2,1);transform-origin:left center}
+/* trail behind your photo, as in Figma: purple 30% fading to grey */
+.bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:50px;background:linear-gradient(90deg,rgba(107,43,245,.3),rgba(245,245,245,.3))}
+.bar .ghost{position:absolute;left:0;top:0;bottom:0;width:46px;border-radius:50px;background:linear-gradient(90deg,rgba(107,43,245,.3),rgba(245,245,245,.3));transform-origin:left;transform:scaleX(.17);opacity:0}
+.dot{position:absolute;top:35.5px;width:12px;height:12px;margin-left:-6px;border-radius:50px;background:#f5f5f5;transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.6)}
+.dot.passed{opacity:0;transform:scale(.4)}
+.opt{position:absolute;top:55.5px;transform:translateX(-50%);font-weight:700;font-size:20px;letter-spacing:-1px;line-height:1.3;text-align:center;white-space:normal;width:max-content;overflow-wrap:normal;color:var(--text-primary);font-variation-settings:"opsz" 14;padding:0 4px;border-radius:8px;
+  transition:left .6s cubic-bezier(.2,.9,.25,1),top .5s cubic-bezier(.2,.9,.25,1),opacity .4s,font-size .45s cubic-bezier(.2,.9,.3,1.3)}
 .opt em{display:block;font-style:normal;font-size:16px;line-height:1.2;letter-spacing:0}
-.opt.mine{color:var(--accent)}
-.track.many .opt{font-size:16px;letter-spacing:-.6px}
-.voters{position:absolute;top:-.5px;height:24px;display:flex;transform:translateX(-50%)}
-.voters img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px;background:#eee;animation:pop .45s cubic-bezier(.2,.9,.3,1.4) both}
+.opt.hot{animation:hot .32s cubic-bezier(.2,.9,.3,1.6)}
+@keyframes hot{50%{transform:translateX(-50%) scale(1.1)}}
+.voters{position:absolute;top:-.5px;height:24px;display:flex;align-items:center;transform:translateX(-50%);transition:left .6s cubic-bezier(.2,.9,.25,1),opacity .4s}
+.voters img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px;background:#eee;flex:none;animation:pop .45s cubic-bezier(.2,.9,.3,1.4) both}
 .voters img:first-child{margin-left:0}
+.voters img.meVote{animation:none;position:relative;z-index:2}
 @keyframes pop{from{transform:scale(0) translateY(10px);opacity:0}}
-.meDot{position:absolute;top:25.5px;left:0;width:32px;height:32px;margin-left:-16px;border-radius:50%;overflow:hidden;cursor:grab;touch-action:none;z-index:2;
-  box-shadow:0 0 0 2px #fff,0 2px 8px rgba(0,0,0,.18);transition:left .5s cubic-bezier(.2,.9,.25,1.2)}
-.meDot.drag{transition:none;cursor:grabbing;transform:scale(1.12)}
-.meDot img{width:100%;height:100%;object-fit:cover}
-.meDot::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--accent);opacity:0;animation:nudge 2.4s 1.2s ease-out infinite}
-.meDot.voted::after{display:none}
-@keyframes nudge{0%{transform:scale(.8);opacity:.7}70%,100%{transform:scale(1.25);opacity:0}}
+.meDot{position:absolute;top:25.5px;left:0;width:32px;height:32px;margin-left:-16px;border-radius:50%;overflow:hidden;cursor:grab;touch-action:none;z-index:3;
+  box-shadow:0 0 0 2px #fff,0 2px 8px rgba(0,0,0,.18);transition:left .28s cubic-bezier(.2,.9,.25,1.15),transform .2s}
+.meDot.drag{transition:transform .2s;cursor:grabbing;transform:scale(1.12)}
+.meDot img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+/* idle hint: the photo slides right on its own twice, then rests */
+.meDot.idle{animation:nudge 4.6s 1.4s infinite}
+.track.idleHint .ghost{animation:ghost 4.6s 1.4s infinite}
+@keyframes nudge{0%{translate:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}11%{translate:38px 0;animation-timing-function:cubic-bezier(.45,0,.25,1)}22%{translate:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}33%{translate:38px 0;animation-timing-function:cubic-bezier(.45,0,.25,1)}44%,100%{translate:0}}
+@keyframes ghost{0%{transform:scaleX(.17);opacity:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}11%{transform:scaleX(1);animation-timing-function:cubic-bezier(.45,0,.25,1)}22%{transform:scaleX(.17);animation-timing-function:cubic-bezier(.45,0,.25,1)}33%{transform:scaleX(1);animation-timing-function:cubic-bezier(.45,0,.25,1)}44%{transform:scaleX(.17);opacity:1}45%,100%{opacity:0}}
 
+/* settle: options spread to the edges, the line goes, the winner gets big */
+.pollCard.spread .dot{opacity:0;transform:scale(.4)}
+.pollCard.lineGone .bar{opacity:0;transform:scaleX(.6)}
+.pollCard.lineGone .meDot{display:none}
+.pollCard.final .track{height:83px}
+.pollCard.final .opt{top:36.5px;opacity:.4}
+.pollCard.final .opt.win{top:32.5px;opacity:1;font-size:24px}
+.pollCard.final .voters.lose{opacity:.5}
+.pollCard.final .pollHead{min-height:59px;padding:8px 12px;gap:4px}
+.pollCard.final .pollQ{font-size:16px;padding-right:52px;-webkit-line-clamp:2}
+.pollCard.final .pollMeta i,.pollCard.final .pollMeta span{opacity:0;max-width:0;margin-left:-8px}
+.pollMeta i,.pollMeta span{transition:opacity .3s,max-width .4s,margin .4s;max-width:200px;overflow:hidden;white-space:nowrap}
+.pollHead,.pollQ{transition:padding .45s cubic-bezier(.2,.9,.25,1),font-size .45s cubic-bezier(.2,.9,.25,1),min-height .45s cubic-bezier(.2,.9,.25,1)}
+.poll3d{transition:right .5s cubic-bezier(.2,.9,.25,1),top .5s cubic-bezier(.2,.9,.25,1)}
+.poll3d span{transition:width .5s cubic-bezier(.2,.9,.3,1.3),height .5s cubic-bezier(.2,.9,.3,1.3),transform .5s}
+.pollCard.final .poll3d{right:-10px;top:-10px}
+.pollCard.final .poll3d span{width:46px;height:46px;transform:rotate(15deg)}
+.pollCtaWrap{width:100%;display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.9,.25,1),margin .55s;margin-top:-24px}
+.pollCtaWrap>div{min-height:0;overflow:hidden;display:flex;justify-content:center}
+.pollCard.final .pollCtaWrap{grid-template-rows:1fr;margin-top:-8px}
+.pollCard.final .pollBox{padding-bottom:16px}
+.pollBox{transition:padding .45s}
+.pollCta{position:relative;width:calc(100% - 24px);max-width:364px;height:48px;margin:2px 0 0;display:flex;align-items:center;justify-content:center;gap:4px;background:#101010;color:#fff;
+  font-weight:700;font-size:18px;letter-spacing:-.3px;font-variation-settings:"opsz" 14;overflow:hidden;opacity:0;transform:translateY(10px) scale(.96);transition:opacity .4s .15s,transform .55s .15s cubic-bezier(.2,.9,.3,1.3)}
+.pollCard.final .pollCta{opacity:1;transform:none}
+.pollCta:active{transform:scale(.98)}
+.pollCta::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);pointer-events:none}
+.pollCta.shine::after{animation:shine 1.1s .55s cubic-bezier(.4,0,.2,1)}
+@keyframes shine{to{left:130%}}
+.spark{position:relative;width:24px;height:24px;flex:none;display:block}
+.spark img{width:24px;height:24px;transform:scale(0) rotate(-90deg)}
+.pollCta.shine .spark img{animation:starIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, twinkle 2.8s 1.6s ease-in-out infinite}
+@keyframes starIn{to{transform:scale(1) rotate(0)}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0);filter:drop-shadow(0 0 0 rgba(255,255,255,0))}12%{transform:scale(1.25) rotate(18deg);filter:drop-shadow(0 0 6px rgba(255,255,255,.9))}24%{transform:scale(1) rotate(0)}}
+.spark i{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;background:#fff;opacity:0;
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
 /* ---------- Create a Poll sheet (Figma "Add a poll" / "Poll Value Added") ---------- */
 .scrim{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.7);opacity:0;transition:opacity .35s}
 .scrim.show{opacity:1}
@@ -377,6 +419,7 @@ body.locked{overflow:hidden}
               <div class="poll3d" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
             </div>
             <div class="track" id="track" role="radiogroup" aria-label="Your vote"></div>
+            <div class="pollCtaWrap"><div><button type="button" class="pollCta" id="pollCta" data-sq="16" tabindex="-1"><span id="pollCtaText">Make a trip</span><span class="spark" aria-hidden="true"><img src="assets/sparkle-white.svg" alt=""></span></button></div></div>
           </div>
           <div class="pollEdge" data-ring="20"></div>
         </div>
@@ -850,15 +893,25 @@ let poll = null, voteTimers = [];
 // "Japan 🇯🇵" -> name on the first line, flag on the second, as in Figma
 const splitLabel = s => { const m = s.match(/^(.*?)\s*((?:\p{Regional_Indicator}{2}|\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*)+)$/u); return m && m[1] ? [m[1], m[2]] : [s, ""]; };
 
+const pollCard = pollSlot.querySelector(".pollCard"), pollCta = document.getElementById("pollCta"), pollCtaText = document.getElementById("pollCtaText");
+
+// Haptics: Android uses vibrate. iPhone Safari has no vibrate, but tapping an iOS switch gives a system tick, so we tap a hidden one.
+const hapticSwitch = (() => { const l = document.createElement("label"); l.setAttribute("aria-hidden", "true");
+  l.style.cssText = "position:fixed;left:-100px;top:0;opacity:0;pointer-events:none";
+  const i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1; l.appendChild(i); document.body.appendChild(l); return l; })();
+function haptic(ms = 10){ if (navigator.vibrate) navigator.vibrate(ms); else { try { hapticSwitch.click(); } catch(e){} } }
+
 function showPoll(q, labels){
   voteTimers.forEach(clearTimeout); voteTimers = [];
-  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, waiting: FRIENDS.length };
+  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, committed: false, waiting: FRIENDS.length, stage: "live" };
   pollQ.textContent = q;
-  track.innerHTML = `<div class="bar"><i class="fill"></i></div>` +
+  pollCard.classList.remove("spread", "lineGone", "final");
+  pollCta.classList.remove("shine"); pollCta.tabIndex = -1;
+  track.innerHTML = `<div class="bar"><i class="ghost"></i><i class="fill"></i></div>` +
     poll.opts.map((o, i) => { const [n, e] = splitLabel(o.label);
       return `<i class="dot"></i><div class="voters"></div><button type="button" class="opt" role="radio" aria-checked="false" data-i="${i}">${esc(n)}${e ? `<em>${e}</em>` : ""}</button>`; }).join("") +
-    `<div class="meDot" role="slider" tabindex="0" aria-label="Drag to vote" aria-valuemin="0" aria-valuemax="${labels.length}" aria-valuenow="0"><img src="${ME}" alt=""></div>`;
-  track.classList.toggle("many", labels.length >= 4);
+    `<div class="meDot idle" role="slider" tabindex="0" aria-label="Drag your photo to an option to vote" aria-valuemin="0" aria-valuemax="${labels.length}" aria-valuenow="0"><img src="${ME}" alt=""></div>`;
+  track.classList.add("idleHint");
   pollSlot.hidden = false; pollSlot.classList.remove("on", "settled");
   requestAnimationFrame(() => requestAnimationFrame(() => { pollSlot.classList.add("on"); layoutTrack(); }));
   setTimeout(() => pollSlot.classList.add("settled"), 650);
@@ -867,76 +920,147 @@ function showPoll(q, labels){
   FRIENDS.forEach((src, k) => voteTimers.push(setTimeout(() => {
     const n = poll.opts.length, i = k < 3 ? Math.min(1, n - 1) : (n > 2 ? n - 1 : 0);
     const img = new Image(); img.src = src; img.alt = "";
-    track.querySelectorAll(".voters")[i].appendChild(img);
-    poll.opts[i].voters.push(src); poll.waiting--; updateStatus();
+    track.querySelectorAll(".voters")[i].prepend(img);
+    poll.opts[i].voters.push(src); poll.waiting--; updateStatus(); maybeSettle();
   }, 1600 + k * 1300)));
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 // Option x positions follow the Figma track (364 wide): you start at 16, options spread to 332
-function optX(){ const W = track.clientWidth, n = poll.opts.length, a = n === 2 ? 180 : n >= 4 ? 100 : 137, b = 332;
+function optX(){ const W = track.clientWidth, n = poll.opts.length, a = n === 2 ? 180 : 137, b = 332;
   return poll.opts.map((_, i) => (n === 1 ? b : a + i * (b - a) / (n - 1)) * W / 364); }
+// After voting the options spread out: first at the left edge, last at the right edge (Figma frames 5 and 6)
+function spreadX(){ const W = track.clientWidth, n = poll.opts.length;
+  if (n === 2) return [W * .27, W * .73];
+  return poll.opts.map((_, i) => i === 0 ? 30 * W / 364 : i === n - 1 ? 344 * W / 364 : W / 2); }
 const startX = () => 16 * track.clientWidth / 364;
+let meX = 0;
 function layoutTrack(){
   if (!poll || !track.clientWidth) return;
-  const xs = optX();
-  track.querySelectorAll(".dot").forEach((d, i) => d.style.left = xs[i] + "px");
-  const W = track.clientWidth; let bottom = 0;
+  const spread = poll.stage !== "live", xs = spread ? spreadX() : optX(), W = track.clientWidth;
+  optX().forEach((x, i) => track.querySelectorAll(".dot")[i].style.left = x + "px");
+  let bottom = 0;
   track.querySelectorAll(".opt").forEach((d, i) => {
     d.style.left = xs[i] + "px";
     const gap = Math.min(i > 0 ? xs[i] - xs[i - 1] : Infinity, i < xs.length - 1 ? xs[i + 1] - xs[i] : Infinity);
-    const maxW = Math.min(gap - 8, 2 * (W - xs[i] + 12));
+    const maxW = Math.min(gap - 8, 2 * (W - xs[i] + 12), 2 * (xs[i] + 12));
     d.style.maxWidth = maxW + "px"; d.style.fontSize = ""; d.style.overflowWrap = "";
+    if (poll.stage === "final") return;            // final sizes come from CSS so the winner can grow
     let fs = parseFloat(getComputedStyle(d).fontSize);
     while (d.scrollWidth > maxW + 1 && fs > 15){ fs -= 1; d.style.fontSize = fs + "px"; }
-    // still too wide (one long made-up word): let it break onto a second line instead of overlapping
     if (d.scrollWidth > maxW + 1) d.style.overflowWrap = "anywhere";
     bottom = Math.max(bottom, d.offsetTop + d.offsetHeight);
   });
-  track.style.height = Math.max(98, bottom + 4) + "px";
+  if (poll.stage !== "final") track.style.height = Math.max(98, bottom + 4) + "px"; else track.style.height = "";
   track.querySelectorAll(".voters").forEach((d, i) => d.style.left = xs[i] + "px");
-  placeMe(poll.mine < 0 ? startX() : xs[poll.mine]);
+  if (!poll.committed) placeMe(poll.mine < 0 ? startX() : optX()[poll.mine]);
 }
-function placeMe(x){
+// Moves your photo, grows the trail, hides the dots you pass, and ticks when you cross an option
+let zone = 0;
+function placeMe(x, live){
+  meX = x;
   track.querySelector(".meDot").style.left = x + "px";
   track.querySelector(".fill").style.width = Math.max(0, x - 8) + "px";
+  const xs = optX(); let z = 0;
+  track.querySelectorAll(".dot").forEach((d, i) => { const past = x >= xs[i] - 3; d.classList.toggle("passed", past); if (past) z = i + 1; });
+  if (live && z !== zone){
+    haptic(z > zone ? 12 : 8);
+    const o = track.querySelectorAll(".opt")[Math.max(z, zone) - 1];
+    if (o){ o.classList.remove("hot"); void o.offsetWidth; o.classList.add("hot"); }
+  }
+  zone = z;
 }
+function setIdle(on){ track.querySelector(".meDot").classList.toggle("idle", on); track.classList.toggle("idleHint", on); }
+
+// Commit a vote: photo snaps to the dot, then hops into that option's stack, big first, then settles to 24px with a bounce
 function vote(i){
-  poll.mine = i;
-  track.querySelectorAll(".dot").forEach((d, k) => d.classList.toggle("mine", k === i));
-  track.querySelectorAll(".opt").forEach((d, k) => { d.classList.toggle("mine", k === i); d.setAttribute("aria-checked", k === i); });
-  const me = track.querySelector(".meDot"); me.classList.toggle("voted", i >= 0); me.setAttribute("aria-valuenow", i + 1);
-  layoutTrack(); updateStatus();
-  if (navigator.vibrate) navigator.vibrate(8);
+  if (!poll || poll.committed) return;
+  if (i < 0){ poll.mine = -1; placeMe(startX()); setIdle(true); return; }
+  poll.mine = i; poll.committed = true; setIdle(false);
+  track.querySelectorAll(".opt").forEach((d, k) => d.setAttribute("aria-checked", k === i));
+  const me = track.querySelector(".meDot"); me.setAttribute("aria-valuenow", i + 1);
+  placeMe(optX()[i]); haptic(14);
+  setTimeout(() => {
+    const from = me.getBoundingClientRect();
+    const img = new Image(); img.src = ME; img.alt = "You"; img.className = "meVote";
+    img.style.width = img.style.height = "32px";
+    track.querySelectorAll(".voters")[i].appendChild(img);
+    me.style.visibility = "hidden";
+    const to = img.getBoundingClientRect();
+    const dx = from.left + from.width / 2 - (to.left + to.width / 2), dy = from.top + from.height / 2 - (to.top + to.height / 2);
+    const fly = img.animate([{transform: `translate(${dx}px, ${dy}px) scale(1.1)`}, {transform: "translate(0,0) scale(1.18)", offset: .7}, {transform: "none"}],
+      {duration: 460, easing: "cubic-bezier(.3,.7,.3,1)"});
+    fly.onfinish = () => {
+      haptic(10);
+      img.animate([{width: "32px", height: "32px"}, {width: "21px", height: "21px", offset: .55}, {width: "25.5px", height: "25.5px", offset: .8}, {width: "24px", height: "24px"}],
+        {duration: 520, easing: "ease-out"}).onfinish = () => { img.style.width = img.style.height = "24px"; };
+      poll.opts[i].voters.push(ME); updateStatus();
+      setTimeout(maybeSettle, 450);
+    };
+  }, 260);
 }
 function updateStatus(){
-  const n = poll.waiting + (poll.mine < 0 ? 1 : 0);
+  const n = poll.waiting + (poll.committed ? 0 : 1);
   pollStatus.textContent = n ? `${n} vote${n > 1 ? "s" : ""} pending` : "Everyone voted";
   pollStatus.classList.toggle("done", !n);
 }
+// Once everyone (you included) has voted: spread the options, drop the line, crown the winner, offer the trip
+function maybeSettle(){
+  if (!poll || !poll.committed || poll.waiting > 0 || poll.stage !== "live" || !poll.opts[poll.mine].voters.includes(ME)) return;
+  let win = poll.mine; poll.opts.forEach((o, k) => { if (o.voters.length > poll.opts[win].voters.length) win = k; });
+  poll.win = win; poll.stage = "spread";
+  pollCard.classList.add("spread"); layoutTrack();
+  setTimeout(() => { pollCard.classList.add("lineGone"); }, 650);
+  setTimeout(() => {
+    poll.stage = "final";
+    track.querySelectorAll(".opt").forEach((d, k) => d.classList.toggle("win", k === win));
+    track.querySelectorAll(".voters").forEach((d, k) => d.classList.toggle("lose", k !== win));
+    pollCtaText.textContent = `Make a ${splitLabel(poll.opts[win].label)[0]} Trip`;
+    pollCard.classList.add("final"); layoutTrack();
+    pollCta.tabIndex = 0; pollCta.classList.add("shine"); haptic(18);
+    burst();
+  }, 1150);
+}
+// A few tiny stars pop out of the sparkle when the button lands
+function burst(){
+  const spark = pollCta.querySelector(".spark");
+  spark.querySelectorAll("i").forEach(n => n.remove());
+  for (let k = 0; k < 7; k++){
+    const p = document.createElement("i"); spark.appendChild(p);
+    const ang = (k / 7) * Math.PI * 2 + Math.random() * .5, d = 16 + Math.random() * 14, sz = .6 + Math.random() * .8;
+    p.animate([{opacity: 0, transform: "translate(0,0) scale(0) rotate(0)"},
+               {opacity: 1, transform: `translate(${Math.cos(ang) * d * .6}px, ${Math.sin(ang) * d * .6}px) scale(${sz}) rotate(45deg)`, offset: .35},
+               {opacity: 0, transform: `translate(${Math.cos(ang) * d}px, ${Math.sin(ang) * d}px) scale(0) rotate(90deg)`}],
+      {duration: 800 + Math.random() * 300, delay: 650 + k * 25, easing: "cubic-bezier(.2,.8,.3,1)", fill: "both"});
+  }
+}
+pollCta.addEventListener("click", () => { burst(); say("Trip planning is coming next"); });
 new ResizeObserver(layoutTrack).observe(track);
 
-track.addEventListener("click", e => { const b = e.target.closest(".opt"); if (b) vote(+b.dataset.i); });
-// Drag your avatar along the line and let go near an option
+track.addEventListener("click", e => { const b = e.target.closest(".opt"); if (b && poll.stage === "live") vote(+b.dataset.i); });
+// Drag your photo along the line and let go near an option
 track.addEventListener("pointerdown", e => {
-  const me = e.target.closest(".meDot"); if (!me) return;
-  e.preventDefault(); me.setPointerCapture(e.pointerId); me.classList.add("drag");
+  const me = e.target.closest(".meDot"); if (!me || poll.committed) return;
+  e.preventDefault(); me.setPointerCapture(e.pointerId); me.classList.add("drag"); setIdle(false);
   const r = track.getBoundingClientRect(), xs = optX(), lo = startX(), hi = xs[xs.length - 1];
-  const move = ev => placeMe(Math.max(lo, Math.min(hi, ev.clientX - r.left)));
-  const up = ev => {
+  const x0 = e.clientX - r.left - meX;
+  const move = ev => placeMe(Math.max(lo, Math.min(hi, ev.clientX - r.left - x0)), true);
+  const up = () => {
     me.removeEventListener("pointermove", move); me.removeEventListener("pointerup", up); me.removeEventListener("pointercancel", up);
     me.classList.remove("drag");
-    const x = ev.clientX - r.left, all = [lo, ...xs];
-    let best = 0; all.forEach((v, k) => { if (Math.abs(v - x) < Math.abs(all[best] - x)) best = k; });
+    const all = [lo, ...xs]; let best = 0;
+    all.forEach((v, k) => { if (Math.abs(v - meX) < Math.abs(all[best] - meX)) best = k; });
     vote(best - 1);
   };
   me.addEventListener("pointermove", move); me.addEventListener("pointerup", up); me.addEventListener("pointercancel", up);
 });
 track.addEventListener("keydown", e => {
-  if (!e.target.closest(".meDot")) return;
-  const n = poll.opts.length;
-  if (e.key === "ArrowRight") { e.preventDefault(); vote(Math.min(n - 1, poll.mine + 1)); }
-  if (e.key === "ArrowLeft") { e.preventDefault(); vote(Math.max(-1, poll.mine - 1)); }
+  if (!e.target.closest(".meDot") || poll.committed) return;
+  const n = poll.opts.length, cur = zone - 1;
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft"){ e.preventDefault(); setIdle(false);
+    const next = Math.max(-1, Math.min(n - 1, cur + (e.key === "ArrowRight" ? 1 : -1)));
+    placeMe(next < 0 ? startX() : optX()[next], true); }
+  if ((e.key === "Enter" || e.key === " ") && cur >= 0){ e.preventDefault(); vote(cur); }
 });
 
 /* ---------- Create a Poll sheet ---------- */
