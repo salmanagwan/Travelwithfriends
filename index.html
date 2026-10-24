@@ -23,7 +23,7 @@ body{overflow-x:hidden}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 img,video{display:block}
 
-.phone{position:relative;width:100%;max-width:428px;margin:0 auto;background:var(--page);overflow:hidden;padding-bottom:56px}
+.phone{position:relative;width:100%;max-width:428px;margin:0 auto;background:var(--page);overflow:hidden;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .status{display:none}
 @media (min-width:600px){
   html,body{background:var(--desk)}
@@ -37,9 +37,9 @@ img,video{display:block}
 .mapfade{position:absolute;left:0;top:0;width:100%;height:359px;overflow:hidden;pointer-events:none;
   -webkit-mask-image:radial-gradient(205px 225px at 50% -45px,#000 0%,transparent 100%);
           mask-image:radial-gradient(205px 225px at 50% -45px,#000 0%,transparent 100%)}
-.mapfade img{position:absolute;left:calc(50% + 13px);transform:translateX(-50%);width:892px;height:453px;object-fit:cover;max-width:none}
-.mapfade img:nth-child(1){top:-178px}
-.mapfade img:nth-child(2){top:212px}
+.mapfade img{position:absolute;transform:translateX(-50%);object-fit:cover;max-width:none}
+.mapfade img:nth-child(1){left:calc(50% + 30px);top:-98px;width:884px;height:529px}
+.mapfade img:nth-child(2){left:calc(50% + 13px);top:212px;width:892px;height:453px}
 
 .content{position:relative;z-index:1;display:flex;flex-direction:column;gap:40px}
 .top{display:flex;flex-direction:column;gap:12px;padding-top:max(12px, env(safe-area-inset-top))}
@@ -48,8 +48,13 @@ img,video{display:block}
 .logo{width:147.6px;height:40px;position:relative;overflow:hidden}
 .logo img{position:absolute;height:207.73%;width:112.56%;left:-7.04%;top:-53.16%;max-width:none}
 .actions{display:flex;gap:12px;align-items:center}
-.aiBtn{width:40px;height:40px;border-radius:32px;display:grid;place-items:center;overflow:hidden;
-  background:rgba(255,255,255,.1);border:.3px solid rgba(24,24,24,.9);box-shadow:0 1px 8px rgba(0,0,0,.1)}
+.aiBtn{width:40px;height:40px;border-radius:32px;display:grid;place-items:center;
+  background:rgba(255,255,255,.1);box-shadow:0 1px 8px rgba(0,0,0,.1)}
+.aiBtn.glass::after{box-shadow:inset 1px 1px .5px -.4px rgba(255,255,255,.9), inset -1px -1px .5px -.4px rgba(255,255,255,.5)}
+/* gradient hairline, as in Figma: dark at the top-left, clear in the middle, dark again at the bottom-right */
+.ring::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.45px;pointer-events:none;z-index:2;
+  background:linear-gradient(145deg,rgba(26,26,26,.9) -24%,rgba(23,23,23,0) 50%,rgba(23,23,23,.7) 124%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .aiBtn span{width:23.5px;height:24px;position:relative;overflow:hidden;display:block}
 .aiBtn img{position:absolute;height:131.17%;width:133.83%;left:-17.93%;top:-16.32%;max-width:none}
 .me{width:40px;height:40px;border-radius:50%;object-fit:cover}
@@ -68,7 +73,8 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
   -webkit-backdrop-filter:saturate(1.5) brightness(1.06);
           backdrop-filter:url(#lg) saturate(1.5) brightness(1.06)}
 .glass.disperse{backdrop-filter:url(#lgd) saturate(1.6) brightness(1.08)}
-@supports (-webkit-hyphens:none){ .glass,.glass.disperse{backdrop-filter:blur(.6px) saturate(1.6) brightness(1.08)} }
+.glass.strong{backdrop-filter:url(#lgs) saturate(1.7) brightness(1.08)}
+@supports (-webkit-hyphens:none){ .glass,.glass.disperse,.glass.strong{backdrop-filter:blur(.6px) saturate(1.6) brightness(1.08)} }
 .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   box-shadow:inset 1px 1px .5px -.4px rgba(255,255,255,.8), inset -1px -1px .5px -.4px rgba(255,255,255,.4), inset 0 0 5px rgba(255,255,255,.06)}
 
@@ -81,9 +87,11 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .reel .poster{z-index:0}
 .reel video{z-index:1;opacity:0;transition:opacity .35s}
 .reel video.ready{opacity:1}
+.cardRim{position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:linear-gradient(145deg,rgba(255,255,255,.9) -24%,rgba(255,255,255,0) 50%,rgba(255,255,255,.7) 124%)}
 .reel .topShade{position:absolute;left:0;right:0;top:0;height:57px;z-index:2;pointer-events:none;background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,0))}
 .creator{position:absolute;z-index:3;display:flex;align-items:center;gap:8px;left:12px;top:12px;overflow:hidden}
-.creator img{width:32px;height:32px}
+.creator img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #fff;background:#fac799}
 .creator span{font-weight:500;font-size:13px;line-height:17px;letter-spacing:-.2px;white-space:nowrap}
 .save{position:absolute;z-index:3;right:12px;top:12px;width:40px;height:40px;border-radius:20px;display:grid;place-items:center;transition:transform .2s}
 .save img{width:20px;height:20px;transition:filter .2s}
@@ -115,7 +123,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .row::-webkit-scrollbar{display:none}
 .row .slot{position:relative;flex:none;width:168px;height:268px;scroll-snap-align:start}
 .row .creator{left:8px;top:8px}
-.row .creator img{width:24px;height:24px}
+.row .creator img{width:24px;height:24px;border-width:1.5px}
 .row .creator span{font-size:12px;line-height:15px;width:96px;overflow:hidden;text-overflow:ellipsis}
 .row .save{left:128px;right:auto;top:8px;width:32px;height:32px;border-radius:20px}
 .row .save img{width:16px;height:16px}
@@ -128,7 +136,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .deckWrap{padding:0 20px;height:500px}
 .deck{position:relative;width:388px;height:410px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:pointer;transform-origin:left top}
 .deck .slot{transition:left .6s cubic-bezier(.2,.9,.2,1),top .6s cubic-bezier(.2,.9,.2,1),width .6s cubic-bezier(.2,.9,.2,1),height .6s cubic-bezier(.2,.9,.2,1),transform .45s cubic-bezier(.4,0,.2,1),opacity .4s}
-.deck .frame,.deck .reel{transition:clip-path .6s cubic-bezier(.2,.9,.2,1)}
+.deck .frame,.deck .reel,.deck .cardRim{transition:clip-path .6s cubic-bezier(.2,.9,.2,1)}
 .deck .slot[data-slot="0"]{left:0;top:0;width:328px;height:500px;z-index:5;filter:drop-shadow(0 0 20px rgba(0,0,0,.1))}
 .deck .slot[data-slot="0"] .frame{background:#f4f4f4}
 .deck .slot[data-slot="1"]{left:58px;top:16px;width:302px;height:468px;z-index:4}
@@ -143,6 +151,29 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 @media (max-width:427px){ .deck{transform:scale(calc((100vw - 40px) / 388px))} .deckWrap{height:calc(500px * (100vw - 40px) / 388px)} }
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- Bottom navigation, as in the "Home Small Viewport" frame ---------- */
+.navWrap{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:428px;z-index:50;pointer-events:none;
+  height:calc(111px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to bottom,rgba(255,255,255,0) 12.9%,#fff 91.3%);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 35%);mask-image:linear-gradient(to bottom,transparent 0%,#000 35%)}
+.tabbar{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);height:96px;display:flex;gap:10px;align-items:flex-start;padding:8px 20px 0;pointer-events:auto}
+.capsule{flex:1;min-width:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:6px;border-radius:32px;
+  background:rgba(196,196,196,.28);border:1px solid rgba(255,255,255,.9)}
+.tab{flex:1;min-width:0;height:52px;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:background .25s}
+.tab img{width:24px;height:24px}
+.tab span{font-size:11px;font-weight:500;color:#333;font-variation-settings:"opsz" 14}
+.tab[aria-current="page"]{background:rgba(255,255,255,.6)}
+.tab[aria-current="page"] span{font-weight:700;color:#6b2bf5}
+.tab:active{transform:scale(.96)}
+.aiTab{position:relative;width:64px;height:64px;flex:none}
+.aiTab .glow{position:absolute;left:-7px;top:-7px;width:78px;height:78px;pointer-events:none}
+.aiTab .disc{position:absolute;inset:0;border-radius:32px;background:rgba(255,255,255,.6);display:grid;place-items:center}
+.aiTab .disc img{width:28px;height:28px}
+.toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);opacity:0;z-index:60;
+  background:rgba(17,18,20,.86);color:#fff;font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
@@ -165,12 +196,23 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
       <feBlend in="rr" in2="gg" mode="screen" result="rg"/>
       <feBlend in="rg" in2="bb" mode="screen"/>
     </filter>
+    <filter id="lgs" x="0" y="0" width="1" height="1" filterUnits="objectBoundingBox" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feImage id="lgsMap" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="0.16" xChannelSelector="R" yChannelSelector="G" result="r"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="0.12" xChannelSelector="R" yChannelSelector="G" result="g"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="0.08" xChannelSelector="R" yChannelSelector="G" result="b"/>
+      <feColorMatrix in="r" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="rr"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="gg"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="bb"/>
+      <feBlend in="rr" in2="gg" mode="screen" result="rg"/>
+      <feBlend in="rg" in2="bb" mode="screen"/>
+    </filter>
   </defs>
 </svg>
 
 <main class="phone">
   <div class="mapfade" aria-hidden="true">
-    <img src="assets/map.jpg" alt="">
+    <img src="assets/map-thailand.jpg" alt="">
     <img src="assets/map.jpg" alt="">
   </div>
 
@@ -187,7 +229,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
       <header class="header">
         <div class="logo"><img src="assets/logo.png" alt="Sidequest"></div>
         <div class="actions">
-          <button class="aiBtn" aria-label="Smart search"><span><img src="assets/ai-badge.png" alt=""></span></button>
+          <button class="aiBtn glass disperse strong ring" aria-label="Smart search"><span><img src="assets/ai-badge.png" alt=""></span></button>
           <img class="me" src="assets/avatar.png" alt="Your profile">
         </div>
       </header>
@@ -214,38 +256,53 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
       </section>
     </div>
   </div>
+  <nav class="navWrap" aria-label="Main">
+    <div class="tabbar">
+      <div class="capsule glass">
+        <button class="tab" aria-current="page"><img src="assets/tab-home.svg" alt=""><span>Home</span></button>
+        <button class="tab" data-soon="Trips"><img src="assets/tab-trips.svg" alt=""><span>Trips</span></button>
+        <button class="tab" data-soon="Collection"><img src="assets/tab-collection.svg" alt=""><span>Collection</span></button>
+        <button class="tab" data-soon="Explore"><img src="assets/tab-explore.svg" alt=""><span>Explore</span></button>
+      </div>
+      <button class="aiTab" data-soon="Smart search" aria-label="Smart search">
+        <img class="glow" src="assets/ai-glow.png" alt="">
+        <span class="disc glass"><img src="assets/tab-ai.svg" alt=""></span>
+      </button>
+    </div>
+  </nav>
+  <div class="toast" id="toast" role="status"></div>
 </main>
 
 <script>
 /* ---------- Sample content (videos from the Figma frame plus extra Thailand reels) ---------- */
 const TRENDING = [
-  {v:"hero", h:"@wanderwithtara", t:"4 days in Bangkok in ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
-  {v:"date-spot", h:"@wanderwithtara", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
-  {v:"hidden-cafe", h:"@islandhops", t:"Hidden cafe with a sea view", d:"1 day", s:"6 spots", w:"640k"},
-  {v:"magical-cafes", h:"@cafecompass", t:"10 fairytale cafes in Thailand", d:"5 days", s:"10 spots", w:"2.1M"},
-  {v:"wildchild", h:"@samuisoul", t:"A day with elephants in Samui", d:"1 day", s:"4 spots", w:"880k"},
-  {v:"fire-show", h:"@nightsinthai", t:"Fire shows worth staying up for", d:"3 days", s:"7 spots", w:"410k"},
-  {v:"samui-cafes", h:"@slowsips", t:"Samui's prettiest cafes", d:"2 days", s:"9 spots", w:"920k"},
-  {v:"blue-ocean", h:"@wanderwithtara", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"}
+  {v:"hero", h:"@wanderwithtara", p:"https://randomuser.me/api/portraits/women/44.jpg", t:"4 days in Bangkok in ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
+  {v:"date-spot", h:"@samui.sunsets", p:"https://randomuser.me/api/portraits/women/68.jpg", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
+  {v:"hidden-cafe", h:"@islandhops", p:"https://randomuser.me/api/portraits/men/32.jpg", t:"Hidden cafe with a sea view", d:"1 day", s:"6 spots", w:"640k"},
+  {v:"magical-cafes", h:"@cafecompass", p:"https://randomuser.me/api/portraits/women/21.jpg", t:"10 fairytale cafes in Thailand", d:"5 days", s:"10 spots", w:"2.1M"},
+  {v:"wildchild", h:"@samuisoul", p:"https://randomuser.me/api/portraits/men/45.jpg", t:"A day with elephants in Samui", d:"1 day", s:"4 spots", w:"880k"},
+  {v:"fire-show", h:"@nightsinthai", p:"https://randomuser.me/api/portraits/men/76.jpg", t:"Fire shows worth staying up for", d:"3 days", s:"7 spots", w:"410k"},
+  {v:"samui-cafes", h:"@meera.eats", p:"https://randomuser.me/api/portraits/women/90.jpg", t:"Samui's prettiest cafes", d:"2 days", s:"9 spots", w:"920k"},
+  {v:"blue-ocean", h:"@arjun.abroad", p:"https://randomuser.me/api/portraits/men/11.jpg", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"}
 ];
 const CAFES = [
-  {v:"elephant-cafe", h:"@slowsips", t:"Cafe hopping in Chiang Mai", d:"2d", s:"9", w:"1.2M"},
-  {v:"blue-ocean", h:"@slowsips", t:"Hidden cafes of Kyoto", d:"2d", s:"9", w:"1.2M"},
-  {v:"sea-breeze", h:"@slowsips", t:"Rome's best espresso bars", d:"2d", s:"9", w:"1.2M"},
-  {v:"samui-cafes", h:"@slowsips", t:"Koh Samui cafe crawl", d:"2d", s:"8", w:"920k"},
-  {v:"foodie", h:"@slowsips", t:"Foodie Samui in a day", d:"1d", s:"6", w:"530k"},
-  {v:"babou", h:"@slowsips", t:"Sunset terrace at Babou", d:"1d", s:"3", w:"300k"}
+  {v:"elephant-cafe", h:"@slowsips", p:"https://randomuser.me/api/portraits/women/12.jpg", t:"Cafe hopping in Chiang Mai", d:"2d", s:"9", w:"1.2M"},
+  {v:"blue-ocean", h:"@kyoto.kaori", p:"https://randomuser.me/api/portraits/women/57.jpg", t:"Hidden cafes of Kyoto", d:"2d", s:"9", w:"1.2M"},
+  {v:"sea-breeze", h:"@marco.brews", p:"https://randomuser.me/api/portraits/men/52.jpg", t:"Rome's best espresso bars", d:"2d", s:"9", w:"1.2M"},
+  {v:"samui-cafes", h:"@latteandleaves", p:"https://randomuser.me/api/portraits/women/33.jpg", t:"Koh Samui cafe crawl", d:"2d", s:"8", w:"920k"},
+  {v:"foodie", h:"@rohan.tastes", p:"https://randomuser.me/api/portraits/men/22.jpg", t:"Foodie Samui in a day", d:"1d", s:"6", w:"530k"},
+  {v:"babou", h:"@golden.hour.ana", p:"https://randomuser.me/api/portraits/women/79.jpg", t:"Sunset terrace at Babou", d:"1d", s:"3", w:"300k"}
 ];
 const CLUBS = [
-  {v:"club-elephant", h:"@wanderwithtara", t:"4 days in Bangkok in ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
-  {v:"club-list", h:"@wanderwithtara", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
-  {v:"club-green-mango", h:"@wanderwithtara", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
-  {v:"club-ibiza", h:"@nightsinthai", t:"Ibiza nights without leaving Samui", d:"2 days", s:"5 spots", w:"760k"},
-  {v:"club-green-mango-2", h:"@nightsinthai", t:"Green Mango after dark", d:"1 day", s:"3 spots", w:"450k"}
+  {v:"club-elephant", h:"@partywithpriya", p:"https://randomuser.me/api/portraits/women/65.jpg", t:"4 days in Bangkok in ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
+  {v:"club-list", h:"@readytoroam.kai", p:"https://randomuser.me/api/portraits/men/61.jpg", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
+  {v:"club-green-mango", h:"@dj.nikhil", p:"https://randomuser.me/api/portraits/men/83.jpg", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
+  {v:"club-ibiza", h:"@noor.after.dark", p:"https://randomuser.me/api/portraits/women/29.jpg", t:"Ibiza nights without leaving Samui", d:"2 days", s:"5 spots", w:"760k"},
+  {v:"club-green-mango-2", h:"@sam.travels.light", p:"https://randomuser.me/api/portraits/men/36.jpg", t:"Green Mango after dark", d:"1 day", s:"3 spots", w:"450k"}
 ];
 
 /* ---------- iOS continuous corners (Figma corner smoothing 60%) ---------- */
-function squircle(w, h, r, s = 0.6){
+function squircle(w, h, r, s = 0.6, ox = 0, oy = 0){
   const budget = Math.min(w, h) / 2; r = Math.min(r, budget);
   let p = (1 + s) * r; const maxS = budget / r - 1; s = Math.max(0, Math.min(s, maxS)); p = Math.min(p, budget);
   const rad = x => x * Math.PI / 180;
@@ -258,11 +315,13 @@ function squircle(w, h, r, s = 0.6){
   const b = (p - arc - c - d) / 3, a = 2 * b;
   const f = n => +n.toFixed(3);
   const A=f(a), AB=f(a+b), ABC=f(a+b+c), BC=f(b+c), C=f(c), D=f(d), R=f(r), K=f(arc), P=f(p), W=f(w), H=f(h);
-  return `M ${f(W-P)} 0 c ${A} 0 ${AB} 0 ${ABC} ${D} a ${R} ${R} 0 0 1 ${K} ${K} c ${D} ${C} ${D} ${BC} ${D} ${ABC} `+
-         `L ${W} ${f(H-P)} c 0 ${A} 0 ${AB} ${-D} ${ABC} a ${R} ${R} 0 0 1 ${-K} ${K} c ${-C} ${D} ${-BC} ${D} ${-ABC} ${D} `+
-         `L ${P} ${H} c ${-A} 0 ${-AB} 0 ${-ABC} ${-D} a ${R} ${R} 0 0 1 ${-K} ${-K} c ${-D} ${-C} ${-D} ${-BC} ${-D} ${-ABC} `+
-         `L 0 ${P} c 0 ${-A} 0 ${-AB} ${D} ${-ABC} a ${R} ${R} 0 0 1 ${K} ${-K} c ${C} ${-D} ${BC} ${-D} ${ABC} ${-D} Z`;
+  const X = v => f(v + ox), Y = v => f(v + oy);
+  return `M ${X(W-P)} ${Y(0)} c ${A} 0 ${AB} 0 ${ABC} ${D} a ${R} ${R} 0 0 1 ${K} ${K} c ${D} ${C} ${D} ${BC} ${D} ${ABC} `+
+         `L ${X(W)} ${Y(H-P)} c 0 ${A} 0 ${AB} ${-D} ${ABC} a ${R} ${R} 0 0 1 ${-K} ${K} c ${-C} ${D} ${-BC} ${D} ${-ABC} ${D} `+
+         `L ${X(P)} ${Y(H)} c ${-A} 0 ${-AB} 0 ${-ABC} ${-D} a ${R} ${R} 0 0 1 ${-K} ${-K} c ${-D} ${-C} ${-D} ${-BC} ${-D} ${-ABC} `+
+         `L ${X(0)} ${Y(P)} c 0 ${-A} 0 ${-AB} ${D} ${-ABC} a ${R} ${R} 0 0 1 ${K} ${-K} c ${C} ${-D} ${BC} ${-D} ${ABC} ${-D} Z`;
 }
+const ring = (el, w, h, r, t = 1) => { const d = squircle(w, h, r) + " " + squircle(w - 2*t, h - 2*t, Math.max(0, r - t), .6, t, t); el.style.clipPath = `path(evenodd, '${d}')`; el.style.webkitClipPath = el.style.clipPath; };
 const clip = (el, w, h, r) => { el.style.clipPath = `path('${squircle(w, h, r)}')`; el.style.webkitClipPath = el.style.clipPath; };
 
 /* ---------- Glass refraction map: flat in the middle, bends near the edges ---------- */
@@ -272,7 +331,7 @@ const clip = (el, w, h, r) => { el.style.clipPath = `path('${squircle(w, h, r)}'
     <linearGradient id="y" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset=".3" stop-color="#008000"/><stop offset=".7" stop-color="#008000"/><stop offset="1" stop-color="#0f0"/></linearGradient>
     </defs><rect width="100" height="100" fill="url(#x)"/><rect width="100" height="100" fill="url(#y)" style="mix-blend-mode:screen"/></svg>`;
   const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  for (const id of ["lgMap","lgdMap"]){ const n = document.getElementById(id); n.setAttribute("href", url); n.setAttributeNS("http://www.w3.org/1999/xlink","href", url); }
+  for (const id of ["lgMap","lgdMap","lgsMap"]){ const n = document.getElementById(id); n.setAttribute("href", url); n.setAttributeNS("http://www.w3.org/1999/xlink","href", url); }
 })();
 
 /* ---------- Card ---------- */
@@ -284,7 +343,8 @@ function card(x){
       <img class="poster" src="posters/${x.v}.jpg" alt="">
       <video muted loop playsinline preload="none" data-src="clips/${x.v}.mp4"></video>
       <div class="topShade"></div>
-      <div class="creator"><img src="assets/creator-avatar.svg" alt=""><span>${x.h}</span></div>
+      <div class="cardRim"></div>
+      <div class="creator"><img src="${x.p}" alt="" loading="lazy" onerror="this.src='assets/creator-avatar.svg'"><span>${x.h}</span></div>
       <button class="save glass" aria-label="Save reel" aria-pressed="false"><img src="assets/bookmark.svg" alt=""></button>
       <div class="info">
         <h3>${x.t}</h3>
@@ -309,7 +369,7 @@ function pause(slot){ const v = slot.querySelector("video"); if (v.src) v.pause(
 
 /* ---------- Trending: drag-follow carousel with spring snapping, endless both ways ---------- */
 const car = document.getElementById("carousel");
-const tSlots = TRENDING.map(x => { const s = card(x); car.appendChild(s); clip(s.querySelector(".reel"), 300, 375, 30); return s; });
+const tSlots = TRENDING.map(x => { const s = card(x); car.appendChild(s); clip(s.querySelector(".reel"), 300, 375, 30); ring(s.querySelector(".cardRim"), 300, 375, 30); return s; });
 const N = tSlots.length, GAP = 230;
 let pos = 0, vel = 0, target = 0, raf = 0, dragging = false, playing = -1;
 const wrap = d => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; };
@@ -388,7 +448,7 @@ render();
 
 /* ---------- Cafe row ---------- */
 const row = document.getElementById("cafes");
-const rSlots = CAFES.map(x => { const s = card(x); row.appendChild(s); clip(s.querySelector(".reel"), 168, 268, 18); return s; });
+const rSlots = CAFES.map(x => { const s = card(x); row.appendChild(s); clip(s.querySelector(".reel"), 168, 268, 18); ring(s.querySelector(".cardRim"), 168, 268, 18); return s; });
 const rowIO = new IntersectionObserver(es => es.forEach(en => en.isIntersecting && en.intersectionRatio > .6 ? play(en.target) : pause(en.target)), {root: row, threshold:[0,.6,1]});
 rSlots.forEach(s => rowIO.observe(s));
 
@@ -399,7 +459,7 @@ let dSlots = CLUBS.map(x => { const s = card(x); deck.appendChild(s); return s; 
 function stack(){
   dSlots.forEach((s, i) => {
     s.dataset.slot = i; const [w, h, r, bw] = GEO[Math.min(i, 4)];
-    clip(s.children[0], w, h, r); clip(s.children[1], w - bw * 2, h - bw * 2, Math.max(0, r - bw));
+    clip(s.children[0], w, h, r); clip(s.children[1], w - bw * 2, h - bw * 2, Math.max(0, r - bw)); ring(s.querySelector(".cardRim"), w - bw * 2, h - bw * 2, Math.max(0, r - bw));
     i === 0 ? play(s) : pause(s);
   });
 }
@@ -425,6 +485,12 @@ const secIO = new IntersectionObserver(es => es.forEach(en => {
   else if (en.target === deck) play(dSlots[0]);
 }), {threshold:.2});
 [car, deck].forEach(n => secIO.observe(n));
+/* Tabs: Home is live, the rest are next */
+const toast = document.getElementById("toast"); let tt;
+document.querySelectorAll("[data-soon]").forEach(b => b.addEventListener("click", () => {
+  toast.textContent = b.dataset.soon + " is coming next"; toast.classList.add("show");
+  clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("show"), 1600);
+}));
 </script>
 </body>
 </html>
