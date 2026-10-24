@@ -82,27 +82,25 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
    .slot positions and casts the shadow, .frame draws the optional border, .reel clips to an iOS squircle. */
 .slot{position:absolute;will-change:transform}
 .frame{position:absolute;inset:0;background:transparent}
-.reel{position:absolute;inset:0;overflow:hidden;background:#2a2326;color:var(--on-dark);isolation:isolate;transform:translateZ(0)}
+.reel{position:absolute;inset:0;overflow:hidden;background:#2a2326;color:var(--on-dark)}
 .reel video,.reel .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .reel .poster{z-index:0}
 .reel video{z-index:1;opacity:0;transition:opacity .35s}
 .reel video.ready{opacity:1}
-.cardRim{position:absolute;inset:0;z-index:4;pointer-events:none;
-  background:linear-gradient(145deg,rgba(255,255,255,.9) -24%,rgba(255,255,255,0) 50%,rgba(255,255,255,.7) 124%)}
 .reel .topShade{position:absolute;left:0;right:0;top:0;height:57px;z-index:2;pointer-events:none;background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,0))}
 .creator{position:absolute;z-index:3;display:flex;align-items:center;gap:8px;left:12px;top:12px;overflow:hidden}
-.creator img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #fff;background:#fac799}
+.creator img{width:32px;height:32px;border-radius:50%;object-fit:cover;background:#fac799}
 .creator span{font-weight:500;font-size:13px;line-height:17px;letter-spacing:-.2px;white-space:nowrap}
 .save{position:absolute;z-index:3;right:12px;top:12px;width:40px;height:40px;border-radius:20px;display:grid;place-items:center;transition:transform .2s}
 .save img{width:20px;height:20px;transition:filter .2s}
 .save[aria-pressed="true"]{background:rgba(255,255,255,.92)}
 .save[aria-pressed="true"] img{filter:invert(1)}
 .save:active{transform:scale(.92)}
-.info{position:absolute;z-index:3;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;padding:24px 16px 12px;isolation:isolate;
-  background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,0))}
-/* progressive background blur: none at the top, 30px at the bottom */
-.info::before{content:"";position:absolute;inset:0;z-index:-1;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);
-  -webkit-mask-image:linear-gradient(to bottom,transparent 5%,#000 100%);mask-image:linear-gradient(to bottom,transparent 5%,#000 100%)}
+.bandBlur{position:absolute;z-index:3;left:0;right:0;bottom:0;height:110px;pointer-events:none;
+  -webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 32%);mask-image:linear-gradient(to bottom,transparent 0%,#000 32%)}
+.info{position:absolute;z-index:4;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;padding:24px 16px 12px;
+  background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,0))}
 .info h3{font-family:var(--display);font-weight:700;font-size:22px;line-height:28px;letter-spacing:-1px}
 .meta{display:flex;align-items:center;justify-content:space-between}
 .chips{display:flex;gap:12px}
@@ -123,7 +121,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .row::-webkit-scrollbar{display:none}
 .row .slot{position:relative;flex:none;width:168px;height:268px;scroll-snap-align:start}
 .row .creator{left:8px;top:8px}
-.row .creator img{width:24px;height:24px;border-width:1.5px}
+.row .creator img{width:24px;height:24px}
 .row .creator span{font-size:12px;line-height:15px;width:96px;overflow:hidden;text-overflow:ellipsis}
 .row .save{left:128px;right:auto;top:8px;width:32px;height:32px;border-radius:20px}
 .row .save img{width:16px;height:16px}
@@ -135,18 +133,8 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 /* ---------- Club deck ---------- */
 .deckWrap{padding:0 20px;height:500px}
 .deck{position:relative;width:388px;height:410px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:pointer;transform-origin:left top}
-.deck .slot{transition:left .6s cubic-bezier(.2,.9,.2,1),top .6s cubic-bezier(.2,.9,.2,1),width .6s cubic-bezier(.2,.9,.2,1),height .6s cubic-bezier(.2,.9,.2,1),transform .45s cubic-bezier(.4,0,.2,1),opacity .4s}
-.deck .frame,.deck .reel,.deck .cardRim{transition:clip-path .6s cubic-bezier(.2,.9,.2,1)}
-.deck .slot[data-slot="0"]{left:0;top:0;width:328px;height:500px;z-index:5;filter:drop-shadow(0 0 20px rgba(0,0,0,.1))}
-.deck .slot[data-slot="0"] .frame{background:#f4f4f4}
-.deck .slot[data-slot="1"]{left:58px;top:16px;width:302px;height:468px;z-index:4}
-.deck .slot[data-slot="1"] .frame{background:#fff}
-.deck .slot[data-slot="2"]{left:105px;top:28px;width:283px;height:444px;z-index:3;filter:drop-shadow(0 0 17px rgba(0,0,0,.1))}
-.deck .slot[data-slot="3"],.deck .slot[data-slot="4"]{left:105px;top:28px;width:283px;height:444px;z-index:1;opacity:0}
+.deck .slot{will-change:left,top,width,height,transform,opacity}
 .deck .reel{inset:2px}
-.deck .slot[data-slot="2"] .reel,.deck .slot[data-slot="3"] .reel,.deck .slot[data-slot="4"] .reel{inset:0}
-.deck .slot[data-slot="0"] .creator{top:16px}
-.deck .slot.fly{transform:translateX(-115%) rotate(-10deg);opacity:0}
 .hint{display:block;text-align:center;font-size:12px;color:#6b6f76;margin-top:16px;letter-spacing:-.2px}
 @media (max-width:427px){ .deck{transform:scale(calc((100vw - 40px) / 388px))} .deckWrap{height:calc(500px * (100vw - 40px) / 388px)} }
 
@@ -174,6 +162,43 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);opacity:0;z-index:60;
   background:rgba(17,18,20,.86);color:#fff;font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Full reel viewer (Figma "Full Reel") ---------- */
+.viewer{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:428px;height:100vh;height:100dvh;z-index:100;background:#000;overflow:hidden}
+.viewer[hidden]{display:none}
+.vScroll{position:absolute;inset:0;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
+.vScroll::-webkit-scrollbar{display:none}
+.full{position:relative;height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#111;color:#fff}
+.full video,.full .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.full video{opacity:0;transition:opacity .3s}
+.full video.ready{opacity:1}
+.full .topShade{position:absolute;left:0;right:0;top:0;height:calc(97px + env(safe-area-inset-top,0px));background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,0));pointer-events:none}
+.backBtn{position:absolute;z-index:5;left:16px;top:calc(env(safe-area-inset-top,0px) + 16px);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(36,36,36,.35)}
+.backBtn img{width:24px;height:24px}
+.full .bandBlur{height:auto;top:auto}
+.fInfo{position:absolute;z-index:4;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:24px;padding:24px 16px calc(32px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,0))}
+.fTop{display:flex;flex-direction:column;gap:16px}
+.fMeta{display:flex;flex-direction:column;gap:10px}
+.fInfo .creator{position:static}
+.fInfo h3{font-family:var(--display);font-weight:700;font-size:22px;line-height:28px;letter-spacing:-1px}
+.fRow{display:flex;align-items:center;gap:12px}
+.fRow .chip span,.fRow .views span{font-size:14px}
+.progress{position:relative;height:4px;border-radius:50px;background:rgba(245,245,245,.2);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);overflow:hidden}
+.progress i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:50px;background:#f5f5f5}
+.fActions{display:flex;gap:16px}
+.fSave{width:80px;flex:none;border-radius:46px;display:grid;place-items:center;padding:16px 19px;background:rgba(255,255,255,.2)}
+.fSave img{width:24px;height:24px}
+.fSave[aria-pressed="true"]{background:rgba(255,255,255,.92)}
+.fSave[aria-pressed="true"] img{filter:invert(1)}
+.fCta{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:16px 19px;border-radius:46px;background:rgba(255,255,255,.2);
+  font-weight:800;font-size:22px;line-height:28px;letter-spacing:-1px;color:#fff;font-variation-settings:"opsz" 14;white-space:nowrap}
+.fCta img{width:24px;height:24px}
+.fCta:active,.fSave:active,.backBtn:active{transform:scale(.96)}
+.soundTip{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,.55);font-size:13px;font-weight:600;transition:opacity .2s,transform .2s;pointer-events:none}
+.soundTip.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+body.locked{overflow:hidden}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
@@ -252,7 +277,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
         <div class="secHead"><h2>Best Clubs in Koh Samui</h2><a href="#">See all</a></div>
         <div style="height:16px"></div>
         <div class="deckWrap"><div class="deck" id="deck"></div></div>
-        <span class="hint">Tap or swipe the card to see the next club</span>
+        <span class="hint">Swipe to put a card away · tap to watch</span>
       </section>
     </div>
   </div>
@@ -272,6 +297,9 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
   </nav>
   <div class="toast" id="toast" role="status"></div>
 </main>
+<div class="viewer" id="viewer" hidden role="dialog" aria-label="Reel">
+  <div class="vScroll" id="vScroll"></div>
+</div>
 
 <script>
 /* ---------- Sample content (videos from the Figma frame plus extra Thailand reels) ---------- */
@@ -298,6 +326,8 @@ const CLUBS = [
   {v:"club-list", h:"@readytoroam.kai", p:"https://randomuser.me/api/portraits/men/61.jpg", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
   {v:"club-green-mango", h:"@dj.nikhil", p:"https://randomuser.me/api/portraits/men/83.jpg", t:"4 days in Bangkok under ₹30k", d:"4 days", s:"18 spots", w:"1.2M"},
   {v:"club-ibiza", h:"@noor.after.dark", p:"https://randomuser.me/api/portraits/women/29.jpg", t:"Ibiza nights without leaving Samui", d:"2 days", s:"5 spots", w:"760k"},
+  {v:"club-oxa", h:"@jungle.beats.leo", p:"https://randomuser.me/api/portraits/men/14.jpg", t:"OXA jungle party, 3 stages", d:"1 night", s:"2 spots", w:"1.4M"},
+  {v:"club-samui-nights", h:"@samui.after.sunset", p:"https://randomuser.me/api/portraits/women/48.jpg", t:"Samui nightlife in one weekend", d:"2 days", s:"8 spots", w:"990k"},
   {v:"club-green-mango-2", h:"@sam.travels.light", p:"https://randomuser.me/api/portraits/men/36.jpg", t:"Green Mango after dark", d:"1 day", s:"3 spots", w:"450k"}
 ];
 
@@ -343,9 +373,9 @@ function card(x){
       <img class="poster" src="posters/${x.v}.jpg" alt="">
       <video muted loop playsinline preload="none" data-src="clips/${x.v}.mp4"></video>
       <div class="topShade"></div>
-      <div class="cardRim"></div>
       <div class="creator"><img src="${x.p}" alt="" loading="lazy" onerror="this.src='assets/creator-avatar.svg'"><span>${x.h}</span></div>
       <button class="save glass" aria-label="Save reel" aria-pressed="false"><img src="assets/bookmark.svg" alt=""></button>
+      <div class="bandBlur"></div>
       <div class="info">
         <h3>${x.t}</h3>
         <div class="meta">
@@ -362,6 +392,9 @@ function card(x){
   save.addEventListener("click", e => { e.stopPropagation(); save.setAttribute("aria-pressed", save.getAttribute("aria-pressed") === "true" ? "false" : "true"); });
   const v = slot.querySelector("video");
   v.addEventListener("playing", () => v.classList.add("ready"));
+  const info = slot.querySelector(".info"), band = slot.querySelector(".bandBlur");
+  new ResizeObserver(() => { band.style.height = (info.offsetHeight + 10) + "px"; }).observe(info);
+  slot._data = x;
   return slot;
 }
 function play(slot){ const v = slot.querySelector("video"); if (!v.src) v.src = v.dataset.src; v.play().catch(()=>{}); }
@@ -369,7 +402,7 @@ function pause(slot){ const v = slot.querySelector("video"); if (v.src) v.pause(
 
 /* ---------- Trending: drag-follow carousel with spring snapping, endless both ways ---------- */
 const car = document.getElementById("carousel");
-const tSlots = TRENDING.map(x => { const s = card(x); car.appendChild(s); clip(s.querySelector(".reel"), 300, 375, 30); ring(s.querySelector(".cardRim"), 300, 375, 30); return s; });
+const tSlots = TRENDING.map(x => { const s = card(x); car.appendChild(s); clip(s.querySelector(".reel"), 300, 375, 30); return s; });
 const N = tSlots.length, GAP = 230;
 let pos = 0, vel = 0, target = 0, raf = 0, dragging = false, playing = -1;
 const wrap = d => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; };
@@ -432,7 +465,7 @@ function release(e){
     vel = v; goTo(t);
   } else if (!moved && e && e.type === "pointerup"){
     const s = e.target.closest(".slot"); if (!s) { goTo(Math.round(pos)); return; }
-    const d = Math.round(wrap(tSlots.indexOf(s) - pos)); if (d) goTo(Math.round(pos) + d); else goTo(Math.round(pos));
+    const d = Math.round(wrap(tSlots.indexOf(s) - pos)); if (d) goTo(Math.round(pos) + d); else { goTo(Math.round(pos)); openReel(TRENDING, tSlots.indexOf(s), s); }
   } else goTo(Math.round(pos));
 }
 car.addEventListener("pointerup", release);
@@ -448,43 +481,201 @@ render();
 
 /* ---------- Cafe row ---------- */
 const row = document.getElementById("cafes");
-const rSlots = CAFES.map(x => { const s = card(x); row.appendChild(s); clip(s.querySelector(".reel"), 168, 268, 18); ring(s.querySelector(".cardRim"), 168, 268, 18); return s; });
+const rSlots = CAFES.map(x => { const s = card(x); row.appendChild(s); clip(s.querySelector(".reel"), 168, 268, 18); return s; });
 const rowIO = new IntersectionObserver(es => es.forEach(en => en.isIntersecting && en.intersectionRatio > .6 ? play(en.target) : pause(en.target)), {root: row, threshold:[0,.6,1]});
 rSlots.forEach(s => rowIO.observe(s));
+rSlots.forEach((s, i) => s.addEventListener("click", () => openReel(CAFES, i, s)));
 
-/* ---------- Club deck ---------- */
+/* ---------- Club deck: put the front card away, the next one rises with your finger ---------- */
 const deck = document.getElementById("deck");
-const GEO = [[328,500,30,2],[302,468,27.66,2],[283,444,25.9,0],[283,444,25.9,0],[283,444,25.9,0]];
-let dSlots = CLUBS.map(x => { const s = card(x); deck.appendChild(s); return s; });
-function stack(){
-  dSlots.forEach((s, i) => {
-    s.dataset.slot = i; const [w, h, r, bw] = GEO[Math.min(i, 4)];
-    clip(s.children[0], w, h, r); clip(s.children[1], w - bw * 2, h - bw * 2, Math.max(0, r - bw)); ring(s.querySelector(".cardRim"), w - bw * 2, h - bw * 2, Math.max(0, r - bw));
-    i === 0 ? play(s) : pause(s);
-  });
+const SLOT = [ // left, top, width, height, radius, border, border colour (grey -> white), shadow alpha
+  [0, 0, 328, 500, 30, 2, 244, .10],
+  [58, 16, 302, 468, 27.66, 2, 255, 0],
+  [105, 28, 283, 444, 25.9, 0, 255, .10]
+];
+const dSlots = CLUBS.map(x => { const s = card(x); deck.appendChild(s); return s; });
+const DN = dSlots.length;
+let dpos = 0, dvel = 0, dtarget = 0, draf = 0, ddrag = false, dPlaying = -1;
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t * t * (3 - 2 * t);
+function slotAt(q){ // q: 0 front, 1 middle, 2 back, >2 hidden behind the back card
+  if (q <= 0) return SLOT[0];
+  if (q >= 2) return SLOT[2];
+  const i = Math.floor(q), t = q - i, A = SLOT[i], B = SLOT[i + 1];
+  return A.map((v, k) => lerp(v, B[k], t));
 }
-let busy = false;
-function next(){
-  if (busy) return; busy = true; const front = dSlots[0]; front.classList.add("fly");
-  setTimeout(() => { dSlots.push(dSlots.shift()); front.classList.remove("fly"); front.style.transition = "none"; stack(); requestAnimationFrame(() => { front.style.transition = ""; busy = false; }); }, 380);
+function drender(){
+  for (let i = 0; i < DN; i++){
+    const s = dSlots[i];
+    let q = ((i - dpos) % DN + DN) % DN; if (q > DN - 1) q -= DN;         // q in [-1, DN-1)
+    const [l, t, w, h, r, bw, bc, sh] = slotAt(Math.max(0, q));
+    s.style.left = l + "px"; s.style.top = t + "px"; s.style.width = w + "px"; s.style.height = h + "px";
+    let tf = "none", op = 1;
+    if (q < 0){                                   // being put away: slides left, sinks back a little, fades late
+      const a = -q, e = ease(a);
+      tf = `translate3d(${(-e * 62).toFixed(2)}%, ${(e * 4).toFixed(2)}%, 0) rotate(${(-e * 7).toFixed(2)}deg) scale(${(1 - e * .08).toFixed(4)})`;
+      op = 1 - ease(Math.max(0, (a - .55) / .45));
+    } else if (q > 2){                            // waiting in the stack, out of sight
+      op = Math.max(0, 1 - (q - 2) * 3);
+    }
+    s.style.transform = tf; s.style.opacity = op.toFixed(3);
+    s.style.visibility = op < .01 ? "hidden" : "visible";
+    s.style.zIndex = String(Math.round(100 - q * 10));
+    s.style.filter = sh > .005 && op > .5 ? `drop-shadow(0 0 ${Math.round(lerp(17, 20, Math.max(0, 1 - q)))}px rgba(0,0,0,${sh.toFixed(3)}))` : "none";
+    const frame = s.children[0], reel = s.children[1];
+    frame.style.background = bw > .05 ? `rgb(${Math.round(bc)},${Math.round(bc)},${Math.round(bc)})` : "transparent";
+    reel.style.inset = bw.toFixed(2) + "px";
+    clip(frame, w, h, r); clip(reel, w - bw * 2, h - bw * 2, Math.max(0, r - bw));
+  }
+  const front = ((Math.round(dpos) % DN) + DN) % DN;
+  if (front !== dPlaying && !ddrag){ if (dPlaying >= 0) pause(dSlots[dPlaying]); dPlaying = front; play(dSlots[front]); }
 }
-function prev(){ if (busy) return; dSlots.unshift(dSlots.pop()); stack(); }
-let dx0 = null, dy0 = 0;
-deck.addEventListener("pointerdown", e => { dx0 = e.clientX; dy0 = e.clientY; });
-deck.addEventListener("pointerup", e => {
-  if (dx0 === null) return; const dx = e.clientX - dx0, dy = e.clientY - dy0; dx0 = null;
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) (dx < 0 ? next : prev)(); else if (Math.hypot(dx, dy) < 8) next();
+function danimate(){
+  cancelAnimationFrame(draf); let last = performance.now();
+  const step = now => {
+    const dt = Math.min(.032, (now - last) / 1000); last = now;
+    const k = 120, c = 2 * Math.sqrt(k) * 1.04;
+    dvel += ((dtarget - dpos) * k - dvel * c) * dt; dpos += dvel * dt;
+    if (Math.abs(dtarget - dpos) < .0005 && Math.abs(dvel) < .002){ dpos = dtarget; dvel = 0; drender(); return; }
+    drender(); draf = requestAnimationFrame(step);
+  };
+  draf = requestAnimationFrame(step);
+}
+const dGo = t => { dtarget = t; danimate(); };
+let dsx = 0, dsy = 0, dsp = 0, dlx = 0, dlt = 0, dv = 0, daxis = null, dmoved = false;
+const DIST = 260; // px of drag for one full put-away
+deck.addEventListener("pointerdown", e => { cancelAnimationFrame(draf); ddrag = true; daxis = null; dmoved = false; dsx = dlx = e.clientX; dsy = e.clientY; dsp = dpos; dlt = performance.now(); dv = 0; dvel = 0; });
+deck.addEventListener("pointermove", e => {
+  if (!ddrag) return; const dx = e.clientX - dsx, dy = e.clientY - dsy;
+  if (!daxis && Math.hypot(dx, dy) > 6){ daxis = Math.abs(dx) > Math.abs(dy) ? "x" : "y"; if (daxis === "x") deck.setPointerCapture(e.pointerId); }
+  if (daxis !== "x") return; dmoved = true;
+  dpos = dsp - dx / DIST;
+  const now = performance.now(), dt = Math.max(1, now - dlt);
+  dv = .75 * dv + .25 * (-(e.clientX - dlx) / DIST) / (dt / 1000); dlx = e.clientX; dlt = now;
+  drender();
 });
-stack();
+function drelease(e){
+  if (!ddrag) return; ddrag = false;
+  if (daxis === "x" && dmoved){
+    const base = Math.round(dsp); let t = Math.round(dpos + dv * .2);
+    t = Math.max(base - 1, Math.min(base + 1, t)); dvel = dv; dGo(t);
+  } else if (!dmoved && e && e.type === "pointerup" && !e.target.closest(".save")){
+    const front = ((Math.round(dpos) % DN) + DN) % DN;
+    const hit = e.target.closest(".slot");
+    if (hit === dSlots[front]) openReel(CLUBS, front, hit); else dGo(Math.round(dpos) + 1);
+  } else dGo(Math.round(dpos));
+}
+deck.addEventListener("pointerup", drelease);
+deck.addEventListener("pointercancel", drelease);
+let dWheel;
+deck.addEventListener("wheel", e => {
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+  e.preventDefault(); cancelAnimationFrame(draf); dpos += e.deltaX / DIST; drender();
+  clearTimeout(dWheel); dWheel = setTimeout(() => dGo(Math.round(dpos)), 90);
+}, {passive:false});
+drender();
 
 /* Pause everything that scrolls off screen */
 const secIO = new IntersectionObserver(es => es.forEach(en => {
   const vids = en.target.querySelectorAll("video");
   if (!en.isIntersecting) vids.forEach(v => v.src && v.pause());
   else if (en.target === car) play(tSlots[playing]);
-  else if (en.target === deck) play(dSlots[0]);
+  else if (en.target === deck) play(dSlots[((Math.round(dpos) % DN) + DN) % DN]);
 }), {threshold:.2});
 [car, deck].forEach(n => secIO.observe(n));
+
+/* ---------- Full reel viewer: opens from the tapped card, swipe up for the next reel ---------- */
+const viewer = document.getElementById("viewer"), vScroll = document.getElementById("vScroll");
+let vList = [], vOrigin = null, vIO = null, vRaf = 0, vMuted = true;
+const tripLabel = d => { const n = parseInt(d, 10) || 1; return `Create a ${n}-day trip`; };
+function fullCard(x){
+  const el = document.createElement("section"); el.className = "full";
+  el.innerHTML = `
+    <img class="poster" src="posters/${x.v}.jpg" alt="">
+    <video muted loop playsinline preload="none" data-src="clips/${x.v}.mp4"></video>
+    <div class="topShade"></div>
+    <button class="backBtn glass" aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
+    <div class="soundTip">Sound on</div>
+    <div class="bandBlur"></div>
+    <div class="fInfo">
+      <div class="fTop">
+        <div class="fMeta">
+          <div class="creator"><img src="${x.p}" alt="" onerror="this.src='assets/creator-avatar.svg'"><span>${x.h}</span></div>
+          <h3>${x.t}</h3>
+          <div class="fRow">
+            <div class="chip glass disperse"><img src="assets/calendar.svg" alt=""><span>${x.d}</span></div>
+            <div class="chip glass disperse"><img src="assets/pin.svg" alt=""><span>${x.s}</span></div>
+            <div class="views"><img src="assets/play.svg" alt=""><span>${x.w}</span></div>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+      </div>
+      <div class="fActions">
+        <button class="fSave glass" aria-label="Save reel" aria-pressed="false"><img src="assets/bookmark-24.svg" alt=""></button>
+        <button class="fCta glass">${tripLabel(x.d)}<img src="assets/sparkle-white.svg" alt=""></button>
+      </div>
+    </div>`;
+  const v = el.querySelector("video");
+  v.addEventListener("playing", () => v.classList.add("ready"));
+  const info = el.querySelector(".fInfo"), band = el.querySelector(".bandBlur");
+  new ResizeObserver(() => { band.style.height = (info.offsetHeight + 10) + "px"; }).observe(info);
+  el.querySelector(".backBtn").addEventListener("click", e => { e.stopPropagation(); closeReel(); });
+  const fs = el.querySelector(".fSave");
+  fs.addEventListener("click", e => { e.stopPropagation(); fs.setAttribute("aria-pressed", fs.getAttribute("aria-pressed") === "true" ? "false" : "true"); });
+  el.querySelector(".fCta").addEventListener("click", e => { e.stopPropagation(); toast.textContent = "Trip planning is coming next"; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("show"), 1600); });
+  el.addEventListener("click", e => {          // tap the video to toggle sound
+    if (e.target.closest("button")) return;
+    vMuted = !vMuted; vScroll.querySelectorAll("video").forEach(x => x.muted = vMuted);
+    const tip = el.querySelector(".soundTip"); tip.textContent = vMuted ? "Sound off" : "Sound on";
+    tip.classList.add("show"); setTimeout(() => tip.classList.remove("show"), 900);
+    if (!vMuted) v.play().catch(()=>{});
+  });
+  el._v = v; el._bar = el.querySelector(".progress i");
+  return el;
+}
+function vPlay(el){ const v = el._v; if (!v.src) v.src = v.dataset.src; v.muted = vMuted; v.play().catch(()=>{}); }
+function vTick(){
+  const cur = [...vScroll.children].find(el => el._v && !el._v.paused);
+  if (cur && cur._v.duration) cur._bar.style.width = (cur._v.currentTime / cur._v.duration * 100).toFixed(2) + "%";
+  vRaf = requestAnimationFrame(vTick);
+}
+function rectInset(r){ const vw = viewer.getBoundingClientRect(); return `inset(${Math.max(0, r.top - vw.top)}px ${Math.max(0, vw.right - r.right)}px ${Math.max(0, vw.bottom - r.bottom)}px ${Math.max(0, r.left - vw.left)}px round 28px)`; }
+function openReel(list, index, fromEl){
+  document.querySelectorAll(".phone video").forEach(v => v.src && v.pause());
+  vList = list; vOrigin = fromEl; vScroll.innerHTML = "";
+  list.forEach(x => vScroll.appendChild(fullCard(x)));
+  viewer.hidden = false; document.body.classList.add("locked");
+  vScroll.scrollTop = index * vScroll.clientHeight;
+  vIO = new IntersectionObserver(es => es.forEach(en => en.isIntersecting && en.intersectionRatio > .6 ? vPlay(en.target) : en.target._v.pause()), {root: vScroll, threshold:[0,.6,1]});
+  [...vScroll.children].forEach(el => vIO.observe(el));
+  vPlay(vScroll.children[index]);
+  cancelAnimationFrame(vRaf); vTick();
+  if (fromEl && viewer.animate){
+    viewer.animate([{clipPath: rectInset(fromEl.getBoundingClientRect()), opacity: .6}, {clipPath: "inset(0px 0px 0px 0px round 0px)", opacity: 1}],
+      {duration: 460, easing: "cubic-bezier(.2,.9,.2,1)"});
+  }
+  history.pushState({reel:true}, "", "#reel");
+}
+function closeReel(fromPop){
+  if (viewer.hidden) return;
+  const done = () => {
+    viewer.hidden = true; document.body.classList.remove("locked");
+    vIO && vIO.disconnect(); cancelAnimationFrame(vRaf);
+    vScroll.querySelectorAll("video").forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
+    vScroll.innerHTML = "";
+    // resume the home videos that were playing
+    play(tSlots[playing]); play(dSlots[((Math.round(dpos) % DN) + DN) % DN]);
+  };
+  if (vOrigin && viewer.animate && vOrigin.getBoundingClientRect().height > 0){
+    const a = viewer.animate([{clipPath: "inset(0px 0px 0px 0px round 0px)", opacity: 1}, {clipPath: rectInset(vOrigin.getBoundingClientRect()), opacity: .4}],
+      {duration: 360, easing: "cubic-bezier(.4,0,.2,1)"});
+    a.onfinish = done;
+  } else done();
+  if (!fromPop && location.hash === "#reel") history.back();
+}
+window.addEventListener("popstate", () => closeReel(true));
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeReel(); });
+
 /* Tabs: Home is live, the rest are next */
 const toast = document.getElementById("toast"); let tt;
 document.querySelectorAll("[data-soon]").forEach(b => b.addEventListener("click", () => {
