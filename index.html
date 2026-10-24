@@ -207,6 +207,148 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .soundTip{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,.55);font-size:13px;font-weight:600;transition:opacity .2s,transform .2s;pointer-events:none}
 .soundTip.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 body.locked{overflow:hidden}
+/* ---------- Trip planning screens (Figma "Making trip plan" and "Plan Ready") ---------- */
+.screen{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:428px;height:100vh;height:100dvh;z-index:105;overflow:hidden;background:#cfe3c4}
+.screen[hidden]{display:none}
+.screen .mapBg{position:absolute;left:50%;bottom:-90px;width:2057px;height:1231px;margin-left:-963px;object-fit:cover;max-width:none;animation:mapDrift 30s ease-in-out infinite alternate}
+@keyframes mapDrift{to{transform:translate(-40px,18px) scale(1.04)}}
+.screen .topGlow{position:absolute;left:0;right:0;top:0;height:97px;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,0));pointer-events:none}
+.mapBack{position:absolute;z-index:6;left:16px;top:calc(env(safe-area-inset-top,0px) + 16px);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.45);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.mapBack img{width:24px;height:24px;filter:invert(.35)}
+.mapBack:active{transform:scale(.94)}
+.bigSheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:2}
+.bigSheet>.bg{position:absolute;inset:0;background:#fff}
+.bigSheet>.edge{position:absolute;inset:0;background:#efefef;pointer-events:none}
+.spin{width:24px;height:24px;flex:none;display:block;animation:spin .9s linear infinite}
+.spin.big{width:27.4px;height:27.4px}
+.spin.wait{animation-play-state:paused;opacity:.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+.okDot{width:24px;height:24px;flex:none;display:none;border-radius:50%;background:var(--accent);place-items:center}
+.okDot svg{width:14px;height:14px}
+.done>.mkHead .spin{display:none}
+.done>.mkHead .okDot{display:grid;animation:okPop .45s cubic-bezier(.2,.9,.3,1.6)}
+@keyframes okPop{from{transform:scale(0)}}
+
+/* Making trip plan */
+#making .bigSheet{height:min(635px,calc(100% - 120px))}
+.mkBody{position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;gap:16px}
+.mkCard{position:relative;flex:none;filter:none}
+.mkCard>.box{position:relative;background:#fff;display:flex;flex-direction:column;overflow:hidden;transition:height .55s cubic-bezier(.2,.9,.25,1)}
+.mkCard>.edge{position:absolute;inset:0;background:#e7dcff;pointer-events:none}
+.mkHead{display:flex;gap:16px;align-items:flex-start;padding:15px 12px 12px;flex:none;position:relative;z-index:2;background:#fff}
+.mkHead .spin,.mkHead .okDot{margin-top:2px}
+.mkHead::after{content:"";position:absolute;left:0;right:0;top:100%;height:18px;background:linear-gradient(#fff,rgba(255,255,255,0));pointer-events:none}
+.mkHead p{font-weight:600;font-size:20px;line-height:1.3;color:#000;font-variation-settings:"opsz" 14}
+.mkList{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:0 8px 24px 51px;display:flex;flex-direction:column;gap:12px}
+.mkList::-webkit-scrollbar{display:none}
+.mkFade{position:absolute;left:0;right:0;bottom:0;height:80px;background:linear-gradient(rgba(255,255,255,0) 21%,#fff);pointer-events:none;z-index:2;opacity:0;transition:opacity .3s}
+.mkCard.scrolls .mkFade{opacity:1}
+.mkItem{flex:none;background:#f2f2f2;padding:12px;display:flex;flex-direction:column;gap:10px}
+.mkRow{display:flex;align-items:center;gap:11px;min-width:0}
+.mkRow .av{width:32px;height:32px;border-radius:50%;border:1.33px solid #fff;object-fit:cover;flex:none;background:#ddd}
+.mkRow .avIcon{width:32px;height:32px;border-radius:50%;flex:none;display:grid;place-items:center;background:#fff;font-size:16px}
+.mkRow span{font-weight:500;font-size:16px;color:#686868;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variation-settings:"opsz" 14;transition:color .3s}
+.mkItem.got .mkRow span{color:#111214}
+.mkRow .tick{width:20px;height:20px;flex:none;border-radius:50%;background:#09c05d;display:none;place-items:center}
+.mkRow .tick svg{width:12px;height:12px}
+.mkItem.got .tick{display:grid;animation:okPop .4s cubic-bezier(.2,.9,.3,1.6)}
+.mkChips{display:flex;flex-wrap:wrap;gap:6px}
+.mkChips:empty,.mkTiles:empty{display:none}
+.pref{display:inline-flex;align-items:center;gap:4px;padding:5px 10px 5px 8px;border-radius:999px;background:#fff;font-size:13px;font-weight:500;color:#333;letter-spacing:-.1px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.mkTiles{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -12px;padding:0 12px;scroll-behavior:smooth}
+.mkTiles::-webkit-scrollbar{display:none}
+.tile{position:relative;flex:none;width:72px;height:72px;overflow:hidden;background:#ddd}
+.tile img{width:100%;height:100%;object-fit:cover}
+.tile b,.spot b{position:absolute;right:4.8px;top:4.8px;height:16px;padding:0 4.8px;border-radius:9.6px;display:grid;place-items:center;font-size:11px;font-weight:400;line-height:1;
+  background:rgba(255,255,255,.6);border:.4px solid #fff;-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px)}
+.mkShape{transition:opacity .4s}
+.mkShape.wait{opacity:.55}
+.mkShape .box{height:auto!important}
+.mkShape .desc{padding:0 16px 16px 51px;font-weight:500;font-size:16px;line-height:1.3;color:#686868;font-variation-settings:"opsz" 14}
+.mkFoot{position:absolute;left:20px;bottom:20px;display:flex;gap:16px;align-items:center}
+.mkFoot p{font-weight:600;font-size:20px;font-variation-settings:"opsz" 14;white-space:nowrap;
+  background:linear-gradient(90deg,#686868 0%,#cecece 25%,#686868 50%,#cecece 75%,#686868 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1.8s linear infinite}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+#making.leaving .mkBody,#making.leaving .mkFoot{opacity:0;transform:translateY(16px);transition:opacity .35s,transform .45s}
+
+/* Plan Ready */
+#plan .bigSheet{top:min(197px,22%)}
+#plan .bigSheet{animation:sheetUp .6s cubic-bezier(.2,.9,.25,1) both}
+@keyframes sheetUp{from{transform:translateY(60px);opacity:0}}
+.prScroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;padding:32px 0 140px;overscroll-behavior:contain}
+.prScroll::-webkit-scrollbar{display:none}
+.prHandle{position:absolute;left:50%;top:8px;width:72px;height:5px;margin-left:-36px;border-radius:50px;background:#ececec;z-index:3}
+.prTop{display:flex;gap:20px;align-items:center;padding:0 16px 0 20px}
+.covers{position:relative;width:101.5px;height:120px;flex:none}
+.covers .cv{position:absolute;inset:0;background:#000;overflow:hidden}
+.covers .cv img{position:absolute;max-width:none;object-fit:cover}
+.covers .cv:nth-child(1){transform:rotate(12deg) translate(4px,6px)}
+.covers .cv:nth-child(2){transform:rotate(-11deg) translate(-2px,-2px)}
+.covers .cv:nth-child(3){box-shadow:0 0 3.7px rgba(0,0,0,.2)}
+.prInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+.prInfo h2{font-weight:900;font-size:20px;line-height:1.3;letter-spacing:-.1px;color:#000;font-variation-settings:"opsz" 14}
+.prMeta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.prMeta .dots{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;color:#686868;white-space:nowrap}
+.prMeta .dots i,.fRoute i,.dayMeta i{width:4px;height:4px;border-radius:50%;background:#c4c4c4;flex:none}
+.dateChip{display:flex;align-items:center;gap:4px;padding:4px 8px 4px 6px;border-radius:38px;background:#fff;border:.5px solid #ececec;font-weight:600;font-size:14px;color:#686868;white-space:nowrap;
+  box-shadow:inset 0 -1px 4px rgba(0,0,0,.1),0 1px 1.5px rgba(0,0,0,.1)}
+.dateChip img{width:16px;height:16px}
+.crew{display:flex;align-items:center}
+.crew span{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center;margin-right:-10px;position:relative}
+.crew span img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.crew span.me{border:1.5px solid var(--accent)}
+.crew span.me img{width:26px;height:26px;border:1.17px solid #fff}
+.crew button{width:32px;height:32px;border-radius:50%;background:#fff;border:2px dashed var(--accent);display:grid;place-items:center;margin-left:3px;position:relative}
+.crew button img{width:20px;height:20px}
+.prChips{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:0 16px;margin-top:32px}
+.prChips::-webkit-scrollbar{display:none}
+.prChips button{flex:none;height:38px;padding:0 14px;border-radius:999px;background:#f2f2f2;display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:#969696;white-space:nowrap;transition:background .2s,color .2s}
+.prChips button em{font-style:normal;color:#c4c4c4}
+.prChips button img{width:20px;height:20px;display:none}
+.prChips button[aria-pressed="true"]{background:#333;color:#fff}
+.prChips button[aria-pressed="true"] img{display:block}
+.prList{display:flex;flex-direction:column;gap:16px;padding:20px 16px 0}
+.pCard{position:relative;filter:drop-shadow(0 0 2px rgba(0,0,0,.08))}
+.pCard>.box{position:relative;background:#fff;padding:4px 4px 8px;display:flex;flex-direction:column;gap:12px}
+.pCard>.edge{position:absolute;inset:0;background:#ececec;pointer-events:none}
+.flight .box{padding:4px;align-items:stretch}
+.flTop{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 4px;gap:8px}
+.fRoute{display:flex;align-items:center;gap:8px;font-weight:700;font-size:12px;letter-spacing:.05px;color:#138cff;white-space:nowrap}
+.fRoute .r{display:flex;align-items:center;gap:6px}
+.fRoute img{width:16px;height:16px}
+.fRoute img.pl{width:20px;height:20px;margin-right:-4px}
+.fRoute .dt{font-weight:600;color:#686868}
+.fPrice{margin-top:8px;font-size:20px;letter-spacing:-.8px;color:#101010;font-weight:600;white-space:nowrap}
+.fPrice b{font-weight:900}
+.fPrice .rs{font-family:Inter,system-ui,sans-serif;font-weight:600;letter-spacing:0}
+.bookBtn{flex:none;padding:8px 23px;background:#101010;color:#fff;font-weight:700;font-size:16px}
+.bookBtn:active{transform:scale(.96)}
+.aiNote{display:flex;align-items:center;gap:4px;padding:4px 8px 4px 6px;background:linear-gradient(90deg,#d8ffea 4.8%,#f2f2f2 16.7%)}
+.aiNote img{width:16px;height:16px}
+.aiNote p{font-size:12px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(90deg,#09c05d 0%,#101010 16.5%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dayHead{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 4px 4px;gap:8px}
+.dayHead .l{display:flex;align-items:center;gap:8px;min-width:0}
+.dayPill{flex:none;padding:3px 8px;border-radius:30px;color:#fff;font-weight:700;font-size:14px;letter-spacing:-.2px}
+.dayHead h3{font-weight:600;font-size:18px;color:#101010;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variation-settings:"opsz" 14}
+.dayMeta{display:flex;align-items:center;gap:8px;font-weight:500;font-size:14px;color:#686868;white-space:nowrap}
+.spots{display:flex;gap:6.4px;overflow-x:auto;scrollbar-width:none;padding:0 4px 0 3.2px}
+.spots::-webkit-scrollbar{display:none}
+.spot{position:relative;flex:none;width:80px;height:80px;overflow:hidden;background:#eee}
+.spot img{width:100%;height:100%;object-fit:cover}
+.prIn{animation:prIn .55s cubic-bezier(.2,.9,.25,1) both}
+@keyframes prIn{from{opacity:0;transform:translateY(14px)}}
+.prFoot{position:absolute;left:0;right:0;bottom:0;height:159px;z-index:3;pointer-events:none;background:linear-gradient(rgba(255,255,255,0) 12.9%,#fff 91.3%);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  -webkit-mask-image:linear-gradient(transparent,#000 35%);mask-image:linear-gradient(transparent,#000 35%)}
+.prBtns{position:absolute;right:20px;bottom:32px;z-index:4;display:flex;gap:16px}
+.prBtns button{position:relative;width:64px;height:64px;border-radius:32px;display:grid;place-items:center}
+.prBtns .ai .glow{position:absolute;left:-7px;top:-7px;width:78px;height:78px;pointer-events:none}
+.prBtns .ai .disc{position:absolute;inset:0;border-radius:32px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);border:.5px solid rgba(24,24,24,.9);display:grid;place-items:center}
+.prBtns .ai img.s{width:28px;height:28px}
+.prBtns .add{background:rgba(0,0,0,.9)}
+.prBtns .add img{width:32px;height:32px}
+.prBtns button:active{transform:scale(.94)}
+
 
 /* ---------- Live poll card (Figma "Poll Live") ---------- */
 /* Sits between the header and Trending. Collapsed it takes no space; the negative margins cancel the section gaps. */
@@ -461,6 +603,50 @@ body.locked{overflow:hidden}
   </nav>
   <div class="toast" id="toast" role="status"></div>
 </main>
+
+
+<section class="screen" id="making" hidden role="dialog" aria-label="Making your trip plan">
+  <img class="mapBg" src="assets/map-plan.jpg" alt="">
+  <div class="topGlow"></div>
+  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
+  <div class="bigSheet">
+    <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
+    <div class="mkBody">
+      <div class="mkCard" id="mkRead">
+        <div class="box" data-sq="20">
+          <div class="mkHead"><img class="spin" src="assets/loader-24.svg" alt=""><span class="okDot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><p>Reading all of your friends preferences and Collections</p></div>
+          <div class="mkList" id="mkList"></div>
+          <div class="mkFade"></div>
+        </div>
+        <i class="edge" data-ring="20"></i>
+      </div>
+      <div class="mkCard mkShape wait" id="mkShape">
+        <div class="box" data-sq="20">
+          <div class="mkHead"><img class="spin wait" src="assets/loader-24.svg" alt=""><span class="okDot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><p>Shaping the Plan</p></div>
+          <p class="desc">While keeping everyones preferences and collections in mind, keeping each day relaxed, not packed</p>
+        </div>
+        <i class="edge" data-ring="20"></i>
+      </div>
+    </div>
+    <div class="mkFoot"><img class="spin big" src="assets/loader-28.svg" alt=""><p id="mkFootText">Planning your days..</p></div>
+  </div>
+</section>
+
+<section class="screen" id="plan" hidden role="dialog" aria-label="Your trip plan">
+  <img class="mapBg" src="assets/map-plan.jpg" alt="">
+  <div class="topGlow"></div>
+  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
+  <div class="bigSheet">
+    <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
+    <div class="prHandle"></div>
+    <div class="prScroll" id="prScroll"></div>
+    <div class="prFoot"></div>
+    <div class="prBtns">
+      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc"><img class="s" src="assets/sparkle-ai.svg" alt=""></span></button>
+      <button class="add" data-soon="Adding spots" aria-label="Add a spot"><img src="assets/plus-white.svg" alt=""></button>
+    </div>
+  </div>
+</section>
 
 <div class="scrim" id="pollScrim" hidden></div>
 <form class="sheet" id="pollSheet" hidden role="dialog" aria-modal="true" aria-labelledby="pollTitle" autocomplete="off">
@@ -880,7 +1066,7 @@ const sqObs = new ResizeObserver(es => es.forEach(({target: el}) => {
   if (el.dataset.ring) ring(el, w, h, +el.dataset.ring, .5);
   if (el.dataset.sqDash) el.querySelector("path").setAttribute("d", squircle(w - 1.5, h - 1.5, +el.dataset.sqDash, .6, .75, .75));
 }));
-const watchSq = root => root.querySelectorAll("[data-sq],[data-ring],[data-sq-dash]").forEach(el => sqObs.observe(el));
+const watchSq = root => { const q = "[data-sq],[data-ring],[data-sq-dash]"; if (root.matches && root.matches(q)) sqObs.observe(root); root.querySelectorAll(q).forEach(el => sqObs.observe(el)); };
 watchSq(document);
 
 /* ---------- Live poll ---------- */
@@ -1034,7 +1220,7 @@ function burst(){
       {duration: 800 + Math.random() * 300, delay: 650 + k * 25, easing: "cubic-bezier(.2,.8,.3,1)", fill: "both"});
   }
 }
-pollCta.addEventListener("click", () => { burst(); say("Trip planning is coming next"); });
+pollCta.addEventListener("click", () => { burst(); setTimeout(() => openMaking(poll ? splitLabel(poll.opts[poll.win].label)[0] : "Thailand"), 380); });
 new ResizeObserver(layoutTrack).observe(track);
 
 track.addEventListener("click", e => { const b = e.target.closest(".opt"); if (b && poll.stage === "live") vote(+b.dataset.i); });
@@ -1062,6 +1248,146 @@ track.addEventListener("keydown", e => {
     placeMe(next < 0 ? startX() : optX()[next], true); }
   if ((e.key === "Enter" || e.key === " ") && cur >= 0){ e.preventDefault(); vote(cur); }
 });
+
+
+/* ---------- Making the trip plan: a scripted 16 second run, then Plan Ready ---------- */
+const making = document.getElementById("making"), planEl = document.getElementById("plan");
+const mkList = document.getElementById("mkList"), mkRead = document.getElementById("mkRead"), mkShape = document.getElementById("mkShape");
+const TICK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+const CREW = [
+  { n: "Isha",  p: "assets/friend-5.jpg", prefs: [["🏖️","Beaches"],["🛕","Temples"],["📸","Photo spots"]] },
+  { n: "Priya", p: "assets/friend-1.jpg", prefs: [["☕","Cafe hopping"],["🛍️","Night markets"],["🧘","Slow mornings"]] },
+  { n: "Aman",  p: "assets/friend-2.jpg", prefs: [["🤿","Snorkelling"],["🍜","Street food"],["🌅","Sunsets"]] },
+  { n: "Arpit", p: "assets/friend-4.jpg", prefs: [["🎉","Nightlife"],["🛵","Scooter rides"],["🍹","Beach bars"]] },
+  { n: "your",  p: "assets/poll-me.jpg",  prefs: [["🌴","Islands"],["☕","Cafes"],["🛕","Temples"]] }
+];
+const SAVED = [["posters/hidden-cafe.jpg","☕"],["assets/spot-temple.jpg","🛕"],["posters/blue-ocean.jpg","🏖️"],["posters/foodie.jpg","🍜"],["posters/sea-breeze.jpg","🌅"],["posters/fire-show.jpg","🔥"],["posters/elephant-cafe.jpg","🐘"]];
+let runId = 0;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+// Card 1 grows with its content up to 360px, then its list scrolls under the sticky heading
+function fitRead(){
+  const box = mkRead.querySelector(".box"), head = box.querySelector(".mkHead");
+  const want = head.offsetHeight + mkList.scrollHeight;
+  const cap = Math.min(360, making.querySelector(".mkBody").clientHeight - mkShape.offsetHeight - 16);
+  box.style.height = Math.min(want, cap) + "px";
+  mkRead.classList.toggle("scrolls", want > cap);
+  mkList.scrollTo({ top: mkList.scrollHeight, behavior: "smooth" });
+}
+function enter(el, from){ el.animate([{ opacity: 0, transform: `translateX(${from}px)` }, { opacity: 1, transform: "none" }], { duration: 480, easing: "cubic-bezier(.2,.9,.25,1)" }); }
+
+async function runMaking(id){
+  const alive = () => id === runId && !making.hidden;
+  await wait(500);
+  for (const c of CREW){
+    if (!alive()) return;
+    const item = document.createElement("div"); item.className = "mkItem"; item.dataset.sq = "16";
+    const who = c.n === "your" ? "your" : c.n + "’s";
+    item.innerHTML = `<div class="mkRow"><img class="av" src="${c.p}" alt=""><span>Collecting ${who} preferences</span><i class="tick">${TICK}</i></div><div class="mkChips"></div>`;
+    mkList.appendChild(item); watchSq(item); enter(item, 60); fitRead();
+    await wait(650);
+    for (const [e, t] of c.prefs){
+      if (!alive()) return;
+      const chip = document.createElement("span"); chip.className = "pref"; chip.textContent = `${e} ${t}`;
+      item.querySelector(".mkChips").appendChild(chip); enter(chip, -28); fitRead();
+      await wait(330);
+    }
+    await wait(250); item.classList.add("got"); haptic(6);
+    await wait(300);
+  }
+  // the group's saved reels: tiles slide in from the left and the row keeps scrolling
+  if (!alive()) return;
+  const col = document.createElement("div"); col.className = "mkItem"; col.dataset.sq = "16";
+  col.innerHTML = `<div class="mkRow"><span class="avIcon">🔖</span><span>Collecting Aman’s bookmarks</span><i class="tick">${TICK}</i></div><div class="mkTiles"></div>`;
+  mkList.appendChild(col); watchSq(col); enter(col, 60); fitRead();
+  await wait(600);
+  const row = col.querySelector(".mkTiles");
+  for (const [src, e] of SAVED){
+    if (!alive()) return;
+    const t = document.createElement("div"); t.className = "tile"; t.dataset.sq = "12";
+    t.innerHTML = `<img src="${src}" alt=""><b>${e}</b>`;
+    row.appendChild(t); watchSq(t); enter(t, -30); fitRead();
+    row.scrollTo({ left: row.scrollWidth, behavior: "smooth" });
+    await wait(380);
+  }
+  await wait(300); col.classList.add("got");
+  await wait(500); if (!alive()) return;
+  mkRead.classList.add("done"); haptic(12);
+  // card 2 wakes up
+  mkShape.classList.remove("wait"); mkShape.querySelector(".spin").classList.remove("wait");
+  await wait(2600); if (!alive()) return;
+  mkShape.classList.add("done"); haptic(12);
+  await wait(1300); if (!alive()) return;
+  making.classList.add("leaving");
+  await wait(450); if (!alive()) return;
+  showPlan(true);
+}
+function openMaking(dest){
+  runId++;
+  mkList.innerHTML = ""; mkRead.className = "mkCard"; mkShape.className = "mkCard mkShape wait";
+  mkShape.querySelector(".spin").classList.add("wait"); mkRead.querySelector(".box").style.height = "";
+  making.classList.remove("leaving"); planEl.hidden = true;
+  making.hidden = false; document.body.classList.add("locked");
+  making.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+  watchSq(making);
+  requestAnimationFrame(fitRead);
+  if (location.hash !== "#plan") history.pushState({ plan: true }, "", "#plan");
+  runMaking(runId);
+}
+function closePlanScreens(fromPop){
+  if (making.hidden && planEl.hidden) return;
+  runId++; making.hidden = true; planEl.hidden = true;
+  if (viewer.hidden && sheet.hidden) document.body.classList.remove("locked");
+  if (!fromPop && location.hash === "#plan") history.back();
+}
+document.querySelectorAll(".screen [data-close]").forEach(b => b.addEventListener("click", () => closePlanScreens()));
+window.addEventListener("popstate", () => closePlanScreens(true));
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePlanScreens(); });
+
+/* ---------- Plan Ready ---------- */
+const DAYS = [
+  { c: "#138cff", place: "Phuket Old Town", km: "18 KM", n: 6, s: [["assets/spot-temple.jpg","🛕"],["assets/spot-cafe.jpg","☕"],["assets/spot-beachcafe.jpg","☕"],["posters/foodie.jpg","🍜"],["posters/hidden-cafe.jpg","☕"],["posters/magical-cafes.jpg","📸"]] },
+  { c: "#e8456b", place: "Kathu District", km: "24 KM", n: 4, s: [["posters/elephant-cafe.jpg","🐘"],["assets/spot-cafe.jpg","☕"],["posters/date-spot.jpg","🌅"],["assets/spot-temple.jpg","🛕"]] },
+  { c: "#09c05d", place: "Phi Phi Islands", km: "46 KM", n: 5, s: [["posters/blue-ocean.jpg","🤿"],["posters/sea-breeze.jpg","🏖️"],["posters/hero.jpg","🌴"],["posters/wildchild.jpg","🍹"],["posters/fire-show.jpg","🔥"]] },
+  { c: "#ff8a00", place: "Koh Samui, Chaweng", km: "32 KM", n: 6, s: [["posters/samui-cafes.jpg","☕"],["posters/club-samui-nights.jpg","🎉"],["posters/babou.jpg","🍹"],["posters/club-ibiza.jpg","🎉"],["posters/sea-breeze.jpg","🌅"]] },
+  { c: "#6b2bf5", place: "Fisherman’s Village", km: "12 KM", n: 7, s: [["posters/club-green-mango.jpg","🛍️"],["posters/foodie.jpg","🍜"],["assets/spot-beachcafe.jpg","☕"],["posters/club-oxa.jpg","🎉"],["posters/date-spot.jpg","🌅"]] }
+];
+function cardHTML(inner, cls, r){ return `<div class="pCard ${cls || ""} prIn"><div class="box" data-sq="${r}">${inner}</div><i class="edge" data-ring="${r}"></i></div>`; }
+function showPlan(fromMaking){
+  const sc = document.getElementById("prScroll");
+  const avs = [["assets/poll-me.jpg","me"],["assets/friend-5.jpg"],["assets/friend-1.jpg"],["assets/friend-2.jpg"],["assets/friend-4.jpg"]];
+  sc.innerHTML = `
+    <div class="prTop prIn">
+      <div class="covers">
+        <div class="cv" data-sq="22"><img src="assets/cover-1.jpg" alt="" style="left:-21px;top:-45px;width:118px;height:178px;transform:rotate(-6deg)"></div>
+        <div class="cv" data-sq="22"><img src="assets/cover-2.jpg" alt="" style="left:-8px;top:-1px;width:184px;height:123px"></div>
+        <div class="cv" data-sq="22"><img src="assets/cover-3.jpg" alt="" style="left:-3px;top:-34px;width:118px;height:177px"></div>
+      </div>
+      <div class="prInfo">
+        <div><h2>Koh Samui, Phuket<br>10-day Trip 🇹🇭</h2>
+          <div class="prMeta"><span class="dots">10 days<i></i>28 spots</span><span class="dateChip"><img src="assets/calendar-fill.svg" alt="">Dec 24 -31</span></div></div>
+        <div class="crew">${avs.map(([p, m], i) => `<span class="${m || ""}" style="z-index:${9 - i}"><img src="${p}" alt=""></span>`).join("")}<button data-soon="Inviting friends" aria-label="Invite a friend"><img src="assets/plus-purple.svg" alt=""></button></div>
+      </div>
+    </div>
+    <div class="prChips prIn" style="animation-delay:.08s">
+      <button aria-pressed="true"><img src="assets/map-outline-white.svg" alt="">Overview</button>
+      <button aria-pressed="false">Chat</button><button aria-pressed="false">Unplanned</button>
+      ${DAYS.map((d, i) => `<button aria-pressed="false"><em>Dec ${24 + i}</em>Day ${i + 1}</button>`).join("")}
+    </div>
+    <div class="prList">
+      ${cardHTML(`<div class="flTop"><div style="min-width:0"><div class="fRoute"><span class="r"><img class="pl" src="assets/plane-fill.svg" alt="">Mumbai<img src="assets/return.svg" alt="return">Phuket</span><i></i><span class="dt">Dec 24 - 31</span></div>
+          <p class="fPrice"><span class="rs">₹</span><b>23,350</b> Return Flight</p></div><button class="bookBtn" data-sq="10" data-soon="Booking">Book</button></div>
+        <div class="aiNote" data-sq="12"><img src="assets/sparkle-green.svg" alt=""><p>Cheapest flight in the month of December from Mumbai</p></div>`, "flight", 16)}
+      ${DAYS.map((d, i) => cardHTML(`<div class="dayHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.n} spots</span></div>
+        <div class="spots">${d.s.map(([p, e]) => `<div class="spot" data-sq="12.8"><img src="${p}" alt="" loading="lazy"><b>${e}</b></div>`).join("")}</div>`, "", 20)).join("")}
+    </div>`;
+  sc.querySelectorAll(".prList .pCard").forEach((c, i) => c.style.animationDelay = (.16 + i * .07) + "s");
+  sc.querySelectorAll("[data-soon]").forEach(b => b.addEventListener("click", () => say(b.dataset.soon + " is coming next")));
+  sc.querySelectorAll(".prChips button").forEach(b => b.addEventListener("click", () => sc.querySelectorAll(".prChips button").forEach(x => x.setAttribute("aria-pressed", x === b))));
+  making.hidden = true; planEl.hidden = false; sc.scrollTop = 0;
+  planEl.querySelector(".bigSheet").style.animation = "none"; void planEl.offsetWidth; planEl.querySelector(".bigSheet").style.animation = "";
+  watchSq(planEl); haptic(16);
+}
 
 /* ---------- Create a Poll sheet ---------- */
 const sheet = document.getElementById("pollSheet"), scrim = document.getElementById("pollScrim");
