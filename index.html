@@ -272,11 +272,155 @@ body.locked{overflow:hidden}
 @keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
 #making.leaving .mkBody,#making.leaving .mkFoot{opacity:0;transform:translateY(16px);transition:opacity .35s,transform .45s}
 
+
+/* Plan sheet: drag up to go edge to edge */
+#plan .bigSheet{transition:top .45s cubic-bezier(.2,.9,.25,1),left .45s cubic-bezier(.2,.9,.25,1),right .45s cubic-bezier(.2,.9,.25,1),bottom .45s cubic-bezier(.2,.9,.25,1)}
+#plan .bigSheet.isFull{top:max(env(safe-area-inset-top,0px),10px);left:0;right:0;bottom:0}
+#plan .bigSheet.drag{transition:none}
+.prGrab{position:absolute;left:0;right:0;top:0;height:26px;z-index:5;cursor:grab;touch-action:none}
+.prChips{position:sticky;top:0;z-index:3;background:#fff;margin-top:14px;padding:18px 16px 12px}
+.prChips button{transition:background .2s,color .2s,transform .15s}
+.prChips button:active{transform:scale(.96)}
+.prView{display:flex;flex-direction:column}
+.prList{padding:8px 16px 0}
+.dayCard{cursor:pointer}
+.dayCard:active{transform:scale(.99)}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%,30%{background-color:rgba(107,43,245,.16);box-shadow:0 0 0 4px rgba(107,43,245,.12)}100%{background-color:transparent}}
+.dateChip.flash{animation:flashChip 1.6s ease-out}
+@keyframes flashChip{0%,30%{background:#efe7ff;color:var(--accent)}100%{background:#fff}}
+/* break in the itinerary: flight + hotel change ticket */
+.breakCard{position:relative;display:flex;background:#f2f2f2}
+.breakCard>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px}
+.breakCard .tag{padding:3px 10px;border-radius:30px;background:#686868;color:#fff;font-weight:600;font-size:12px}
+.breakCard .what{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;color:#101010;white-space:nowrap;letter-spacing:-.2px}
+.breakCard .what img{width:18px;height:18px}
+.breakCard .when{font-weight:500;font-size:13px;color:#686868}
+.breakCard .cut{flex:none;width:0;border-left:2px dashed #fff;margin:6px 0;padding:0}
+.breakCard::before,.breakCard::after{content:"";position:absolute;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#fff}
+.breakCard::before{top:-7px}.breakCard::after{bottom:-7px}
+/* a single day, drilled down */
+.dayView{padding:8px 16px 0;display:flex;flex-direction:column;gap:16px}
+.dvHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dvHead .l{display:flex;align-items:center;gap:8px;min-width:0}
+.dvHead h3{font-weight:700;font-size:20px;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dvSub{font-size:14px;color:#686868;font-weight:500;margin-top:-8px}
+.stops{display:flex;flex-direction:column}
+.stop{display:flex;gap:12px;position:relative}
+.stop .time{width:58px;flex:none;font-weight:600;font-size:13px;color:#686868;padding-top:6px;text-align:right}
+.stop .rail{width:12px;flex:none;position:relative;display:flex;justify-content:center}
+.stop .rail i{width:12px;height:12px;border-radius:50%;border:3px solid var(--dc,#138cff);background:#fff;margin-top:8px;position:relative;z-index:1}
+.stop .rail::after{content:"";position:absolute;top:20px;bottom:-8px;width:2px;background:#ececec}
+.stop:last-child .rail::after{display:none}
+.stop .body{flex:1;min-width:0;display:flex;gap:12px;align-items:center;padding:4px;margin-bottom:12px;background:#fff;border:.7px solid #ececec;border-radius:16px}
+.stop .body .spot{width:64px;height:64px}
+.stop .body h4{font-weight:600;font-size:16px;color:#101010;letter-spacing:-.2px}
+.stop .body p{font-size:13px;color:#686868;margin-top:2px;line-height:1.3}
+.addFrom{display:flex;align-items:center;justify-content:center;gap:6px;height:52px;margin:4px 0 0 82px;border:1.5px dashed #c4c4c4;border-radius:16px;font-weight:600;font-size:15px;color:#686868}
+/* Unplanned */
+.unView{padding:8px 16px 0;display:flex;flex-direction:column;gap:12px}
+.unIntro{font-size:14px;line-height:1.4;color:#686868}
+.unItem{background:#fff;border:.7px solid #ececec;border-radius:16px;padding:6px;display:flex;flex-direction:column;gap:8px}
+.unRow{display:flex;align-items:center;gap:12px}
+.unRow .spot{width:56px;height:56px}
+.unRow .t{flex:1;min-width:0}
+.unRow h4{font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.unRow .by{display:flex;align-items:center;gap:6px;font-size:13px;color:#686868;margin-top:3px}
+.unRow .by img{width:16px;height:16px;border-radius:50%;object-fit:cover}
+.unRow .add{flex:none;padding:8px 12px;border-radius:999px;background:#f2f2f2;font-weight:600;font-size:13px;color:#101010}
+.unRow .add[aria-expanded="true"]{background:#101010;color:#fff}
+.unDays{display:none;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 2px 4px}
+.unDays::-webkit-scrollbar{display:none}
+.unItem.open .unDays{display:flex}
+.unDays button{flex:none;padding:6px 10px;border-radius:999px;color:#fff;font-weight:700;font-size:13px}
+.unEmpty{text-align:center;color:#969696;font-size:14px;padding:24px 0}
+/* + menu over the plan and the chat */
+.fabMenu{position:absolute;inset:0;z-index:6;pointer-events:none}
+.fabMenu .wash{position:absolute;inset:0;background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .3s}
+.fabMenu.open{pointer-events:auto}
+.fabMenu.open .wash{opacity:1}
+.fabMenu .pill{position:absolute;height:60px;display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:32px;background:rgba(255,255,255,.5);border:.5px solid rgba(24,24,24,.9);
+  box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
+  opacity:0;transform:translateY(24px) scale(.9);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.3)}
+.fabMenu .pill img{height:36px;width:auto;max-width:48px;object-fit:contain}
+.fabMenu.open .pill{opacity:1;transform:none}
+.fabMenu .pill:active{transform:scale(.96)}
+#plan .prBtns{z-index:7}
+#plan .prBtns[hidden]{display:none}
+#plan .mapBack{transition:opacity .3s}
+#plan:has(.bigSheet.isFull) .mapBack{opacity:0;pointer-events:none}
+.prBtns .add img{transition:transform .35s cubic-bezier(.2,.9,.3,1.3)}
+.prBtns.open .add img{transform:rotate(45deg)}
+.prBtns.open .ai{opacity:.9}
+/* AI button: Liquid Glass with the glow behind, as in Figma */
+.prBtns .ai .disc{position:absolute;inset:0;border-radius:32px;background:rgba(255,255,255,.1);border:.3px solid rgba(24,24,24,.9);box-shadow:0 1px 8px rgba(0,0,0,.1);display:grid;place-items:center}
+/* Chat */
+.prChat{position:absolute;inset:0;z-index:4;background:#fff;display:flex;flex-direction:column;border-radius:32px;overflow:hidden}
+.prChat[hidden]{display:none}
+.prChat .prChips{position:relative;margin-top:0;padding:26px 16px 12px;flex:none}
+.msgs{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:16px;padding:8px 0 12px;overscroll-behavior:contain}
+.msgs::-webkit-scrollbar{display:none}
+.msgs>:first-child{margin-top:auto}
+.msg{display:flex;gap:12px;align-items:flex-start;padding:0 20px}
+.msg.self{justify-content:flex-end}
+.msg>img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.msg.self>img{border:1.67px solid #fff}
+.bubble{max-width:268px;background:rgba(118,118,118,.07);border-radius:16px;padding:8px 12px 12px;display:flex;flex-direction:column;gap:4px;line-height:19px}
+.msg.self .bubble{background:#f5f5f5}
+.bubble b{font-weight:700;font-size:12px;letter-spacing:.6px;color:#969696;text-transform:uppercase}
+.msg.self .bubble b{color:var(--accent)}
+.bubble p{font-size:16px;color:#101010;letter-spacing:.08px;font-weight:400;overflow-wrap:anywhere}
+.msgIn{animation:msgIn .4s cubic-bezier(.2,.9,.25,1) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(12px)}}
+.typing .bubble{padding:14px 16px;flex-direction:row;gap:5px}
+.typing .bubble i{width:7px;height:7px;border-radius:50%;background:#b8b8b8;animation:dot 1s infinite}
+.typing .bubble i:nth-child(2){animation-delay:.15s}.typing .bubble i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.msgCard{padding:0 20px}
+.chatPoll{padding:0 20px}
+.chatPoll .pollCard{opacity:1;transform:none}
+.aiRow{padding:0 20px;flex:none;min-height:0}
+.aiChip{display:inline-flex;align-items:center;gap:4px;padding:8px 14px 8px 8px;border-radius:38px;background:#fff;border:.5px solid rgba(107,43,245,.2);box-shadow:inset 0 -4px 7px rgba(0,0,0,.08),0 1px 2px rgba(107,43,245,.1);
+  font-weight:500;font-size:16px;letter-spacing:-.2px;white-space:nowrap;animation:msgIn .45s cubic-bezier(.2,.9,.3,1.3) both}
+.aiChip img{width:20px;height:20px}
+.aiChip span{background:linear-gradient(90deg,#6b2bf5 0%,#101010 16.5%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:aiShine 2.4s ease-in-out infinite}
+@keyframes aiShine{0%,100%{background-position:0 0}50%{background-position:-30% 0}}
+.aiChip:active{transform:scale(.97)}
+.aiLoad{display:flex;align-items:center;gap:16px;padding:6px 20px;animation:msgIn .35s both}
+.aiLoad p{font-weight:600;font-size:20px;white-space:nowrap;background:linear-gradient(90deg,#686868 0%,#cecece 25%,#686868 50%,#cecece 75%,#686868 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1.8s linear infinite}
+.chatBar{flex:none;display:flex;gap:16px;align-items:center;padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));position:relative;z-index:7}
+.chatBar input{flex:1;min-width:0;height:56px;border:1px solid #ececec;border-radius:16px;padding:0 16px;font:500 18px var(--sans);color:#101010;outline:0;caret-color:var(--accent)}
+.chatBar input::placeholder{color:#a0a4ab}
+.chatBar input:focus{border-color:#d9ccff}
+.chatBar .plus{width:56px;height:56px;flex:none;border-radius:28px;background:#f2f2f2;display:grid;place-items:center;transition:background .25s}
+.chatBar .plus img{width:28px;height:28px;transition:transform .35s cubic-bezier(.2,.9,.3,1.3),filter .25s}
+.chatBar.open .plus{background:#101010}
+.chatBar.open .plus img{transform:rotate(45deg);filter:brightness(0) invert(1)}
+.chatBar .send{display:none}
+/* Invite sheet */
+.invite{position:fixed;z-index:131;left:50%;bottom:8px;width:min(412px,calc(100vw - 16px));transform:translate(-50%,calc(100% + 40px));transition:transform .5s cubic-bezier(.2,.9,.25,1);padding:40px 24px 28px}
+.invite.show{transform:translate(-50%,0)}
+.invite[hidden]{display:none}
+.invite>.bg{position:absolute;inset:0;background:#fff;z-index:-1}
+.invite h2{font-weight:900;font-size:28px;letter-spacing:-1px}
+.invite .sub{margin-top:6px;font-weight:500;font-size:16px;color:#6b6f76}
+.invLink{margin-top:24px;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px;background:#f8f5ff;border-radius:16px}
+.invLink span{flex:1;min-width:0;font-weight:600;font-size:15px;color:#101010;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.invLink button{padding:10px 16px;border-radius:12px;background:#101010;color:#fff;font-weight:700;font-size:14px}
+.invPeople{margin-top:20px;display:flex;flex-direction:column;gap:4px}
+.invPeople h3{font-weight:700;font-size:13px;letter-spacing:.6px;color:#969696;text-transform:uppercase;margin-bottom:6px}
+.invP{display:flex;align-items:center;gap:12px;padding:6px 0}
+.invP .ini{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none}
+.invP .nm{flex:1;font-weight:600;font-size:16px}
+.invP .nm small{display:block;font-weight:500;font-size:13px;color:#969696}
+.invP button{padding:8px 14px;border-radius:999px;background:#f2f2f2;font-weight:700;font-size:14px;transition:background .2s,color .2s}
+.invP button.done{background:#e8f9ef;color:#09a050}
+
 /* Plan Ready */
 #plan .bigSheet{top:min(197px,22%)}
 #plan .bigSheet{animation:sheetUp .6s cubic-bezier(.2,.9,.25,1) both}
 @keyframes sheetUp{from{transform:translateY(60px);opacity:0}}
-.prScroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;padding:32px 0 140px;overscroll-behavior:contain}
+.prScroll{position:absolute;inset:0;isolation:isolate;overflow-y:auto;scrollbar-width:none;padding:32px 0 140px;overscroll-behavior:contain}
 .prScroll::-webkit-scrollbar{display:none}
 .prHandle{position:absolute;left:50%;top:8px;width:72px;height:5px;margin-left:-36px;border-radius:50px;background:#ececec;z-index:3}
 .prTop{display:flex;gap:20px;align-items:center;padding:0 16px 0 20px}
@@ -297,18 +441,18 @@ body.locked{overflow:hidden}
 .crew{display:flex;align-items:center}
 .crew span{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center;margin-right:-10px;position:relative}
 .crew span img{width:28px;height:28px;border-radius:50%;object-fit:cover}
-.crew span.me{border:1.5px solid var(--accent)}
-.crew span.me img{width:26px;height:26px;border:1.17px solid #fff}
+.crew span.self{border:1.5px solid var(--accent)}
+.crew span.self img{width:26px;height:26px;border:1.17px solid #fff}
 .crew button{width:32px;height:32px;border-radius:50%;background:#fff;border:2px dashed var(--accent);display:grid;place-items:center;margin-left:3px;position:relative}
 .crew button img{width:20px;height:20px}
-.prChips{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:0 16px;margin-top:32px}
+.prChips{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
 .prChips::-webkit-scrollbar{display:none}
 .prChips button{flex:none;height:38px;padding:0 14px;border-radius:999px;background:#f2f2f2;display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:#969696;white-space:nowrap;transition:background .2s,color .2s}
 .prChips button em{font-style:normal;color:#c4c4c4}
 .prChips button img{width:20px;height:20px;display:none}
 .prChips button[aria-pressed="true"]{background:#333;color:#fff}
 .prChips button[aria-pressed="true"] img{display:block}
-.prList{display:flex;flex-direction:column;gap:16px;padding:20px 16px 0}
+.prList{display:flex;flex-direction:column;gap:16px}
 .pCard{position:relative;filter:drop-shadow(0 0 2px rgba(0,0,0,.08))}
 .pCard>.box{position:relative;background:#fff;padding:4px 4px 8px;display:flex;flex-direction:column;gap:12px}
 .pCard>.edge{position:absolute;inset:0;background:#ececec;pointer-events:none}
@@ -383,7 +527,8 @@ body.locked{overflow:hidden}
 .dot{position:absolute;top:35.5px;width:12px;height:12px;margin-left:-6px;border-radius:50px;background:#f5f5f5;transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.6)}
 .dot.passed{opacity:0;transform:scale(.4)}
 .opt{position:absolute;top:55.5px;transform:translateX(-50%);font-weight:700;font-size:20px;letter-spacing:-1px;line-height:1.3;text-align:center;white-space:normal;width:max-content;overflow-wrap:normal;color:var(--text-primary);font-variation-settings:"opsz" 14;padding:0 4px;border-radius:8px;
-  transition:left .6s cubic-bezier(.2,.9,.25,1),top .5s cubic-bezier(.2,.9,.25,1),opacity .4s,font-size .45s cubic-bezier(.2,.9,.3,1.3)}
+  transition:left .6s cubic-bezier(.2,.9,.25,1),top .5s cubic-bezier(.2,.9,.25,1),opacity .4s}
+.pollCard.final .opt{transition:left .6s cubic-bezier(.2,.9,.25,1),top .5s cubic-bezier(.2,.9,.25,1),opacity .4s,font-size .45s cubic-bezier(.2,.9,.3,1.3)}
 .opt em{display:block;font-style:normal;font-size:16px;line-height:1.2;letter-spacing:0}
 .opt.hot{animation:hot .32s cubic-bezier(.2,.9,.3,1.6)}
 @keyframes hot{50%{transform:translateX(-50%) scale(1.1)}}
@@ -636,17 +781,52 @@ body.locked{overflow:hidden}
   <img class="mapBg" src="assets/map-plan.jpg" alt="">
   <div class="topGlow"></div>
   <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
-  <div class="bigSheet">
+  <div class="bigSheet" id="prSheet">
     <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
     <div class="prHandle"></div>
+    <div class="prGrab" id="prGrab" aria-hidden="true"></div>
     <div class="prScroll" id="prScroll"></div>
     <div class="prFoot"></div>
-    <div class="prBtns">
-      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc"><img class="s" src="assets/sparkle-ai.svg" alt=""></span></button>
-      <button class="add" data-soon="Adding spots" aria-label="Add a spot"><img src="assets/plus-white.svg" alt=""></button>
+    <div class="fabMenu" id="prMenu">
+      <div class="wash"></div>
+      <button class="pill" data-act="stays" style="right:21px;bottom:380px"><img src="assets/i3d-stays.png" alt="">Add Stays</button>
+      <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" alt="">Invite Friends</button>
+      <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
+      <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" alt="">Add Spots</button>
+    </div>
+    <div class="prBtns" id="prBtns">
+      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc glass strong"><img class="s" src="assets/sparkle-ai.svg" alt=""></span></button>
+      <button class="add" id="prAdd" aria-label="Add to this trip" aria-expanded="false"><img src="assets/plus-white.svg" alt=""></button>
+    </div>
+    <div class="prChat" id="prChat" hidden>
+      <div class="prChips" id="chatChips"></div>
+      <div class="msgs" id="msgs"></div>
+      <div class="aiRow" id="aiRow"></div>
+      <div class="fabMenu" id="chatMenu">
+        <div class="wash"></div>
+        <button class="pill" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d.png" alt="">Add Poll</button>
+        <button class="pill" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" alt="">Invite Friends</button>
+        <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" alt="">Add Spots</button>
+      </div>
+      <form class="chatBar" id="chatBar" autocomplete="off">
+        <input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send">
+        <button type="button" class="plus" id="chatPlus" aria-label="Add to chat" aria-expanded="false"><img src="assets/plus-grey.svg" alt=""></button>
+      </form>
     </div>
   </div>
 </section>
+<div class="scrim" id="invScrim" hidden style="z-index:130"></div>
+<div class="invite" id="invite" hidden role="dialog" aria-labelledby="invTitle">
+  <div class="bg" data-sq="32"></div>
+  <h2 id="invTitle">Invite friends</h2>
+  <p class="sub">They’ll see the plan, join the chat and vote on polls.</p>
+  <div class="invLink"><span>sidequest.app/t/koh-samui-phuket</span><button type="button" id="invCopy">Copy link</button></div>
+  <div class="invPeople"><h3>Suggested</h3>
+    <div class="invP"><span class="ini" style="background:#f5a623">R</span><span class="nm">Rohan<small>Was on your Goa trip</small></span><button type="button">Invite</button></div>
+    <div class="invP"><span class="ini" style="background:#8b5cf6">N</span><span class="nm">Neha<small>Saved 12 Thailand reels</small></span><button type="button">Invite</button></div>
+    <div class="invP"><span class="ini" style="background:#2ebd6b">K</span><span class="nm">Kabir<small>From your contacts</small></span><button type="button">Invite</button></div>
+  </div>
+</div>
 
 <div class="scrim" id="pollScrim" hidden></div>
 <form class="sheet" id="pollSheet" hidden role="dialog" aria-modal="true" aria-labelledby="pollTitle" autocomplete="off">
@@ -1087,19 +1267,25 @@ const hapticSwitch = (() => { const l = document.createElement("label"); l.setAt
   const i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1; l.appendChild(i); document.body.appendChild(l); return l; })();
 function haptic(ms = 10){ if (navigator.vibrate) navigator.vibrate(ms); else { try { hapticSwitch.click(); } catch(e){} } }
 
-function showPoll(q, labels){
+function showPoll(q, labels, where = "home"){
   voteTimers.forEach(clearTimeout); voteTimers = [];
-  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, committed: false, waiting: FRIENDS.length, stage: "live" };
+  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, committed: false, waiting: FRIENDS.length, stage: "live", where };
+  // the same live card can sit on Home or inside the trip chat
+  if (where === "chat"){
+    const w = document.createElement("div"); w.className = "chatPoll msgIn"; w.appendChild(pollCard);
+    msgsEl.appendChild(w); pollSlot.hidden = true; scrollChat();
+  } else if (pollCard.parentElement !== pollSlot.querySelector(".pollPad")) pollSlot.querySelector(".pollPad").appendChild(pollCard);
   pollQ.textContent = q;
   pollCard.classList.remove("spread", "lineGone", "final");
   pollCta.classList.remove("shine"); pollCta.tabIndex = -1;
   track.innerHTML = `<div class="bar"><i class="ghost"></i><i class="fill"></i></div>` +
     poll.opts.map((o, i) => { const [n, e] = splitLabel(o.label);
-      return `<i class="dot"></i><div class="voters"></div><button type="button" class="opt" role="radio" aria-checked="false" data-i="${i}">${esc(n)}${e ? `<em>${e}</em>` : ""}</button>`; }).join("") +
+      return `<i class="dot"></i><div class="voters"></div><button type="button" class="opt" role="radio" aria-checked="false" data-i="${i}">${esc(n.replace(/(\d)\s*-\s*(\d)/g, "$1–$2"))}${e ? `<em>${e}</em>` : ""}</button>`; }).join("") +
     `<div class="meDot idle" role="slider" tabindex="0" aria-label="Drag your photo to an option to vote" aria-valuemin="0" aria-valuemax="${labels.length}" aria-valuenow="0"><img src="${ME}" alt=""></div>`;
   track.classList.add("idleHint");
-  pollSlot.hidden = false; pollSlot.classList.remove("on", "settled");
-  requestAnimationFrame(() => requestAnimationFrame(() => { pollSlot.classList.add("on"); layoutTrack(); }));
+  if (where === "home"){ pollSlot.hidden = false; pollSlot.classList.remove("on", "settled");
+    requestAnimationFrame(() => requestAnimationFrame(() => { pollSlot.classList.add("on"); layoutTrack(); })); }
+  else requestAnimationFrame(layoutTrack);
   setTimeout(() => pollSlot.classList.add("settled"), 650);
   watchSq(pollSlot); updateStatus();
   // friends start voting a moment after the poll goes live
@@ -1129,11 +1315,14 @@ function layoutTrack(){
   track.querySelectorAll(".opt").forEach((d, i) => {
     d.style.left = xs[i] + "px";
     const gap = Math.min(i > 0 ? xs[i] - xs[i - 1] : Infinity, i < xs.length - 1 ? xs[i + 1] - xs[i] : Infinity);
-    const maxW = Math.min(gap - 8, 2 * (W - xs[i] + 12), 2 * (xs[i] + 12));
-    d.style.maxWidth = maxW + "px"; d.style.fontSize = ""; d.style.overflowWrap = "";
-    if (poll.stage === "final") return;            // final sizes come from CSS so the winner can grow
+    const maxW = Math.min(gap - 6, 2 * (W - xs[i] + 12), 2 * (xs[i] + 12));
+    d.style.maxWidth = maxW + "px"; d.style.fontSize = ""; d.style.overflowWrap = ""; d.style.whiteSpace = "nowrap";
+    if (poll.stage === "final"){ d.style.whiteSpace = ""; return; }   // final sizes come from CSS so the winner can grow
+    // first try one line at a smaller size, then let it wrap, then break long made-up words
     let fs = parseFloat(getComputedStyle(d).fontSize);
-    while (d.scrollWidth > maxW + 1 && fs > 15){ fs -= 1; d.style.fontSize = fs + "px"; }
+    while (d.scrollWidth > maxW + 1 && fs > 14){ fs -= 1; d.style.fontSize = fs + "px"; }
+    if (d.scrollWidth > maxW + 1){ d.style.whiteSpace = ""; d.style.fontSize = ""; fs = parseFloat(getComputedStyle(d).fontSize);
+      while (d.scrollWidth > maxW + 1 && fs > 15){ fs -= 1; d.style.fontSize = fs + "px"; } }
     if (d.scrollWidth > maxW + 1) d.style.overflowWrap = "anywhere";
     bottom = Math.max(bottom, d.offsetTop + d.offsetHeight);
   });
@@ -1201,7 +1390,7 @@ function maybeSettle(){
     poll.stage = "final";
     track.querySelectorAll(".opt").forEach((d, k) => d.classList.toggle("win", k === win));
     track.querySelectorAll(".voters").forEach((d, k) => d.classList.toggle("lose", k !== win));
-    pollCtaText.textContent = `Make a ${splitLabel(poll.opts[win].label)[0]} Trip`;
+    pollCtaText.textContent = poll.where === "chat" ? `Go with ${splitLabel(poll.opts[win].label)[0]}` : `Make a ${splitLabel(poll.opts[win].label)[0]} Trip`;
     pollCard.classList.add("final"); layoutTrack();
     pollCta.tabIndex = 0; pollCta.classList.add("shine"); haptic(18);
     burst();
@@ -1220,7 +1409,10 @@ function burst(){
       {duration: 800 + Math.random() * 300, delay: 650 + k * 25, easing: "cubic-bezier(.2,.8,.3,1)", fill: "both"});
   }
 }
-pollCta.addEventListener("click", () => { burst(); setTimeout(() => openMaking(poll ? splitLabel(poll.opts[poll.win].label)[0] : "Thailand"), 380); });
+pollCta.addEventListener("click", () => { burst();
+  const name = poll ? splitLabel(poll.opts[poll.win].label)[0] : "Thailand";
+  if (poll && poll.where === "chat"){ setTimeout(() => { bubble("You", `Locking ${name} 🙌`); say(`${name} it is`); }, 300); return; }
+  setTimeout(() => openMaking(name), 380); });
 new ResizeObserver(layoutTrack).observe(track);
 
 track.addEventListener("click", e => { const b = e.target.closest(".opt"); if (b && poll.stage === "live") vote(+b.dataset.i); });
@@ -1255,13 +1447,12 @@ const making = document.getElementById("making"), planEl = document.getElementBy
 const mkList = document.getElementById("mkList"), mkRead = document.getElementById("mkRead"), mkShape = document.getElementById("mkShape");
 const TICK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 const CREW = [
-  { n: "Isha",  p: "assets/friend-5.jpg", prefs: [["🏖️","Beaches"],["🛕","Temples"],["📸","Photo spots"]] },
-  { n: "Priya", p: "assets/friend-1.jpg", prefs: [["☕","Cafe hopping"],["🛍️","Night markets"],["🧘","Slow mornings"]] },
-  { n: "Aman",  p: "assets/friend-2.jpg", prefs: [["🤿","Snorkelling"],["🍜","Street food"],["🌅","Sunsets"]] },
-  { n: "Arpit", p: "assets/friend-4.jpg", prefs: [["🎉","Nightlife"],["🛵","Scooter rides"],["🍹","Beach bars"]] },
-  { n: "your",  p: "assets/poll-me.jpg",  prefs: [["🌴","Islands"],["☕","Cafes"],["🛕","Temples"]] }
+  { n: "Isha",  p: "assets/friend-1.jpg", prefs: [["🏖️","Beaches"],["🛕","Temples"],["📸","Photo spots"]], saved: [["assets/spot-temple.jpg","🛕"],["posters/sea-breeze.jpg","🏖️"],["posters/magical-cafes.jpg","📸"]] },
+  { n: "Priya", p: "assets/friend-5.jpg", prefs: [["☕","Cafe hopping"],["🛍️","Night markets"],["🧘","Slow mornings"]], saved: [["posters/hidden-cafe.jpg","☕"],["assets/spot-cafe.jpg","☕"],["posters/club-green-mango.jpg","🛍️"]] },
+  { n: "Aman",  p: "assets/friend-2.jpg", prefs: [["🤿","Snorkelling"],["🍜","Street food"],["🌅","Sunsets"]], saved: [["posters/blue-ocean.jpg","🤿"],["posters/foodie.jpg","🍜"],["posters/date-spot.jpg","🌅"]] },
+  { n: "Arpit", p: "assets/friend-4.jpg", prefs: [["🎉","Nightlife"],["🛵","Scooter rides"],["🍹","Beach bars"]], saved: [["posters/club-samui-nights.jpg","🎉"],["posters/fire-show.jpg","🔥"],["posters/babou.jpg","🍹"]] },
+  { n: "your",  p: "assets/poll-me.jpg",  prefs: [["🌴","Islands"],["☕","Cafes"],["🛕","Temples"]], saved: [["posters/elephant-cafe.jpg","🐘"],["assets/spot-beachcafe.jpg","☕"],["posters/hero.jpg","🌴"]] }
 ];
-const SAVED = [["posters/hidden-cafe.jpg","☕"],["assets/spot-temple.jpg","🛕"],["posters/blue-ocean.jpg","🏖️"],["posters/foodie.jpg","🍜"],["posters/sea-breeze.jpg","🌅"],["posters/fire-show.jpg","🔥"],["posters/elephant-cafe.jpg","🐘"]];
 let runId = 0;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
@@ -1276,48 +1467,52 @@ function fitRead(){
 }
 function enter(el, from){ el.animate([{ opacity: 0, transform: `translateX(${from}px)` }, { opacity: 1, transform: "none" }], { duration: 480, easing: "cubic-bezier(.2,.9,.25,1)" }); }
 
+function mkCardFor(c, kind){
+  const item = document.createElement("div"); item.className = "mkItem"; item.dataset.sq = "16";
+  const who = c.n === "your" ? "your" : c.n + "’s";
+  item.innerHTML = `<div class="mkRow"><img class="av" src="${c.p}" alt=""><span>Collecting ${who} ${kind}</span><i class="tick">${TICK}</i></div>` +
+    (kind === "preferences" ? `<div class="mkChips"></div>` : `<div class="mkTiles"></div>`);
+  mkList.appendChild(item); watchSq(item); enter(item, 60); fitRead();
+  return item;
+}
 async function runMaking(id){
   const alive = () => id === runId && !making.hidden;
-  await wait(500);
+  await wait(450);
+  // everyone's preferences: chips slide in from the left
   for (const c of CREW){
     if (!alive()) return;
-    const item = document.createElement("div"); item.className = "mkItem"; item.dataset.sq = "16";
-    const who = c.n === "your" ? "your" : c.n + "’s";
-    item.innerHTML = `<div class="mkRow"><img class="av" src="${c.p}" alt=""><span>Collecting ${who} preferences</span><i class="tick">${TICK}</i></div><div class="mkChips"></div>`;
-    mkList.appendChild(item); watchSq(item); enter(item, 60); fitRead();
-    await wait(650);
+    const item = mkCardFor(c, "preferences");
+    await wait(480);
     for (const [e, t] of c.prefs){
       if (!alive()) return;
       const chip = document.createElement("span"); chip.className = "pref"; chip.textContent = `${e} ${t}`;
       item.querySelector(".mkChips").appendChild(chip); enter(chip, -28); fitRead();
-      await wait(330);
+      await wait(260);
     }
-    await wait(250); item.classList.add("got"); haptic(6);
-    await wait(300);
+    await wait(200); item.classList.add("got"); haptic(6);
+    await wait(220);
   }
-  // the group's saved reels: tiles slide in from the left and the row keeps scrolling
-  if (!alive()) return;
-  const col = document.createElement("div"); col.className = "mkItem"; col.dataset.sq = "16";
-  col.innerHTML = `<div class="mkRow"><span class="avIcon">🔖</span><span>Collecting Aman’s bookmarks</span><i class="tick">${TICK}</i></div><div class="mkTiles"></div>`;
-  mkList.appendChild(col); watchSq(col); enter(col, 60); fitRead();
-  await wait(600);
-  const row = col.querySelector(".mkTiles");
-  for (const [src, e] of SAVED){
+  // everyone's bookmarks: saved spots slide in from the left, each with its category
+  for (const c of CREW){
     if (!alive()) return;
-    const t = document.createElement("div"); t.className = "tile"; t.dataset.sq = "12";
-    t.innerHTML = `<img src="${src}" alt=""><b>${e}</b>`;
-    row.appendChild(t); watchSq(t); enter(t, -30); fitRead();
-    row.scrollTo({ left: row.scrollWidth, behavior: "smooth" });
-    await wait(380);
+    const item = mkCardFor(c, "bookmarks"), row = item.querySelector(".mkTiles");
+    await wait(420);
+    for (const [src, e] of c.saved){
+      if (!alive()) return;
+      const t = document.createElement("div"); t.className = "tile"; t.dataset.sq = "12";
+      t.innerHTML = `<img src="${src}" alt=""><b>${e}</b>`;
+      row.appendChild(t); watchSq(t); enter(t, -30); fitRead();
+      await wait(260);
+    }
+    await wait(200); item.classList.add("got"); haptic(6);
+    await wait(220);
   }
-  await wait(300); col.classList.add("got");
-  await wait(500); if (!alive()) return;
+  await wait(400); if (!alive()) return;
   mkRead.classList.add("done"); haptic(12);
-  // card 2 wakes up
   mkShape.classList.remove("wait"); mkShape.querySelector(".spin").classList.remove("wait");
-  await wait(2600); if (!alive()) return;
+  await wait(2400); if (!alive()) return;
   mkShape.classList.add("done"); haptic(12);
-  await wait(1300); if (!alive()) return;
+  await wait(1100); if (!alive()) return;
   making.classList.add("leaving");
   await wait(450); if (!alive()) return;
   showPlan(true);
@@ -1341,53 +1536,252 @@ function closePlanScreens(fromPop){
   if (!fromPop && location.hash === "#plan") history.back();
 }
 document.querySelectorAll(".screen [data-close]").forEach(b => b.addEventListener("click", () => closePlanScreens()));
-window.addEventListener("popstate", () => closePlanScreens(true));
-document.addEventListener("keydown", e => { if (e.key === "Escape") closePlanScreens(); });
+window.addEventListener("popstate", () => { if (location.hash !== "#plan" && location.hash !== "#poll") closePlanScreens(true); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sheet.hidden && invite.hidden) closePlanScreens(); });
 
 /* ---------- Plan Ready ---------- */
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const fmtD = (d, pad) => `${MON[d.getMonth()]} ${pad ? String(d.getDate()).padStart(2, "0") : d.getDate()}`;
+function fmtRange(start, n, pad){ const e = addDays(start, n - 1);
+  return e.getMonth() === start.getMonth() ? `${fmtD(start, pad)} - ${pad ? String(e.getDate()).padStart(2, "0") : e.getDate()}` : `${fmtD(start, pad)} - ${fmtD(e, pad)}`; }
+const PEOPLE = { Isha: "assets/friend-1.jpg", Priya: "assets/friend-5.jpg", Aman: "assets/friend-2.jpg", Arpit: "assets/friend-4.jpg", You: "assets/poll-me.jpg" };
+const TRIP = { start: new Date(2026, 11, 24), from: "Mumbai", price: "23,350", note: "Cheapest flight in the month of December from Mumbai" };
+const S = (t, n, e, img, note) => ({ t, n, e, img, note });
 const DAYS = [
-  { c: "#138cff", place: "Phuket Old Town", km: "18 KM", n: 6, s: [["assets/spot-temple.jpg","🛕"],["assets/spot-cafe.jpg","☕"],["assets/spot-beachcafe.jpg","☕"],["posters/foodie.jpg","🍜"],["posters/hidden-cafe.jpg","☕"],["posters/magical-cafes.jpg","📸"]] },
-  { c: "#e8456b", place: "Kathu District", km: "24 KM", n: 4, s: [["posters/elephant-cafe.jpg","🐘"],["assets/spot-cafe.jpg","☕"],["posters/date-spot.jpg","🌅"],["assets/spot-temple.jpg","🛕"]] },
-  { c: "#09c05d", place: "Phi Phi Islands", km: "46 KM", n: 5, s: [["posters/blue-ocean.jpg","🤿"],["posters/sea-breeze.jpg","🏖️"],["posters/hero.jpg","🌴"],["posters/wildchild.jpg","🍹"],["posters/fire-show.jpg","🔥"]] },
-  { c: "#ff8a00", place: "Koh Samui, Chaweng", km: "32 KM", n: 6, s: [["posters/samui-cafes.jpg","☕"],["posters/club-samui-nights.jpg","🎉"],["posters/babou.jpg","🍹"],["posters/club-ibiza.jpg","🎉"],["posters/sea-breeze.jpg","🌅"]] },
-  { c: "#6b2bf5", place: "Fisherman’s Village", km: "12 KM", n: 7, s: [["posters/club-green-mango.jpg","🛍️"],["posters/foodie.jpg","🍜"],["assets/spot-beachcafe.jpg","☕"],["posters/club-oxa.jpg","🎉"],["posters/date-spot.jpg","🌅"]] }
+  { c: "#138cff", place: "Phuket Old Town", km: "18 KM", stops: [S("9:00 AM","Wat Chalong","🛕","assets/spot-temple.jpg","Phuket’s biggest temple. Go early, it gets busy."), S("11:30 AM","Thalang Road cafes","☕","assets/spot-cafe.jpg","Sino-Portuguese shophouses, slow coffee."), S("1:30 PM","Old Town street food","🍜","posters/foodie.jpg","Mee hokkien and roti for lunch."), S("5:30 PM","Big Buddha at sunset","🌅","assets/cover-3.jpg","45 m marble Buddha on Nakkerd Hill.")] },
+  { c: "#e8456b", place: "Kata & Karon", km: "22 KM", stops: [S("9:30 AM","Kata Beach","🏖️","posters/sea-breeze.jpg","Calm water in the morning."), S("12:30 PM","Beach cafe lunch","☕","assets/spot-beachcafe.jpg","Shade, smoothies, sea view."), S("3:30 PM","Karon Viewpoint","📸","posters/magical-cafes.jpg","Three bays in one frame."), S("6:00 PM","Promthep Cape","🌅","posters/date-spot.jpg","Phuket’s favourite sunset spot.")] },
+  { c: "#f5a623", place: "Phi Phi Islands", km: "46 KM", stops: [S("7:30 AM","Speedboat from Rassada Pier","🚤","posters/blue-ocean.jpg","Around 45 minutes each way."), S("9:30 AM","Maya Bay","🏖️","posters/hero.jpg","Swimming isn’t allowed, but the view is."), S("11:30 AM","Pileh Lagoon snorkelling","🤿","posters/blue-ocean.jpg","Clear green water, bring a GoPro."), S("3:00 PM","Phi Phi Viewpoint","📸","posters/wildchild.jpg","A sweaty climb, worth it."), S("8:00 PM","Fire show on the beach","🔥","posters/fire-show.jpg","Back on Phi Phi Don for dinner.")] },
+  { c: "#2ebd6b", place: "Chaweng, Koh Samui", km: "12 KM", stops: [S("2:00 PM","Check in, Chaweng Beach","🏖️","posters/samui-cafes.jpg","Easy first afternoon on Samui."), S("5:30 PM","Sunset cafe","☕","posters/hidden-cafe.jpg","Hilltop cafe with a view."), S("9:30 PM","Chaweng nightlife","🎉","posters/club-samui-nights.jpg","Arpit’s pick.")] },
+  { c: "#8b5cf6", place: "Ang Thong Marine Park", km: "38 KM", stops: [S("8:00 AM","Boat to Ang Thong","🚤","posters/blue-ocean.jpg","Day trip, lunch on board."), S("10:30 AM","Kayaking","🛶","posters/sea-breeze.jpg","Paddle between limestone islands."), S("1:00 PM","Viewpoint hike","📸","posters/hero.jpg","Over the Emerald Lake."), S("6:00 PM","Beach bar","🍹","posters/babou.jpg","Back on Samui by sunset.")] },
+  { c: "#4fa8f5", place: "Bophut & Fisherman’s Village", km: "15 KM", stops: [S("9:00 AM","Big Buddha Temple","🛕","assets/cover-1.jpg","Wat Phra Yai, Samui’s landmark."), S("11:30 AM","Elephant cafe","🐘","posters/elephant-cafe.jpg","Priya’s saved reel."), S("6:00 PM","Fisherman’s Village walking street","🛍️","posters/club-green-mango.jpg","Best on a Friday night."), S("9:30 PM","Beach club","🎉","posters/club-ibiza.jpg","Last big night out.")] },
+  { c: "#ff6b3d", place: "Lamai", km: "20 KM", stops: [S("9:30 AM","Hin Ta & Hin Yai rocks","📸","posters/date-spot.jpg","Quick stop on the coast road."), S("11:30 AM","Lamai beach cafe","☕","assets/spot-cafe.jpg","Slow morning, Priya will love it."), S("3:00 PM","Spa afternoon","💆","posters/sea-breeze.jpg","Rest before the flight."), S("7:30 PM","Farewell dinner","🍽️","posters/foodie.jpg","Seafood by the water.")] }
 ];
-function cardHTML(inner, cls, r){ return `<div class="pCard ${cls || ""} prIn"><div class="box" data-sq="${r}">${inner}</div><i class="edge" data-ring="${r}"></i></div>`; }
-function showPlan(fromMaking){
-  const sc = document.getElementById("prScroll");
-  const avs = [["assets/poll-me.jpg","me"],["assets/friend-5.jpg"],["assets/friend-1.jpg"],["assets/friend-2.jpg"],["assets/friend-4.jpg"]];
-  sc.innerHTML = `
-    <div class="prTop prIn">
+const BREAK_AFTER = 2;   // the move from Phuket to Koh Samui happens before Day 4
+const UNPLANNED = [
+  { n: "Kata Noi Beach", e: "🏖️", img: "posters/sea-breeze.jpg", by: "Isha" },
+  { n: "Sunday Walking Street", e: "🛍️", img: "posters/club-green-mango.jpg", by: "Priya" },
+  { n: "Secret Buddha Garden", e: "🛕", img: "assets/spot-temple.jpg", by: "You" },
+  { n: "Na Muang Waterfall", e: "🌿", img: "posters/elephant-cafe.jpg", by: "Aman" },
+  { n: "Silver Beach", e: "🤿", img: "posters/blue-ocean.jpg", by: "Arpit" }
+];
+const totalSpots = () => DAYS.reduce((a, d) => a + d.stops.length, 0);
+let view = "overview";
+const prSheet = document.getElementById("prSheet"), prScroll = document.getElementById("prScroll");
+const prChat = document.getElementById("prChat"), msgsEl = document.getElementById("msgs"), aiRow = document.getElementById("aiRow");
+
+function cardHTML(inner, cls, r){ return `<div class="pCard ${cls || ""}"><div class="box" data-sq="${r}">${inner}</div><i class="edge" data-ring="${r}"></i></div>`; }
+function chipsHTML(){
+  return `<button data-v="overview" aria-pressed="${view === "overview"}"><img src="assets/map-outline-white.svg" alt="">Overview</button>
+    <button data-v="chat" aria-pressed="${view === "chat"}">Chat</button><button data-v="unplanned" aria-pressed="${view === "unplanned"}">Unplanned</button>
+    ${DAYS.map((d, i) => `<button data-v="day:${i}" aria-pressed="${view === "day:" + i}"><em>${fmtD(addDays(TRIP.start, i))}</em>Day ${i + 1}</button>`).join("")}`;
+}
+function flightHTML(f){
+  return cardHTML(`<div class="flTop"><div style="min-width:0"><div class="fRoute"><span class="r"><img class="pl" src="assets/plane-fill.svg" alt="">${f.from}<img src="assets/return.svg" alt="return">Phuket</span><i></i><span class="dt">${f.dates}</span></div>
+      <p class="fPrice"><span class="rs">₹</span><b>${f.price}</b> Return Flight</p></div><button class="bookBtn" data-sq="10" data-soon="Booking">Book</button></div>
+    <div class="aiNote" data-sq="12"><img src="assets/sparkle-green.svg" alt=""><p>${f.note}</p></div>`, "flight", 16);
+}
+const spotTile = st => `<div class="spot" data-sq="12.8"><img src="${st.img}" alt="${esc(st.n)}" loading="lazy"><b>${st.e}</b></div>`;
+function headerHTML(){
+  const avs = ["You", "Isha", "Priya", "Aman", "Arpit"];
+  return `<div class="prTop">
       <div class="covers">
         <div class="cv" data-sq="22"><img src="assets/cover-1.jpg" alt="" style="left:-21px;top:-45px;width:118px;height:178px;transform:rotate(-6deg)"></div>
         <div class="cv" data-sq="22"><img src="assets/cover-2.jpg" alt="" style="left:-8px;top:-1px;width:184px;height:123px"></div>
         <div class="cv" data-sq="22"><img src="assets/cover-3.jpg" alt="" style="left:-3px;top:-34px;width:118px;height:177px"></div>
       </div>
       <div class="prInfo">
-        <div><h2>Koh Samui, Phuket<br>10-day Trip 🇹🇭</h2>
-          <div class="prMeta"><span class="dots">10 days<i></i>28 spots</span><span class="dateChip"><img src="assets/calendar-fill.svg" alt="">Dec 24 -31</span></div></div>
-        <div class="crew">${avs.map(([p, m], i) => `<span class="${m || ""}" style="z-index:${9 - i}"><img src="${p}" alt=""></span>`).join("")}<button data-soon="Inviting friends" aria-label="Invite a friend"><img src="assets/plus-purple.svg" alt=""></button></div>
+        <div><h2>Koh Samui, Phuket<br>${DAYS.length}-day Trip 🇹🇭</h2>
+          <div class="prMeta"><span class="dots">${DAYS.length} days<i></i><span id="prSpots">${totalSpots()} spots</span></span><span class="dateChip" id="prDates"><img src="assets/calendar-fill.svg" alt="">${fmtRange(TRIP.start, DAYS.length, true)}</span></div></div>
+        <div class="crew">${avs.map((p, i) => `<span class="${p === "You" ? "self" : ""}" style="z-index:${9 - i}"><img src="${PEOPLE[p]}" alt="${p}"></span>`).join("")}<button data-act="invite" aria-label="Invite a friend"><img src="assets/plus-purple.svg" alt=""></button></div>
       </div>
-    </div>
-    <div class="prChips prIn" style="animation-delay:.08s">
-      <button aria-pressed="true"><img src="assets/map-outline-white.svg" alt="">Overview</button>
-      <button aria-pressed="false">Chat</button><button aria-pressed="false">Unplanned</button>
-      ${DAYS.map((d, i) => `<button aria-pressed="false"><em>Dec ${24 + i}</em>Day ${i + 1}</button>`).join("")}
-    </div>
-    <div class="prList">
-      ${cardHTML(`<div class="flTop"><div style="min-width:0"><div class="fRoute"><span class="r"><img class="pl" src="assets/plane-fill.svg" alt="">Mumbai<img src="assets/return.svg" alt="return">Phuket</span><i></i><span class="dt">Dec 24 - 31</span></div>
-          <p class="fPrice"><span class="rs">₹</span><b>23,350</b> Return Flight</p></div><button class="bookBtn" data-sq="10" data-soon="Booking">Book</button></div>
-        <div class="aiNote" data-sq="12"><img src="assets/sparkle-green.svg" alt=""><p>Cheapest flight in the month of December from Mumbai</p></div>`, "flight", 16)}
-      ${DAYS.map((d, i) => cardHTML(`<div class="dayHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.n} spots</span></div>
-        <div class="spots">${d.s.map(([p, e]) => `<div class="spot" data-sq="12.8"><img src="${p}" alt="" loading="lazy"><b>${e}</b></div>`).join("")}</div>`, "", 20)).join("")}
     </div>`;
-  sc.querySelectorAll(".prList .pCard").forEach((c, i) => c.style.animationDelay = (.16 + i * .07) + "s");
-  sc.querySelectorAll("[data-soon]").forEach(b => b.addEventListener("click", () => say(b.dataset.soon + " is coming next")));
-  sc.querySelectorAll(".prChips button").forEach(b => b.addEventListener("click", () => sc.querySelectorAll(".prChips button").forEach(x => x.setAttribute("aria-pressed", x === b))));
-  making.hidden = true; planEl.hidden = false; sc.scrollTop = 0;
-  planEl.querySelector(".bigSheet").style.animation = "none"; void planEl.offsetWidth; planEl.querySelector(".bigSheet").style.animation = "";
+}
+function overviewHTML(){
+  let h = `<div class="prList">` + flightHTML({ from: TRIP.from, dates: fmtRange(TRIP.start, DAYS.length), price: TRIP.price, note: TRIP.note });
+  DAYS.forEach((d, i) => {
+    h += cardHTML(`<div class="dayHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.stops.length} spots</span></div>
+      <div class="spots">${d.stops.map(spotTile).join("")}</div>`, `dayCard" data-day="${i}`, 20);
+    if (i === BREAK_AFTER){
+      const day = addDays(TRIP.start, i + 1);
+      h += `<div class="breakCard" data-sq="20"><div><span class="tag">Flight Change</span><span class="what"><img src="assets/plane-fill.svg" alt="">Phuket → Koh Samui</span><span class="when">${fmtD(day)}, ${day.getFullYear()}</span></div>
+        <i class="cut"></i><div><span class="tag">Hotel Change</span><span class="what">🛏️ Koh Samui, Chaweng</span><span class="when">${fmtRange(day, DAYS.length - i - 1)}, ${day.getFullYear()}</span></div></div>`;
+    }
+  });
+  return h + `</div>`;
+}
+function dayHTML(i){
+  const d = DAYS[i], date = addDays(TRIP.start, i);
+  return `<div class="dayView" style="--dc:${d.c}">
+    <div class="dvHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.stops.length} spots</span></div>
+    <p class="dvSub">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()]}, ${fmtD(date)} · relaxed pace, about ${d.stops.length + 2} hours out</p>
+    <div class="stops">${d.stops.map(st => `<div class="stop"><span class="time">${st.t}</span><span class="rail"><i></i></span><div class="body" data-sq="16">${spotTile(st)}<div style="min-width:0"><h4>${esc(st.n)}</h4><p>${esc(st.note || "")}</p></div></div></div>`).join("")}</div>
+    <button class="addFrom" data-v="unplanned">+ Add a spot from Unplanned</button>
+  </div>`;
+}
+function unplannedHTML(){
+  return `<div class="unView"><p class="unIntro">Spots anyone saves or imports land here. Add them to a day when the group is ready.</p>
+    ${UNPLANNED.length ? UNPLANNED.map((u, k) => `<div class="unItem" data-k="${k}"><div class="unRow">${spotTile(u)}<div class="t"><h4>${esc(u.n)}</h4><span class="by"><img src="${PEOPLE[u.by]}" alt="">Saved by ${u.by === "You" ? "you" : u.by}</span></div><button class="add" aria-expanded="false">Add to day</button></div>
+      <div class="unDays">${DAYS.map((d, i) => `<button data-to="${i}" style="background:${d.c}">Day ${i + 1}</button>`).join("")}</div></div>`).join("") : `<p class="unEmpty">All caught up. Everything is planned.</p>`}
+  </div>`;
+}
+function renderView(){
+  const v = document.getElementById("prView"); if (!v) return;
+  v.innerHTML = view === "unplanned" ? unplannedHTML() : view.startsWith("day:") ? dayHTML(+view.slice(4)) : overviewHTML();
+  v.querySelectorAll(".pCard,.dayView,.unView,.breakCard").forEach((c, i) => { c.classList.add("prIn"); c.style.animationDelay = (i * .05) + "s"; });
+  watchSq(v); bindSoon(v);
+}
+function bindSoon(root){ root.querySelectorAll("[data-soon]").forEach(b => { if (!b._s){ b._s = 1; b.addEventListener("click", e => { e.stopPropagation(); say(b.dataset.soon + " is coming next"); }); } }); }
+function syncChips(){
+  [prScroll.querySelector(".prChips"), document.getElementById("chatChips")].forEach(bar => {
+    if (!bar) return; bar.innerHTML = chipsHTML();
+    const on = bar.querySelector('[aria-pressed="true"]'); if (on) on.scrollIntoView({ inline: "center", block: "nearest" });
+  });
+}
+function renderPlan(){
+  prScroll.innerHTML = `${headerHTML()}<div class="prChips"></div><div class="prView" id="prView"></div>`;
+  syncChips(); renderView(); watchSq(prScroll);
+}
+function setView(v){
+  closeMenus();
+  view = v; syncChips();
+  if (v === "chat"){ openChat(); return; }
+  prChat.hidden = true; document.getElementById("prBtns").hidden = false;
+  renderView();
+  if (v !== "overview"){ setFull(true); requestAnimationFrame(() => { const top = prScroll.querySelector(".prChips").offsetTop; prScroll.scrollTo({ top, behavior: "smooth" }); }); }
+}
+function setFull(on){
+  prSheet.classList.toggle("isFull", on); prSheet.style.top = "";
+  if (!on) prScroll.scrollTo({ top: 0, behavior: "smooth" });
+}
+function showPlan(){
+  view = "overview"; renderPlan(); prChat.hidden = true; document.getElementById("prBtns").hidden = false;
+  prSheet.classList.remove("isFull");
+  making.hidden = true; planEl.hidden = false; prScroll.scrollTop = 0;
+  prSheet.style.animation = "none"; void planEl.offsetWidth; prSheet.style.animation = "";
   watchSq(planEl); haptic(16);
 }
+
+// clicks inside the plan: chips, day cards, unplanned actions, invite
+planEl.addEventListener("click", e => {
+  const chip = e.target.closest("[data-v]"); if (chip){ setView(chip.dataset.v); haptic(6); return; }
+  const day = e.target.closest(".dayCard"); if (day){ setView("day:" + day.dataset.day); return; }
+  const act = e.target.closest("[data-act]"); if (act){ doAct(act.dataset.act); return; }
+  const add = e.target.closest(".unRow .add");
+  if (add){ const it = add.closest(".unItem"), open = !it.classList.contains("open"); prScroll.querySelectorAll(".unItem.open").forEach(x => { x.classList.remove("open"); x.querySelector(".add").setAttribute("aria-expanded", "false"); });
+    it.classList.toggle("open", open); add.setAttribute("aria-expanded", open); return; }
+  const to = e.target.closest(".unDays [data-to]");
+  if (to){ const k = +to.closest(".unItem").dataset.k, u = UNPLANNED.splice(k, 1)[0], d = +to.dataset.to;
+    DAYS[d].stops.push(S("Free time", u.n, u.e, u.img, `Added from Unplanned. Saved by ${u.by === "You" ? "you" : u.by}.`));
+    renderView(); const sp = document.getElementById("prSpots"); if (sp){ sp.textContent = totalSpots() + " spots"; sp.classList.add("flash"); }
+    say(`${u.n} added to Day ${d + 1}`); haptic(12); return; }
+});
+function doAct(a){
+  closeMenus();
+  if (a === "invite") openInvite();
+  else if (a === "spots" || a === "import"){ setView("unplanned"); say(a === "import" ? "Paste a reel or map link. Imported spots land in Unplanned." : "Pick a spot and add it to a day"); }
+  else if (a === "stays") say("Adding stays is coming next");
+  else if (a === "poll") openPoll("chat");
+}
+
+// + menus
+const prMenu = document.getElementById("prMenu"), prBtns = document.getElementById("prBtns"), prAdd = document.getElementById("prAdd");
+const chatMenu = document.getElementById("chatMenu"), chatBarEl = document.getElementById("chatBar"), chatPlus = document.getElementById("chatPlus");
+function closeMenus(){ prMenu.classList.remove("open"); prBtns.classList.remove("open"); prAdd.setAttribute("aria-expanded", "false");
+  chatMenu.classList.remove("open"); chatBarEl.classList.remove("open"); chatPlus.setAttribute("aria-expanded", "false"); }
+prAdd.addEventListener("click", () => { const o = !prMenu.classList.contains("open"); closeMenus(); if (o){ prMenu.classList.add("open"); prBtns.classList.add("open"); prAdd.setAttribute("aria-expanded", "true"); haptic(8); } });
+chatPlus.addEventListener("click", () => { const o = !chatMenu.classList.contains("open"); closeMenus(); if (o){ chatMenu.classList.add("open"); chatBarEl.classList.add("open"); chatPlus.setAttribute("aria-expanded", "true"); haptic(8); } });
+[prMenu, chatMenu].forEach(m => m.querySelector(".wash").addEventListener("click", closeMenus));
+
+// Drag the sheet: up goes edge to edge, down comes back. Scrolling the list up also takes it full screen.
+prScroll.addEventListener("scroll", () => { if (!prSheet.classList.contains("isFull") && prScroll.scrollTop > 12) setFull(true); }, { passive: true });
+prScroll.addEventListener("wheel", e => { if (prSheet.classList.contains("isFull") && prScroll.scrollTop <= 0 && e.deltaY < -40) setFull(false); }, { passive: true });
+let pull = null;
+prScroll.addEventListener("touchstart", e => { pull = prScroll.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+prScroll.addEventListener("touchmove", e => { if (pull !== null && e.touches[0].clientY - pull > 70 && prSheet.classList.contains("isFull") && view === "overview"){ pull = null; setFull(false); } }, { passive: true });
+document.getElementById("prGrab").addEventListener("pointerdown", e => {
+  const g = e.currentTarget; g.setPointerCapture(e.pointerId);
+  const y0 = e.clientY, top0 = prSheet.getBoundingClientRect().top - planEl.getBoundingClientRect().top; let dy = 0;
+  prSheet.classList.add("drag");
+  const move = ev => { dy = ev.clientY - y0; prSheet.style.top = Math.max(8, top0 + dy) + "px"; };
+  const up = () => { g.removeEventListener("pointermove", move); g.removeEventListener("pointerup", up); prSheet.classList.remove("drag");
+    if (Math.abs(dy) < 6) setFull(!prSheet.classList.contains("isFull")); else setFull(dy < 0); };
+  g.addEventListener("pointermove", move); g.addEventListener("pointerup", up);
+});
+
+/* ---------- Chat: the group talks, AI offers the next step ---------- */
+let chatStage = 0, chatRun = 0;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function bubble(who, text, anim = true){
+  const me = who === "You", el = document.createElement("div");
+  el.className = "msg" + (me ? " self" : "") + (anim ? " msgIn" : "");
+  const b = `<div class="bubble" data-sq="16"><b>${who}</b><p>${esc(text)}</p></div>`, av = `<img src="${PEOPLE[who]}" alt="">`;
+  el.innerHTML = me ? b + av : av + b;
+  msgsEl.appendChild(el); watchSq(el); scrollChat(); return el;
+}
+function scrollChat(){ requestAnimationFrame(() => msgsEl.scrollTo({ top: msgsEl.scrollHeight, behavior: "smooth" })); }
+async function typing(who, ms){
+  const el = document.createElement("div"); el.className = "msg typing msgIn";
+  el.innerHTML = `<img src="${PEOPLE[who]}" alt=""><div class="bubble" data-sq="16"><i></i><i></i><i></i></div>`;
+  msgsEl.appendChild(el); watchSq(el); scrollChat(); await sleep(ms); el.remove();
+}
+function aiChip(text, onTap){
+  aiRow.innerHTML = `<button class="aiChip"><img src="assets/sparkle-purple.svg" alt=""><span>${esc(text)}</span></button>`;
+  aiRow.querySelector("button").addEventListener("click", () => { aiRow.innerHTML = ""; haptic(10); onTap(); }, { once: true });
+  scrollChat();
+}
+function aiLoading(text){ aiRow.innerHTML = `<div class="aiLoad"><img class="spin big" src="assets/loader-28.svg" alt=""><p>${esc(text)}</p></div>`; scrollChat(); }
+function openChat(){
+  prChat.hidden = false; document.getElementById("prBtns").hidden = true; setFull(true); syncChips();
+  if (!chatStage){
+    chatStage = 1; msgsEl.innerHTML = ""; aiRow.innerHTML = "";
+    bubble("Isha", "Guys, these dates are not working for me.", false);
+    bubble("Priya", "Isha these are the dates where we are getting cheapest flight prices", false);
+    bubble("You", "Yes, Isha these are the dates where we are getting cheapest prices but tell me the dates when you are comfortable with? we can see", false);
+    const id = ++chatRun;
+    (async () => { await sleep(900); if (id !== chatRun || prChat.hidden) { chatStage = 0; return; }
+      await typing("Isha", 1300); bubble("Isha", "I am free in January first half."); chatStage = 2;
+      await sleep(500); aiChip("Give cheapest flights in January 2027", findFlights); })();
+  } else scrollChat();
+}
+async function findFlights(){
+  aiLoading("Fetching flights details"); await sleep(2200); aiRow.innerHTML = "";
+  const opts = [{ from: "Mumbai", dates: "Jan 9 - 15", price: "23,350", note: "Cheapest return flight from Mumbai in January" },
+                { from: "Delhi", dates: "Jan 4 - 10", price: "18,350", note: "Cheapest return flight from Delhi in January" }];
+  for (const o of opts){ const w = document.createElement("div"); w.className = "msgCard msgIn"; w.innerHTML = flightHTML(o); msgsEl.appendChild(w); watchSq(w); bindSoon(w); scrollChat(); haptic(6); await sleep(450); }
+  await sleep(900);
+  // you type your reaction into the box, then it sends
+  const inp = document.getElementById("chatInput"), line = "Guys this Jan 4 - 10 flights looks very cheap.";
+  for (let k = 1; k <= line.length; k++){ inp.value = line.slice(0, k); await sleep(22); }
+  await sleep(300); inp.value = ""; bubble("You", line);
+  await typing("Priya", 1000); bubble("Priya", "Works for me 👍");
+  await typing("Aman", 900); bubble("Aman", "I’m in!");
+  await typing("Isha", 900); bubble("Isha", "Perfect, thank you guys ❤️");
+  chatStage = 3; await sleep(500);
+  aiChip("Change trip dates to Jan 4 - 10", changeDates);
+}
+async function changeDates(){
+  aiLoading("Updating your trip dates.."); await sleep(2000); aiRow.innerHTML = "";
+  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest return flight from Delhi in January";
+  bubble("You", "Done! Trip moved to Jan 4 - 10 ✈️"); chatStage = 4;
+  await sleep(700);
+  renderPlan(); setView("overview"); setFull(false);
+  requestAnimationFrame(() => { ["prDates"].forEach(id => document.getElementById(id).classList.add("flash"));
+    const fl = prScroll.querySelector(".flight .box"); if (fl) fl.classList.add("flash"); });
+  say("Trip dates updated to Jan 4 - 10"); haptic(18);
+}
+chatBarEl.addEventListener("submit", e => { e.preventDefault(); const inp = document.getElementById("chatInput"), t = inp.value.trim(); if (!t) return; inp.value = ""; bubble("You", t); haptic(6); });
+
+/* ---------- Invite sheet ---------- */
+const invite = document.getElementById("invite"), invScrim = document.getElementById("invScrim");
+function openInvite(){ invScrim.hidden = false; invite.hidden = false; watchSq(invite);
+  requestAnimationFrame(() => requestAnimationFrame(() => { invScrim.classList.add("show"); invite.classList.add("show"); })); }
+function closeInvite(){ if (invite.hidden) return; invScrim.classList.remove("show"); invite.classList.remove("show");
+  setTimeout(() => { if (!invite.classList.contains("show")){ invite.hidden = true; invScrim.hidden = true; } }, 450); }
+invScrim.addEventListener("click", closeInvite);
+document.getElementById("invCopy").addEventListener("click", e => { try { navigator.clipboard && navigator.clipboard.writeText("https://sidequest.app/t/koh-samui-phuket"); } catch(_){} e.target.textContent = "Copied"; haptic(8); setTimeout(() => e.target.textContent = "Copy link", 1500); });
+invite.querySelectorAll(".invP button").forEach(b => b.addEventListener("click", () => { b.classList.toggle("done"); b.textContent = b.classList.contains("done") ? "Invited" : "Invite"; haptic(8); }));
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInvite(); closeMenus(); } });
 
 /* ---------- Create a Poll sheet ---------- */
 const sheet = document.getElementById("pollSheet"), scrim = document.getElementById("pollScrim");
@@ -1439,7 +1833,7 @@ function check(el, isQ){
   // flags and emoji at the end don't count toward the limit, even half-typed ones
   const v = el.value, name = isQ ? v : v.replace(/[\s\p{Regional_Indicator}\p{Extended_Pictographic}\uFE0F\u200D]+$/u, "");
   if ([...name.trim()].length > (isQ ? Q_MAX : OPT_MAX)) return `Max ${isQ ? Q_MAX : OPT_MAX} characters`;
-  if (!isQ && name.trim().split(/\s+/).filter(Boolean).length > OPT_WORDS) return `Keep it to ${OPT_WORDS} words`;
+  if (!isQ && name.trim().split(/\s+/).filter(w => /\p{L}/u.test(w)).length > OPT_WORDS) return `Keep it to ${OPT_WORDS} words`;
   return null;
 }
 function flag(box, el, msg){
@@ -1459,7 +1853,9 @@ function guard(el, isQ, box){
   flag(box, el, msg);
 }
 
-function openPoll(){
+let pollTarget = "home";
+function openPoll(target){
+  pollTarget = target === "chat" ? "chat" : "home";
   qEl.value = ""; qEl._last = ""; qWrap.classList.remove("bad"); optsEl.innerHTML = "";
   sheet.style.transform = ""; sheet.style.height = "";
   scrim.hidden = false; sheet.hidden = false;
@@ -1473,10 +1869,10 @@ function closePoll(fromPop){
   document.activeElement && document.activeElement.blur && document.activeElement.blur();
   sheet.style.transform = ""; scrim.classList.remove("show"); sheet.classList.remove("show", "typing");
   setTimeout(() => { if (!sheet.classList.contains("show")) { sheet.hidden = true; scrim.hidden = true; } }, 500);
-  if (viewer.hidden) document.body.classList.remove("locked");
+  if (viewer.hidden && making.hidden && planEl.hidden) document.body.classList.remove("locked");
   if (!fromPop && location.hash === "#poll") history.back();
 }
-document.getElementById("pollBtn").addEventListener("click", openPoll);
+document.getElementById("pollBtn").addEventListener("click", () => openPoll("home"));
 scrim.addEventListener("click", () => closePoll());
 window.addEventListener("popstate", () => closePoll(true));
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePoll(); });
@@ -1522,6 +1918,7 @@ sheet.addEventListener("submit", e => {
   const q = qEl.value.trim().replace(/\s+/g, " ");
   const labels = [...optsEl.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
   closePoll();
+  if (pollTarget === "chat"){ setTimeout(() => { showPoll(q, labels, "chat"); say("Poll shared in the trip chat"); }, 280); return; }
   window.scrollTo({top: 0, behavior: "smooth"});
   setTimeout(() => { showPoll(q, labels); say("Poll shared with your crew"); }, 280);
 });
