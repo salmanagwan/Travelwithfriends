@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sidequest Home</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&family=Inter:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&family=Inter:wght@600&display=swap">
 <style>
 /* Layout: one 428px phone column. Header map fades in from the top, then three reel sections. */
 :root{
@@ -25,10 +25,18 @@ img,video{display:block}
 
 .phone{position:relative;width:100%;max-width:428px;margin:0 auto;background:var(--page);overflow:hidden;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .status{display:none}
-@media (min-width:600px){
+/* Any screen wider than the phone gets a grey desk so the phone edge is visible */
+@media (min-width:429px){
   html,body{background:var(--desk)}
+  .phone{box-shadow:0 0 0 1px rgba(17,18,20,.06),0 20px 60px rgba(17,18,20,.14)}
+}
+@media (min-width:460px){
+  body{padding:16px 0}
+  .phone{border-radius:32px}
+}
+@media (min-width:600px){
   body{padding:32px 0}
-  .phone{border-radius:32px;box-shadow:0 30px 80px rgba(17,18,20,.18)}
+  .phone{box-shadow:0 30px 80px rgba(17,18,20,.18)}
   .status{display:flex;height:41px;align-items:center;justify-content:space-between;padding:12px 24px;position:relative;z-index:2}
   .status p{font:600 14px Inter,system-ui,sans-serif;color:#272727}
   .status .dev{display:flex;gap:5px;align-items:center}
@@ -199,6 +207,94 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .soundTip{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,.55);font-size:13px;font-weight:600;transition:opacity .2s,transform .2s;pointer-events:none}
 .soundTip.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 body.locked{overflow:hidden}
+
+/* ---------- Live poll card (Figma "Poll Live") ---------- */
+/* Sits between the header and Trending. Collapsed it takes no space; the negative margins cancel the section gaps. */
+.pollSlot{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.9,.25,1);margin:-40px 0 -40px}
+.pollSlot[hidden]{display:none}
+.pollSlot.on{grid-template-rows:1fr}
+.pollSlot>div{min-height:0;overflow:hidden}
+.pollSlot.settled>div{overflow:visible}
+.pollPad{padding:24px 16px 40px}
+.pollCard{position:relative;filter:drop-shadow(0 1px 40px rgba(0,0,0,.12));opacity:0;transform:translateY(-12px) scale(.96);transition:opacity .45s .1s,transform .6s .1s cubic-bezier(.2,.9,.25,1.15)}
+.pollSlot.on .pollCard{opacity:1;transform:none}
+.pollBox{position:relative;background:#fff;display:flex;flex-direction:column;gap:24px;align-items:center;padding:4px 4px 12px}
+.pollEdge{position:absolute;inset:0;background:#d9d9d9;pointer-events:none}
+.pollHead{position:relative;width:100%;background:#f8f5ff;padding:12px 16px;display:flex;flex-direction:column;gap:8px;overflow:hidden;min-height:76px;justify-content:center}
+.pollMeta{display:flex;align-items:center;gap:8px}
+.pollMeta b{font-weight:800;font-size:12px;letter-spacing:.72px;text-transform:uppercase;color:var(--accent);font-variation-settings:"opsz" 14}
+.pollMeta i{width:3px;height:3px;border-radius:50%;background:#c4c4c4}
+.pollMeta span{font-size:14px;font-weight:400;letter-spacing:-.028px;color:#f74e78;transition:color .3s;font-variation-settings:"opsz" 14}
+.pollMeta span.done{color:#1e9e5a}
+.pollQ{font-weight:600;font-size:18px;letter-spacing:-.2px;line-height:1.25;padding-right:64px;font-variation-settings:"opsz" 14;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.poll3d{position:absolute;right:-16.4px;top:3.3px;width:95.7px;height:95.7px;display:grid;place-items:center;pointer-events:none}
+.poll3d span,.sheetArt span{display:block;position:relative;overflow:hidden;transform:rotate(25deg)}
+.poll3d span{width:72px;height:72px}
+.poll3d img,.sheetArt img{position:absolute;left:-17.57%;top:-16.32%;width:131.17%;height:131.17%;max-width:none}
+.track{position:relative;width:calc(100% - 28px);max-width:364px;height:98px;touch-action:pan-y}
+.bar{position:absolute;left:8px;right:0;top:39.5px;height:4px;border-radius:50px;background:#f5f5f5}
+.bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:50px;background:var(--accent);opacity:.9}
+.dot{position:absolute;top:35.5px;width:12px;height:12px;margin-left:-6px;border-radius:50px;background:#f5f5f5;transition:background .25s,transform .25s}
+.dot.mine{background:var(--accent)}
+.opt{position:absolute;top:55.5px;transform:translateX(-50%);font-weight:700;font-size:20px;letter-spacing:-1px;line-height:1.3;text-align:center;white-space:nowrap;color:var(--text-primary);font-variation-settings:"opsz" 14;padding:0 4px;border-radius:8px;transition:color .2s}
+.opt em{display:block;font-style:normal;font-size:16px;line-height:1.2;letter-spacing:0}
+.opt.mine{color:var(--accent)}
+.track.many .opt{font-size:16px;letter-spacing:-.6px}
+.voters{position:absolute;top:-.5px;height:24px;display:flex;transform:translateX(-50%)}
+.voters img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px;background:#eee;animation:pop .45s cubic-bezier(.2,.9,.3,1.4) both}
+.voters img:first-child{margin-left:0}
+@keyframes pop{from{transform:scale(0) translateY(10px);opacity:0}}
+.meDot{position:absolute;top:25.5px;left:0;width:32px;height:32px;margin-left:-16px;border-radius:50%;overflow:hidden;cursor:grab;touch-action:none;z-index:2;
+  box-shadow:0 0 0 2px #fff,0 2px 8px rgba(0,0,0,.18);transition:left .5s cubic-bezier(.2,.9,.25,1.2)}
+.meDot.drag{transition:none;cursor:grabbing;transform:scale(1.12)}
+.meDot img{width:100%;height:100%;object-fit:cover}
+.meDot::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--accent);opacity:0;animation:nudge 2.4s 1.2s ease-out infinite}
+.meDot.voted::after{display:none}
+@keyframes nudge{0%{transform:scale(.8);opacity:.7}70%,100%{transform:scale(1.25);opacity:0}}
+
+/* ---------- Create a Poll sheet (Figma "Add a poll" / "Poll Value Added") ---------- */
+.scrim{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.7);opacity:0;transition:opacity .35s}
+.scrim.show{opacity:1}
+.sheet{position:fixed;z-index:121;left:50%;bottom:8px;width:min(412px,calc(100vw - 16px));height:min(635px,calc(100dvh - 28px));transform:translate(-50%,calc(100% + 40px));
+  transition:transform .5s cubic-bezier(.2,.9,.25,1),height .3s,bottom .25s;display:flex;flex-direction:column}
+.sheet.show{transform:translate(-50%,0)}
+.sheet.drag{transition:none}
+.sheet[hidden],.scrim[hidden]{display:none}
+.sheetBg{position:absolute;inset:0;background:#fff;pointer-events:none}
+.sheetEdge{position:absolute;inset:0;background:#efefef;pointer-events:none}
+.grab{position:relative;height:40px;flex:none;cursor:grab;touch-action:none}
+.grab::before{content:"";position:absolute;left:50%;top:8px;width:80px;height:6px;margin-left:-40px;border-radius:3px;background:#ececec}
+.sheetArt{position:absolute;right:-24px;top:-21px;width:96px;height:96px;display:grid;place-items:center;pointer-events:none;z-index:2;filter:drop-shadow(0 8px 16px rgba(240,60,40,.25))}
+.sheetArt span{width:80px;height:80px;transform:rotate(20deg)}
+.sheetBody{position:relative;flex:1;min-height:0;overflow-y:auto;padding:0 24px 16px;display:flex;flex-direction:column;gap:40px;scrollbar-width:none}
+.sheetBody::-webkit-scrollbar{display:none}
+.sheetTitle h2{font-weight:900;font-size:32px;line-height:1.15;letter-spacing:-1px;font-variation-settings:"opsz" 14}
+.sheetTitle p{margin-top:6px;font-weight:500;font-size:18px;letter-spacing:-.2px;color:#6b6f76}
+.qWrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.qWrap textarea{width:100%;resize:none;border:0;outline:0;background:none;text-align:center;font:500 32px/1.2 var(--sans);letter-spacing:-1px;color:var(--text-primary);caret-color:var(--accent);padding:0;overflow:hidden;min-height:38px;font-variation-settings:"opsz" 14}
+.qWrap textarea::placeholder{color:rgba(160,164,171,.5)}
+.qLine{height:1px;width:294px;max-width:100%;background:#a0a4ab;transition:width .35s cubic-bezier(.2,.9,.25,1),background .25s}
+.qWrap.filled .qLine,.qWrap:focus-within .qLine{width:100%;background:#101010}
+.opts{display:flex;flex-direction:column;gap:12px}
+.optRow{position:relative;transition:opacity .25s,transform .3s}
+.optRow.enter{opacity:0;transform:translateY(-8px)}
+.optRow input{width:100%;border:0;outline:0;background:#f8f5ff;padding:16px 44px;text-align:center;font:500 20px/1.3 var(--sans);letter-spacing:-1px;color:var(--text-primary);caret-color:var(--accent);transition:background .2s;font-variation-settings:"opsz" 14}
+.optRow input::placeholder{color:#a0a4ab}
+.optRow input:focus{background:#efe7ff}
+.optRow .x{position:absolute;right:12px;top:50%;width:28px;height:28px;margin-top:-14px;border-radius:50%;display:grid;place-items:center;color:#6b6f76;font-size:18px;line-height:1}
+.optRow .x:active{background:rgba(0,0,0,.06)}
+.addMore{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;height:58px;font:500 20px var(--sans);letter-spacing:-1px;color:#6b6f76}
+.addMore svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.addMore[hidden]{display:none}
+.sheetFoot{position:relative;flex:none;padding:12px 24px 24px;transition:padding .25s}
+.sheetFoot::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:#ebebeb;opacity:0;transition:opacity .25s}
+.sheet.typing .sheetFoot::before{opacity:1}
+.sheet.typing .sheetFoot{padding:16px 24px 16px}
+.createBtn{width:100%;height:60px;display:grid;place-items:center;background:#c4c4c4;color:#fff;font-weight:700;font-size:20px;letter-spacing:-.5px;transition:background .25s,transform .15s;font-variation-settings:"opsz" 14}
+.createBtn:not(:disabled){background:#101010}
+.createBtn:not(:disabled):active{transform:scale(.98)}
+.createBtn:disabled{cursor:default}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
@@ -254,13 +350,27 @@ body.locked{overflow:hidden}
       <header class="header">
         <div class="logo"><img src="assets/logo.png" alt="Sidequest"></div>
         <div class="actions">
-          <button class="aiBtn glass disperse strong ring" aria-label="Smart search"><span><img src="assets/ai-badge.png" alt=""></span></button>
+          <button class="aiBtn glass disperse strong ring" id="pollBtn" aria-label="Create a poll" aria-haspopup="dialog"><span><img src="assets/ai-badge.png" alt=""></span></button>
           <img class="me" src="assets/avatar.png" alt="Your profile">
         </div>
       </header>
     </div>
 
     <div class="sections">
+      <section class="pollSlot" id="pollSlot" hidden aria-label="Live poll"><div><div class="pollPad">
+        <div class="pollCard">
+          <div class="pollBox" data-sq="20">
+            <div class="pollHead" data-sq="16">
+              <div class="pollMeta"><b>Poll</b><i></i><span id="pollStatus">1 vote pending</span></div>
+              <p class="pollQ" id="pollQ"></p>
+              <div class="poll3d" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
+            </div>
+            <div class="track" id="track" role="radiogroup" aria-label="Your vote"></div>
+          </div>
+          <div class="pollEdge" data-ring="20"></div>
+        </div>
+      </div></div></section>
+
       <section>
         <h1>Trending in Thailand 🇹🇭</h1>
         <div style="height:24px"></div>
@@ -297,6 +407,29 @@ body.locked{overflow:hidden}
   </nav>
   <div class="toast" id="toast" role="status"></div>
 </main>
+
+<div class="scrim" id="pollScrim" hidden></div>
+<form class="sheet" id="pollSheet" hidden role="dialog" aria-modal="true" aria-labelledby="pollTitle" autocomplete="off">
+  <div class="sheetBg" data-sq="32"></div>
+  <div class="sheetEdge" data-ring="32"></div>
+  <div class="sheetArt" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
+  <div class="grab" id="pollGrab" aria-hidden="true"></div>
+  <div class="sheetBody">
+    <div class="sheetTitle">
+      <h2 id="pollTitle">Create a Poll</h2>
+      <p>Publish a poll to align your friends</p>
+    </div>
+    <div class="qWrap" id="qWrap">
+      <textarea id="pollQuestion" rows="1" maxlength="80" placeholder="Write your question" aria-label="Question"></textarea>
+      <div class="qLine"></div>
+    </div>
+    <div class="opts">
+      <div class="opts" id="pollOpts"></div>
+      <button type="button" class="addMore" id="addMore" data-sq-dash="16"><svg aria-hidden="true"><path fill="none" stroke="#969696" stroke-width="1.5" stroke-dasharray="6 5" stroke-linecap="round"/></svg>+ Add more</button>
+    </div>
+  </div>
+  <div class="sheetFoot"><button type="submit" class="createBtn" id="createPoll" data-sq="16" disabled>Create Poll</button></div>
+</form>
 <div class="viewer" id="viewer" hidden role="dialog" aria-label="Reel">
   <div class="vScroll" id="vScroll"></div>
 </div>
@@ -682,6 +815,195 @@ document.querySelectorAll("[data-soon]").forEach(b => b.addEventListener("click"
   toast.textContent = b.dataset.soon + " is coming next"; toast.classList.add("show");
   clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("show"), 1600);
 }));
+function say(msg){ toast.textContent = msg; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("show"), 1800); }
+
+/* ---------- iOS corners for any element that asks for them ----------
+   data-sq="r" clips to a squircle, data-ring="r" draws a .5px squircle hairline, data-sq-dash="r" draws a dashed squircle outline. */
+const sqObs = new ResizeObserver(es => es.forEach(({target: el}) => {
+  const w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
+  if (el.dataset.sq) clip(el, w, h, +el.dataset.sq);
+  if (el.dataset.ring) ring(el, w, h, +el.dataset.ring, .5);
+  if (el.dataset.sqDash) el.querySelector("path").setAttribute("d", squircle(w - 1.5, h - 1.5, +el.dataset.sqDash, .6, .75, .75));
+}));
+const watchSq = root => root.querySelectorAll("[data-sq],[data-ring],[data-sq-dash]").forEach(el => sqObs.observe(el));
+watchSq(document);
+
+/* ---------- Live poll ---------- */
+const FRIENDS = ["assets/friend-1.jpg", "assets/friend-2.jpg", "assets/friend-3.jpg", "assets/friend-4.jpg"];
+const ME = "assets/poll-me.jpg";
+const pollSlot = document.getElementById("pollSlot"), track = document.getElementById("track");
+const pollQ = document.getElementById("pollQ"), pollStatus = document.getElementById("pollStatus");
+let poll = null, voteTimers = [];
+
+// "Japan 🇯🇵" -> name on the first line, flag on the second, as in Figma
+const splitLabel = s => { const m = s.match(/^(.*?)\s*((?:\p{Regional_Indicator}{2}|\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*)+)$/u); return m && m[1] ? [m[1], m[2]] : [s, ""]; };
+
+function showPoll(q, labels){
+  voteTimers.forEach(clearTimeout); voteTimers = [];
+  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, waiting: FRIENDS.length };
+  pollQ.textContent = q;
+  track.innerHTML = `<div class="bar"><i class="fill"></i></div>` +
+    poll.opts.map((o, i) => { const [n, e] = splitLabel(o.label);
+      return `<i class="dot"></i><div class="voters"></div><button type="button" class="opt" role="radio" aria-checked="false" data-i="${i}">${esc(n)}${e ? `<em>${e}</em>` : ""}</button>`; }).join("") +
+    `<div class="meDot" role="slider" tabindex="0" aria-label="Drag to vote" aria-valuemin="0" aria-valuemax="${labels.length}" aria-valuenow="0"><img src="${ME}" alt=""></div>`;
+  track.classList.toggle("many", labels.length >= 4);
+  pollSlot.hidden = false; pollSlot.classList.remove("on", "settled");
+  requestAnimationFrame(() => requestAnimationFrame(() => { pollSlot.classList.add("on"); layoutTrack(); }));
+  setTimeout(() => pollSlot.classList.add("settled"), 650);
+  watchSq(pollSlot); updateStatus();
+  // friends start voting a moment after the poll goes live
+  FRIENDS.forEach((src, k) => voteTimers.push(setTimeout(() => {
+    const n = poll.opts.length, i = k < 3 ? Math.min(1, n - 1) : (n > 2 ? n - 1 : 0);
+    const img = new Image(); img.src = src; img.alt = "";
+    track.querySelectorAll(".voters")[i].appendChild(img);
+    poll.opts[i].voters.push(src); poll.waiting--; updateStatus();
+  }, 1600 + k * 1300)));
+}
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// Option x positions follow the Figma track (364 wide): you start at 16, options spread to 332
+function optX(){ const W = track.clientWidth, n = poll.opts.length, a = n === 2 ? 180 : n >= 4 ? 100 : 137, b = 332;
+  return poll.opts.map((_, i) => (n === 1 ? b : a + i * (b - a) / (n - 1)) * W / 364); }
+const startX = () => 16 * track.clientWidth / 364;
+function layoutTrack(){
+  if (!poll || !track.clientWidth) return;
+  const xs = optX();
+  track.querySelectorAll(".dot").forEach((d, i) => d.style.left = xs[i] + "px");
+  track.querySelectorAll(".opt").forEach((d, i) => d.style.left = xs[i] + "px");
+  track.querySelectorAll(".voters").forEach((d, i) => d.style.left = xs[i] + "px");
+  placeMe(poll.mine < 0 ? startX() : xs[poll.mine]);
+}
+function placeMe(x){
+  track.querySelector(".meDot").style.left = x + "px";
+  track.querySelector(".fill").style.width = Math.max(0, x - 8) + "px";
+}
+function vote(i){
+  poll.mine = i;
+  track.querySelectorAll(".dot").forEach((d, k) => d.classList.toggle("mine", k === i));
+  track.querySelectorAll(".opt").forEach((d, k) => { d.classList.toggle("mine", k === i); d.setAttribute("aria-checked", k === i); });
+  const me = track.querySelector(".meDot"); me.classList.toggle("voted", i >= 0); me.setAttribute("aria-valuenow", i + 1);
+  layoutTrack(); updateStatus();
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+function updateStatus(){
+  const n = poll.waiting + (poll.mine < 0 ? 1 : 0);
+  pollStatus.textContent = n ? `${n} vote${n > 1 ? "s" : ""} pending` : "Everyone voted";
+  pollStatus.classList.toggle("done", !n);
+}
+new ResizeObserver(layoutTrack).observe(track);
+
+track.addEventListener("click", e => { const b = e.target.closest(".opt"); if (b) vote(+b.dataset.i); });
+// Drag your avatar along the line and let go near an option
+track.addEventListener("pointerdown", e => {
+  const me = e.target.closest(".meDot"); if (!me) return;
+  e.preventDefault(); me.setPointerCapture(e.pointerId); me.classList.add("drag");
+  const r = track.getBoundingClientRect(), xs = optX(), lo = startX(), hi = xs[xs.length - 1];
+  const move = ev => placeMe(Math.max(lo, Math.min(hi, ev.clientX - r.left)));
+  const up = ev => {
+    me.removeEventListener("pointermove", move); me.removeEventListener("pointerup", up); me.removeEventListener("pointercancel", up);
+    me.classList.remove("drag");
+    const x = ev.clientX - r.left, all = [lo, ...xs];
+    let best = 0; all.forEach((v, k) => { if (Math.abs(v - x) < Math.abs(all[best] - x)) best = k; });
+    vote(best - 1);
+  };
+  me.addEventListener("pointermove", move); me.addEventListener("pointerup", up); me.addEventListener("pointercancel", up);
+});
+track.addEventListener("keydown", e => {
+  if (!e.target.closest(".meDot")) return;
+  const n = poll.opts.length;
+  if (e.key === "ArrowRight") { e.preventDefault(); vote(Math.min(n - 1, poll.mine + 1)); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); vote(Math.max(-1, poll.mine - 1)); }
+});
+
+/* ---------- Create a Poll sheet ---------- */
+const sheet = document.getElementById("pollSheet"), scrim = document.getElementById("pollScrim");
+const qWrap = document.getElementById("qWrap"), qEl = document.getElementById("pollQuestion");
+const optsEl = document.getElementById("pollOpts"), addMore = document.getElementById("addMore"), createBtn = document.getElementById("createPoll");
+const MAX_OPTS = 4;
+
+function addOption(focus){
+  const n = optsEl.children.length; if (n >= MAX_OPTS) return;
+  const row = document.createElement("div"); row.className = "optRow" + (n >= 2 ? " enter" : "");
+  row.innerHTML = `<input type="text" maxlength="24" placeholder="Option ${n + 1}" aria-label="Option ${n + 1}" data-sq="16" enterkeyhint="next">` +
+    (n >= 2 ? `<button type="button" class="x" aria-label="Remove option">×</button>` : "");
+  optsEl.appendChild(row); watchSq(row);
+  requestAnimationFrame(() => row.classList.remove("enter"));
+  if (focus) row.querySelector("input").focus();
+  syncSheet();
+}
+function renumber(){ [...optsEl.children].forEach((r, i) => { const inp = r.querySelector("input"); inp.placeholder = "Option " + (i + 1); inp.setAttribute("aria-label", "Option " + (i + 1)); }); }
+function syncSheet(){
+  const filled = [...optsEl.querySelectorAll("input")].filter(i => i.value.trim()).length;
+  createBtn.disabled = !(qEl.value.trim() && filled >= 2);
+  qWrap.classList.toggle("filled", !!qEl.value.trim());
+  addMore.hidden = optsEl.children.length >= MAX_OPTS;
+}
+function growQ(){ qEl.style.height = "auto"; qEl.style.height = qEl.scrollHeight + "px"; }
+
+function openPoll(){
+  qEl.value = ""; growQ(); optsEl.innerHTML = ""; addOption(); addOption();
+  sheet.style.transform = "";
+  scrim.hidden = false; sheet.hidden = false; growQ();
+  requestAnimationFrame(() => requestAnimationFrame(() => { scrim.classList.add("show"); sheet.classList.add("show"); }));
+  document.body.classList.add("locked");
+  history.pushState({poll: true}, "", "#poll");
+}
+function closePoll(fromPop){
+  if (sheet.hidden) return;
+  document.activeElement && document.activeElement.blur && document.activeElement.blur();
+  sheet.style.transform = ""; scrim.classList.remove("show"); sheet.classList.remove("show", "typing");
+  setTimeout(() => { if (!sheet.classList.contains("show")) { sheet.hidden = true; scrim.hidden = true; } }, 500);
+  if (viewer.hidden) document.body.classList.remove("locked");
+  if (!fromPop && location.hash === "#poll") history.back();
+}
+document.getElementById("pollBtn").addEventListener("click", openPoll);
+scrim.addEventListener("click", () => closePoll());
+window.addEventListener("popstate", () => closePoll(true));
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePoll(); });
+
+qEl.addEventListener("input", () => { growQ(); syncSheet(); });
+qEl.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); optsEl.querySelector("input").focus(); } });
+optsEl.addEventListener("input", syncSheet);
+optsEl.addEventListener("keydown", e => {
+  if (e.key !== "Enter" || !e.target.matches("input")) return;
+  e.preventDefault();
+  const inputs = [...optsEl.querySelectorAll("input")], i = inputs.indexOf(e.target);
+  if (inputs[i + 1]) inputs[i + 1].focus(); else if (!createBtn.disabled) sheet.requestSubmit(); else if (inputs.length < MAX_OPTS) addOption(true);
+});
+optsEl.addEventListener("click", e => { const x = e.target.closest(".x"); if (!x) return; x.parentElement.remove(); renumber(); syncSheet(); });
+addMore.addEventListener("click", () => addOption(true));
+
+// The "typing" look from Figma: footer gets a hairline and the sheet rides above the keyboard
+sheet.addEventListener("focusin", e => { if (e.target.matches("input,textarea")) sheet.classList.add("typing"); });
+sheet.addEventListener("focusout", () => setTimeout(() => { if (!sheet.contains(document.activeElement) || !document.activeElement.matches("input,textarea")) sheet.classList.remove("typing"); }, 0));
+if (window.visualViewport){
+  const fit = () => { const vv = visualViewport, kb = Math.max(0, innerHeight - vv.height - vv.offsetTop);
+    sheet.style.bottom = (kb + 8) + "px"; sheet.style.height = kb > 0 ? `min(635px, ${vv.height - 20}px)` : ""; };
+  visualViewport.addEventListener("resize", fit); visualViewport.addEventListener("scroll", fit);
+}
+
+// Pull the handle down to dismiss
+document.getElementById("pollGrab").addEventListener("pointerdown", e => {
+  const g = e.currentTarget; g.setPointerCapture(e.pointerId); sheet.classList.add("drag");
+  const y0 = e.clientY, t0 = performance.now(); let dy = 0;
+  const move = ev => { dy = Math.max(0, ev.clientY - y0); sheet.style.transform = `translate(-50%, ${dy}px)`; scrim.style.opacity = Math.max(0, 1 - dy / 400); };
+  const up = ev => {
+    g.removeEventListener("pointermove", move); g.removeEventListener("pointerup", up); g.removeEventListener("pointercancel", up);
+    sheet.classList.remove("drag"); scrim.style.opacity = "";
+    const v = dy / Math.max(1, performance.now() - t0);
+    if (dy > 120 || (v > .6 && dy > 30)) closePoll(); else sheet.style.transform = "";
+  };
+  g.addEventListener("pointermove", move); g.addEventListener("pointerup", up); g.addEventListener("pointercancel", up);
+});
+
+sheet.addEventListener("submit", e => {
+  e.preventDefault(); if (createBtn.disabled) return;
+  const q = qEl.value.trim().replace(/\s+/g, " ");
+  const labels = [...optsEl.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
+  closePoll();
+  window.scrollTo({top: 0, behavior: "smooth"});
+  setTimeout(() => { showPoll(q, labels); say("Poll shared with your crew"); }, 280);
+});
 </script>
 </body>
 </html>
