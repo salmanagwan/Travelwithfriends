@@ -265,7 +265,7 @@ body.locked{overflow:hidden}
 .sheetEdge{position:absolute;inset:0;background:#efefef;pointer-events:none}
 .grab{position:relative;height:40px;flex:none;cursor:grab;touch-action:none}
 .grab::before{content:"";position:absolute;left:50%;top:8px;width:80px;height:6px;margin-left:-40px;border-radius:3px;background:#ececec}
-.sheetArt{position:absolute;right:-24px;top:-21px;width:96px;height:96px;display:grid;place-items:center;pointer-events:none;z-index:2;filter:drop-shadow(0 8px 16px rgba(240,60,40,.25))}
+.sheetArt{position:absolute;right:10px;top:-21px;width:96px;height:96px;display:grid;place-items:center;pointer-events:none;z-index:2;filter:drop-shadow(0 8px 16px rgba(240,60,40,.25))}
 .sheetArt span{width:80px;height:80px;transform:rotate(20deg)}
 .sheetBody{position:relative;flex:1;min-height:0;overflow-y:auto;padding:0 24px 16px;display:flex;flex-direction:column;gap:40px;scrollbar-width:none}
 .sheetBody::-webkit-scrollbar{display:none}
@@ -919,7 +919,7 @@ track.addEventListener("keydown", e => {
 const sheet = document.getElementById("pollSheet"), scrim = document.getElementById("pollScrim");
 const qWrap = document.getElementById("qWrap"), qEl = document.getElementById("pollQuestion");
 const optsEl = document.getElementById("pollOpts"), addMore = document.getElementById("addMore"), createBtn = document.getElementById("createPoll");
-const MAX_OPTS = 4;
+const MAX_OPTS = 3;
 
 function addOption(focus){
   const n = optsEl.children.length; if (n >= MAX_OPTS) return;
