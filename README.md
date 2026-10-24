@@ -1,5 +1,10 @@
 # Travel with Friends
 
-Prototype for a group trip planning design task.
+Design prototype for a group trip planning app (take-home assignment).
 
-Open `index.html` in a browser. The globe uses MapLibre GL JS with OpenFreeMap tiles. Place data is dummy data.
+Live: https://salmanagwan.github.io/Travelwithfriends/
+
+- `/` Home: trending reels carousel, cafe row, club deck
+- `/globe/` Globe map prototype (MapLibre + OpenFreeMap)
+
+Reel videos are short compressed clips used as sample content for the prototype.
