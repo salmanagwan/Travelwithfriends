@@ -210,10 +210,11 @@ body.locked{overflow:hidden}
 
 /* ---------- Live poll card (Figma "Poll Live") ---------- */
 /* Sits between the header and Trending. Collapsed it takes no space; the negative margins cancel the section gaps. */
-.pollSlot{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.9,.25,1);margin:-40px 0 -40px}
+.pollSlot{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.9,.25,1);margin:-40px 0 -40px}
 .pollSlot[hidden]{display:none}
 .pollSlot.on{grid-template-rows:1fr}
-.pollSlot>div{min-height:0;overflow:hidden}
+.pollSlot>div{min-height:0;min-width:0;overflow:hidden}
+.pollCard,.pollBox,.pollHead{min-width:0;max-width:100%}
 .pollSlot.settled>div{overflow:visible}
 .pollPad{padding:24px 16px 40px}
 .pollCard{position:relative;filter:drop-shadow(0 1px 40px rgba(0,0,0,.12));opacity:0;transform:translateY(-12px) scale(.96);transition:opacity .45s .1s,transform .6s .1s cubic-bezier(.2,.9,.25,1.15)}
@@ -226,7 +227,7 @@ body.locked{overflow:hidden}
 .pollMeta i{width:3px;height:3px;border-radius:50%;background:#c4c4c4}
 .pollMeta span{font-size:14px;font-weight:400;letter-spacing:-.028px;color:#f74e78;transition:color .3s;font-variation-settings:"opsz" 14}
 .pollMeta span.done{color:#1e9e5a}
-.pollQ{font-weight:600;font-size:18px;letter-spacing:-.2px;line-height:1.25;padding-right:64px;font-variation-settings:"opsz" 14;
+.pollQ{overflow-wrap:anywhere;word-break:break-word;min-width:0;font-weight:600;font-size:18px;letter-spacing:-.2px;line-height:1.25;padding-right:64px;font-variation-settings:"opsz" 14;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .poll3d{position:absolute;right:-16.4px;top:3.3px;width:95.7px;height:95.7px;display:grid;place-items:center;pointer-events:none}
 .poll3d span,.sheetArt span{display:block;position:relative;overflow:hidden;transform:rotate(25deg)}
@@ -273,7 +274,7 @@ body.locked{overflow:hidden}
 .sheetTitle h2{font-weight:900;font-size:32px;line-height:1.15;letter-spacing:-1px;font-variation-settings:"opsz" 14}
 .sheetTitle p{margin-top:6px;font-weight:500;font-size:18px;letter-spacing:-.2px;color:#6b6f76}
 .qWrap{display:flex;flex-direction:column;align-items:center;gap:8px}
-.qWrap textarea{width:100%;resize:none;border:0;outline:0;background:none;text-align:center;font:500 32px/1.2 var(--sans);letter-spacing:-1px;color:var(--text-primary);caret-color:var(--accent);padding:0;overflow:hidden;min-height:38px;font-variation-settings:"opsz" 14}
+.qWrap textarea{overflow-wrap:anywhere;width:100%;resize:none;border:0;outline:0;background:none;text-align:center;font:500 32px/1.2 var(--sans);letter-spacing:-1px;color:var(--text-primary);caret-color:var(--accent);padding:0;overflow:hidden;min-height:38px;font-variation-settings:"opsz" 14}
 .qWrap textarea::placeholder{color:rgba(160,164,171,.5)}
 .qLine{height:1px;width:294px;max-width:100%;background:#a0a4ab;transition:width .35s cubic-bezier(.2,.9,.25,1),background .25s}
 .qWrap.filled .qLine,.qWrap:focus-within .qLine{width:100%;background:#101010}
@@ -885,9 +886,11 @@ function layoutTrack(){
     d.style.left = xs[i] + "px";
     const gap = Math.min(i > 0 ? xs[i] - xs[i - 1] : Infinity, i < xs.length - 1 ? xs[i + 1] - xs[i] : Infinity);
     const maxW = Math.min(gap - 8, 2 * (W - xs[i] + 12));
-    d.style.maxWidth = maxW + "px"; d.style.fontSize = "";
+    d.style.maxWidth = maxW + "px"; d.style.fontSize = ""; d.style.overflowWrap = "";
     let fs = parseFloat(getComputedStyle(d).fontSize);
-    while (d.scrollWidth > maxW + 1 && fs > 14){ fs -= 1; d.style.fontSize = fs + "px"; }
+    while (d.scrollWidth > maxW + 1 && fs > 15){ fs -= 1; d.style.fontSize = fs + "px"; }
+    // still too wide (one long made-up word): let it break onto a second line instead of overlapping
+    if (d.scrollWidth > maxW + 1) d.style.overflowWrap = "anywhere";
     bottom = Math.max(bottom, d.offsetTop + d.offsetHeight);
   });
   track.style.height = Math.max(98, bottom + 4) + "px";
