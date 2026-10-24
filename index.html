@@ -533,7 +533,7 @@ body.locked{overflow:hidden}
 .opt.hot{animation:hot .32s cubic-bezier(.2,.9,.3,1.6)}
 @keyframes hot{50%{transform:translateX(-50%) scale(1.1)}}
 .voters{position:absolute;top:-.5px;height:24px;display:flex;align-items:center;transform:translateX(-50%);transition:left .6s cubic-bezier(.2,.9,.25,1),opacity .4s}
-.voters img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px;background:#eee;flex:none;animation:pop .45s cubic-bezier(.2,.9,.3,1.4) both}
+.voters img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px;background:#eee;flex:none}
 .voters img:first-child{margin-left:0}
 .voters img.meVote{animation:none;position:relative;z-index:2}
 @keyframes pop{from{transform:scale(0) translateY(10px);opacity:0}}
@@ -1287,12 +1287,17 @@ function showPoll(q, labels, where = "home"){
   setTimeout(() => pollSlot.classList.add("settled"), 650);
   watchSq(pollSlot); updateStatus();
   // friends start voting a moment after the poll goes live
-  FRIENDS.forEach((src, k) => voteTimers.push(setTimeout(() => {
-    const n = poll.opts.length, i = k < 3 ? Math.min(1, n - 1) : (n > 2 ? n - 1 : 0);
-    const img = new Image(); img.src = src; img.alt = "";
-    track.querySelectorAll(".voters")[i].prepend(img);
-    poll.opts[i].voters.push(src); poll.waiting--; updateStatus(); maybeSettle();
-  }, 1600 + k * 1300)));
+  // votes already in show up together, each stack landing with a little collision
+  voteTimers.push(setTimeout(() => {
+    const n = poll.opts.length, stacks = track.querySelectorAll(".voters");
+    FRIENDS.forEach((src, k) => {
+      const i = k < 3 ? Math.min(1, n - 1) : (n > 2 ? n - 1 : 0);
+      const img = new Image(); img.src = src; img.alt = "";
+      stacks[i].appendChild(img); poll.opts[i].voters.push(src); poll.waiting--;
+    });
+    stacks.forEach(st => collideIn([...st.children]));
+    updateStatus(); haptic(8); maybeSettle();
+  }, where === "home" ? 750 : 350));
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -1305,9 +1310,51 @@ function spreadX(){ const W = track.clientWidth, n = poll.opts.length;
   return poll.opts.map((_, i) => i === 0 ? 30 * W / 364 : i === n - 1 ? 344 * W / 364 : W / 2); }
 const startX = () => 16 * track.clientWidth / 364;
 let meX = 0;
+
+// Photos fly in from slightly apart, squash into each other, then settle
+function collideIn(imgs){
+  const m = imgs.length;
+  imgs.forEach((img, k) => {
+    const out = (k - (m - 1) / 2) * 12 + (m === 1 ? 0 : 0);
+    img.animate([
+      { transform: `translateX(${out}px) scale(.4)`, opacity: 0 },
+      { transform: `translateX(${out * .4}px) scale(1.08)`, opacity: 1, offset: .45 },
+      { transform: `translateX(${-out * .22}px) scale(.97)`, offset: .7 },
+      { transform: `translateX(${out * .06}px) scale(1.01)`, offset: .87 },
+      { transform: "none", opacity: 1 }
+    ], { duration: 640, delay: 0, easing: "ease-out", fill: "backwards" });
+  });
+}
+// When a photo joins a stack, the ones already there get nudged sideways and bounce back
+function bumpStack(stack, mutate){
+  const sibs = [...stack.children], before = sibs.map(e => e.getBoundingClientRect().left);
+  mutate();
+  sibs.forEach((e, k) => { const dx = before[k] - e.getBoundingClientRect().left; if (Math.abs(dx) < .5) return;
+    e.animate([{ transform: `translateX(${dx}px)` }, { transform: `translateX(${-dx * .35}px)`, offset: .5 }, { transform: `translateX(${dx * .12}px)`, offset: .78 }, { transform: "none" }],
+      { duration: 560, easing: "ease-out" }); });
+}
+
+// Spread and final layouts: keep every label inside the card, shrinking edge labels if a long name would run off
+const mctx = document.createElement("canvas").getContext("2d");
+function textW(t, px){ mctx.font = `700 ${px}px "DM Sans"`; return mctx.measureText(t).width - t.length * .9 + 8; }
+function settleLayout(final){
+  const W = track.clientWidth, n = poll.opts.length, pad = 10;
+  const names = poll.opts.map(o => splitLabel(o.label)[0].replace(/(\d)\s*-\s*(\d)/g, "$1–$2"));
+  const sizes = names.map((_, k) => final && k === poll.win ? 24 : 20);
+  let w = names.map((t, k) => textW(t, sizes[k]));
+  const fit = (k, avail) => { if (w[k] > avail){ sizes[k] = Math.max(13, Math.floor(sizes[k] * avail / w[k])); w[k] = textW(names[k], sizes[k]); } };
+  if (n === 3){
+    fit(1, W * .5);
+    const side = W / 2 - w[1] / 2 + pad - 16;
+    fit(0, side); fit(2, side);
+    return { sizes, xs: [-pad + w[0] / 2, W / 2, W + pad - w[2] / 2] };
+  }
+  const half = W / 2 + pad - 8; fit(0, half); fit(1, half);
+  return { sizes, xs: [-pad + w[0] / 2, W + pad - w[1] / 2] };
+}
 function layoutTrack(){
   if (!poll || !track.clientWidth) return;
-  const spread = poll.stage !== "live", xs = spread ? spreadX() : optX(), W = track.clientWidth;
+  const spread = poll.stage !== "live", lay = spread ? settleLayout(poll.stage === "final") : null, xs = spread ? lay.xs : optX(), W = track.clientWidth;
   optX().forEach((x, i) => track.querySelectorAll(".dot")[i].style.left = x + "px");
   let bottom = 0;
   track.querySelectorAll(".opt").forEach((d, i) => {
@@ -1315,7 +1362,7 @@ function layoutTrack(){
     const gap = Math.min(i > 0 ? xs[i] - xs[i - 1] : Infinity, i < xs.length - 1 ? xs[i + 1] - xs[i] : Infinity);
     const maxW = Math.min(gap - 6, 2 * (W - xs[i] + 12), 2 * (xs[i] + 12));
     d.style.maxWidth = maxW + "px"; d.style.fontSize = ""; d.style.overflowWrap = ""; d.style.whiteSpace = "nowrap";
-    if (poll.stage === "final"){ d.style.whiteSpace = ""; return; }   // final sizes come from CSS so the winner can grow
+    if (spread){ d.style.maxWidth = ""; d.style.fontSize = lay.sizes[i] + "px"; return; }   // sizes worked out by settleLayout
     // first try one line at a smaller size, then let it wrap, then break long made-up words
     let fs = parseFloat(getComputedStyle(d).fontSize);
     while (d.scrollWidth > maxW + 1 && fs > 14){ fs -= 1; d.style.fontSize = fs + "px"; }
@@ -1325,7 +1372,8 @@ function layoutTrack(){
     bottom = Math.max(bottom, d.offsetTop + d.offsetHeight);
   });
   if (poll.stage !== "final") track.style.height = Math.max(98, bottom + 4) + "px"; else track.style.height = "";
-  track.querySelectorAll(".voters").forEach((d, i) => d.style.left = xs[i] + "px");
+  track.querySelectorAll(".voters").forEach((d, i) => { const h = d.offsetWidth / 2, pad = spread ? 10 : 14;
+    d.style.left = Math.max(h - pad, Math.min(W + pad - h, xs[i])) + "px"; });
   if (!poll.committed) placeMe(poll.mine < 0 ? startX() : optX()[poll.mine]);
 }
 // Moves your photo, grows the trail, hides the dots you pass, and ticks when you cross an option
@@ -1357,7 +1405,7 @@ function vote(i){
     const from = me.getBoundingClientRect();
     const img = new Image(); img.src = ME; img.alt = "You"; img.className = "meVote";
     img.style.width = img.style.height = "32px";
-    track.querySelectorAll(".voters")[i].appendChild(img);
+    bumpStack(track.querySelectorAll(".voters")[i], () => track.querySelectorAll(".voters")[i].appendChild(img));
     me.style.visibility = "hidden";
     const to = img.getBoundingClientRect();
     const dx = from.left + from.width / 2 - (to.left + to.width / 2), dy = from.top + from.height / 2 - (to.top + to.height / 2);
