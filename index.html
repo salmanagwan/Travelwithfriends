@@ -278,7 +278,7 @@ body.locked{overflow:hidden}
 #plan .bigSheet.isFull{top:max(env(safe-area-inset-top,0px),10px);left:0;right:0;bottom:0}
 #plan .bigSheet.drag{transition:none}
 .prGrab{position:absolute;left:0;right:0;top:0;height:26px;z-index:5;cursor:grab;touch-action:none}
-.prChips{position:sticky;top:0;z-index:3;background:#fff;margin-top:14px;padding:18px 16px 12px}
+.prChips{position:sticky;top:0;z-index:3;background:#fff;margin-top:6px;padding:26px 16px 12px}
 .prChips button{transition:background .2s,color .2s,transform .15s}
 .prChips button:active{transform:scale(.96)}
 .prView{display:flex;flex-direction:column}
@@ -286,6 +286,9 @@ body.locked{overflow:hidden}
 .dayCard{cursor:pointer}
 .dayCard:active{transform:scale(.99)}
 .flash{animation:flash 1.6s ease-out}
+.updNote{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(90deg,#d8ffea 0%,#f2f2f2 55%)}
+.updNote img{width:18px;height:18px;flex:none}
+.updNote p{font-size:13px;line-height:1.35;color:#101010;letter-spacing:-.1px}
 @keyframes flash{0%,30%{background-color:rgba(107,43,245,.16);box-shadow:0 0 0 4px rgba(107,43,245,.12)}100%{background-color:transparent}}
 .dateChip.flash{animation:flashChip 1.6s ease-out}
 @keyframes flashChip{0%,30%{background:#efe7ff;color:var(--accent)}100%{background:#fff}}
@@ -420,10 +423,10 @@ body.locked{overflow:hidden}
 #plan .bigSheet{top:min(197px,22%)}
 #plan .bigSheet{animation:sheetUp .6s cubic-bezier(.2,.9,.25,1) both}
 @keyframes sheetUp{from{transform:translateY(60px);opacity:0}}
-.prScroll{position:absolute;inset:0;isolation:isolate;overflow-y:auto;scrollbar-width:none;padding:32px 0 140px;overscroll-behavior:contain}
+.prScroll{position:absolute;inset:0;isolation:isolate;overflow-y:auto;scrollbar-width:none;padding:0 0 140px;overscroll-behavior:contain}
 .prScroll::-webkit-scrollbar{display:none}
 .prHandle{position:absolute;left:50%;top:8px;width:72px;height:5px;margin-left:-36px;border-radius:50px;background:#ececec;z-index:3}
-.prTop{display:flex;gap:20px;align-items:center;padding:0 16px 0 20px}
+.prTop{display:flex;gap:20px;align-items:center;padding:32px 16px 0 20px}
 .covers{position:relative;width:101.5px;height:120px;flex:none}
 .covers .cv{position:absolute;inset:0;background:#000;overflow:hidden}
 .covers .cv img{position:absolute;max-width:none;object-fit:cover}
@@ -1648,13 +1651,27 @@ function overviewHTML(){
   DAYS.forEach((d, i) => {
     h += cardHTML(`<div class="dayHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.stops.length} spots</span></div>
       <div class="spots">${d.stops.map(spotTile).join("")}</div>`, `dayCard" data-day="${i}`, 20);
-    if (i === BREAK_AFTER){
-      const day = addDays(TRIP.start, i + 1);
-      h += `<div class="breakCard" data-sq="20"><div><span class="tag">Flight Change</span><span class="what"><img src="assets/plane-fill.svg" alt="">Phuket → Koh Samui</span><span class="when">${fmtD(day)}, ${day.getFullYear()}</span></div>
-        <i class="cut"></i><div><span class="tag">Hotel Change</span><span class="what">🛏️ Koh Samui, Chaweng</span><span class="when">${fmtRange(day, DAYS.length - i - 1)}, ${day.getFullYear()}</span></div></div>`;
-    }
+    if (i === BREAK_AFTER) h += breakHTML();
   });
   return h + `</div>`;
+}
+function breakHTML(){
+  const i = BREAK_AFTER, day = addDays(TRIP.start, i + 1);
+  return `<div class="breakCard" data-sq="20"><div><span class="tag">Flight Change</span><span class="what"><img src="assets/plane-fill.svg" alt="">Phuket → Koh Samui</span><span class="when">${fmtD(day)}, ${day.getFullYear()}</span></div>
+    <i class="cut"></i><div><span class="tag">Hotel Change</span><span class="what">🛏️ Koh Samui, Chaweng</span><span class="when">${fmtRange(day, DAYS.length - i - 1)}, ${day.getFullYear()}</span></div></div>`;
+}
+const swapIn = (old, html) => { const t = document.createElement("div"); t.innerHTML = html; const n = t.firstElementChild; old.replaceWith(n); watchSq(n); bindSoon(n); return n; };
+// Re-order a day's spots around the new dates: tiles slide to their new places
+function shuffleDay(card, i){
+  const box = card.querySelector(".spots"), tiles = [...box.children], n = tiles.length; if (n < 2) return;
+  let perm; do { perm = [...Array(n).keys()].sort(() => Math.random() - .5); } while (perm.every((k, j) => k === j));
+  const before = tiles.map(t => t.getBoundingClientRect().left), times = DAYS[i].stops.map(st => st.t);
+  DAYS[i].stops = perm.map(k => DAYS[i].stops[k]); DAYS[i].stops.forEach((st, j) => st.t = times[j]);
+  perm.forEach(k => box.appendChild(tiles[k]));
+  perm.forEach((k, j) => { const t = tiles[k], dx = before[k] - t.getBoundingClientRect().left;
+    t.animate([{ transform: `translateX(${dx}px) scale(.9)`, filter: "brightness(1.15)" }, { transform: `translateX(${-dx * .06}px) scale(1.04)`, offset: .72 }, { transform: "none", filter: "none" }],
+      { duration: 640, delay: j * 35, easing: "cubic-bezier(.3,.7,.3,1)" }); });
+  card.querySelector(".dayHead").animate([{ opacity: .4 }, { opacity: 1 }], { duration: 500 });
 }
 function dayHTML(i){
   const d = DAYS[i], date = addDays(TRIP.start, i);
@@ -1811,9 +1828,21 @@ async function changeDates(){
   TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest return flight from Delhi in January";
   bubble("You", "Done! Trip moved to Jan 4 - 10 ✈️"); chatStage = 4;
   await sleep(700);
+  // land on the overview as it was, then let the changes play out in place
+  TRIP.start = new Date(2026, 11, 24); TRIP.from = "Mumbai"; TRIP.price = "23,350"; TRIP.note = "Cheapest flight in the month of December from Mumbai";
   renderPlan(); setView("overview"); setFull(false);
-  requestAnimationFrame(() => { ["prDates"].forEach(id => document.getElementById(id).classList.add("flash"));
-    const fl = prScroll.querySelector(".flight .box"); if (fl) fl.classList.add("flash"); });
+  await sleep(650);
+  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest return flight from Delhi in January";
+  const dc = document.getElementById("prDates"); dc.innerHTML = `<img src="assets/calendar-fill.svg" alt="">${fmtRange(TRIP.start, DAYS.length, true)}`; dc.classList.add("flash");
+  syncChips();
+  const list = prScroll.querySelector(".prList");
+  const fl = swapIn(prScroll.querySelector(".flight"), flightHTML({ from: TRIP.from, dates: fmtRange(TRIP.start, DAYS.length), price: TRIP.price, note: TRIP.note }));
+  fl.querySelector(".box").classList.add("flash");
+  const note = document.createElement("div"); note.className = "updNote prIn"; note.dataset.sq = "14";
+  note.innerHTML = `<img src="assets/sparkle-green.svg" alt=""><p>Plan updated for ${fmtRange(TRIP.start, DAYS.length)}. Spots re-ordered around the new flight times.</p>`;
+  list.prepend(note); watchSq(note);
+  const br = prScroll.querySelector(".breakCard"); if (br) swapIn(br, breakHTML()).classList.add("flash");
+  prScroll.querySelectorAll(".dayCard").forEach((card, i) => setTimeout(() => shuffleDay(card, i), 300 + i * 120));
   say("Trip dates updated to Jan 4 - 10"); haptic(18);
 }
 chatBarEl.addEventListener("submit", e => { e.preventDefault(); const inp = document.getElementById("chatInput"), t = inp.value.trim(); if (!t) return; inp.value = ""; bubble("You", t); haptic(6); });
