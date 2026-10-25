@@ -339,13 +339,15 @@ body.locked{overflow:hidden}
 .unEmpty{text-align:center;color:#969696;font-size:14px;padding:24px 0}
 /* + menu over the plan and the chat */
 .fabMenu{position:absolute;inset:0;z-index:6;pointer-events:none}
-.fabMenu .wash{position:absolute;inset:0;background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .3s}
+.fabMenu .wash{position:absolute;inset:0;background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);opacity:0;transition:opacity .3s}
 .fabMenu.open{pointer-events:auto}
 .fabMenu.open .wash{opacity:1}
-.fabMenu .pill{position:absolute;height:60px;display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:32px;background:rgba(255,255,255,.5);border:.5px solid rgba(24,24,24,.9);
-  box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
+.fabMenu .pill{position:absolute;height:60px;display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:32px;background:rgba(255,255,255,.5);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
+  box-shadow:inset 1px 1px .5px -.4px rgba(255,255,255,.9),inset -1px -1px .5px -.4px rgba(255,255,255,.5),inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
   opacity:0;transform:translateY(24px) scale(.9);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.3)}
-.fabMenu .pill img{height:36px;width:auto;max-width:48px;object-fit:contain}
+.fabMenu .pill img{height:34px;width:auto;max-width:48px;object-fit:contain;position:relative;z-index:1}
+.fabMenu .pill img.sm{height:30px}
 .fabMenu.open .pill{opacity:1;transform:none}
 .fabMenu .pill:active{transform:scale(.96)}
 #plan .prBtns{z-index:7}
@@ -356,7 +358,10 @@ body.locked{overflow:hidden}
 .prBtns.open .add img{transform:rotate(45deg)}
 .prBtns.open .ai{opacity:.9}
 /* AI button: Liquid Glass with the glow behind, as in Figma */
-.prBtns .ai .disc{position:absolute;inset:0;border-radius:32px;background:rgba(255,255,255,.1);border:.3px solid rgba(24,24,24,.9);box-shadow:0 1px 8px rgba(0,0,0,.1);display:grid;place-items:center}
+.prBtns .ai .disc{position:absolute;inset:0;border-radius:32px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);display:grid;place-items:center}
+.prBtns .ai .disc img{position:relative;z-index:1}
+.prBtns .ai .glowC{position:absolute;left:3px;top:3px;width:58px;height:58px;border-radius:50%;pointer-events:none;opacity:.3;filter:blur(10px);
+  background:conic-gradient(from 90deg,#ff9f0a,#ff375f 20%,#bf5af2 40%,#5e5ce6 60%,#64d2ff 80%,#ff9f0a)}
 /* Chat */
 .prChat{position:absolute;inset:0;z-index:4;background:#fff;display:flex;flex-direction:column;border-radius:32px;overflow:hidden}
 .prChat[hidden]{display:none}
@@ -839,17 +844,17 @@ body.locked{overflow:hidden}
     <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
     <div class="prHandle"></div>
     <div class="prGrab" id="prGrab" aria-hidden="true"></div>
-    <div class="prScroll" id="prScroll"></div>
+    <div class="prScroll" id="prScroll" data-sq="32"></div>
     <div class="prFoot"></div>
     <div class="fabMenu" id="prMenu">
       <div class="wash"></div>
-      <button class="pill" data-act="stays" style="right:21px;bottom:380px"><img src="assets/i3d-stays.png" alt="">Add Stays</button>
-      <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" alt="">Invite Friends</button>
-      <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
-      <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" alt="">Add Spots</button>
+      <button class="pill ring" data-act="stays" style="right:21px;bottom:380px"><img src="assets/i3d-stays.png" alt="">Add Stays</button>
+      <button class="pill ring" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
+      <button class="pill ring" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
+      <button class="pill ring" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
     </div>
     <div class="prBtns" id="prBtns">
-      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc glass strong"><img class="s" src="assets/sparkle-ai.svg" alt=""></span></button>
+      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><span class="glowC"></span><span class="disc glass strong ring"><img class="s" src="assets/sparkle-ai.svg" alt=""></span></button>
       <button class="add" id="prAdd" aria-label="Add to this trip" aria-expanded="false"><img src="assets/plus-white.svg" alt=""></button>
     </div>
     <div class="prChat" id="prChat" hidden>
@@ -858,9 +863,9 @@ body.locked{overflow:hidden}
       <div class="aiRow" id="aiRow"></div>
       <div class="fabMenu" id="chatMenu">
         <div class="wash"></div>
-        <button class="pill" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d.png" alt="">Add Poll</button>
-        <button class="pill" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" alt="">Invite Friends</button>
-        <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" alt="">Add Spots</button>
+        <button class="pill ring" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d.png" alt="">Add Poll</button>
+        <button class="pill ring" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
+        <button class="pill ring" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
       </div>
       <form class="chatBar" id="chatBar" autocomplete="off">
         <input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send">
@@ -2160,6 +2165,8 @@ sheet.addEventListener("submit", e => {
   const q = qEl.value.trim().replace(/\s+/g, " ");
   const labels = [...optsEl.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
   // next step from Figma: invite friends to vote, then the poll goes live
+  // in the trip chat everyone is already in, so the poll posts straight away
+  if (pollTarget === "chat"){ closePoll(); setTimeout(() => { showPoll(q, labels, "chat"); say("Poll shared in the trip chat"); }, 300); return; }
   openInvite("poll", { q, labels, target: pollTarget });
 });
 </script>
