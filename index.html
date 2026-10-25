@@ -1939,7 +1939,21 @@ invSearch.addEventListener("input", () => {
   const q = invSearch.value.trim().toLowerCase();
   if (!q){ invResults.hidden = true; return; }
   const hits = DIRECTORY.filter(d => d.n.toLowerCase().includes(q));
-  invResults.innerHTML = hits.length ? hits.map(d => `<button type="button" data-n="${esc(d.n)}"><img src="${d.p}" alt="">${esc(d.n)}</button>`).join("") : `<p>No one called “${esc(invSearch.value.trim())}” yet. Share the link instead.</p>`;
+  // always show a few people: whatever you type, a couple of matching profiles come up
+  if (hits.length < 2){
+    const cap = w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    const words = invSearch.value.trim().split(/\s+/).map(cap), first = words[0];
+    const SUR = ["Mehta", "Rao", "Sethi", "Iyer", "Malhotra", "Shah", "Nair", "Kapoor", "Bose", "Gill"];
+    let h = 0; for (const ch of q) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const names = words.length > 1 ? [words.join(" "), `${first} ${SUR[h % SUR.length]}`] : [`${first} ${SUR[h % SUR.length]}`, `${first} ${SUR[(h + 3) % SUR.length]}`];
+    for (const [k, n] of names.entries()){
+      if (hits.length >= 2 || hits.some(x => x.n === n)) continue;
+      const d = { n, s: first, p: `assets/friend-${((h + k) % 5) + 1}.jpg` };
+      if (!DIRECTORY.some(x => x.n === n)) DIRECTORY.push(d);
+      hits.push(DIRECTORY.find(x => x.n === n));
+    }
+  }
+  invResults.innerHTML = hits.map(d => `<button type="button" data-n="${esc(d.n)}"><img src="${d.p}" alt="">${esc(d.n)}</button>`).join("");
   invResults.hidden = false; watchSq(invResults);
 });
 invResults.addEventListener("click", e => { const b = e.target.closest("button[data-n]"); if (!b) return;
