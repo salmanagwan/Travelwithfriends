@@ -122,8 +122,10 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .deco img{width:100%;height:100%;display:block}
 .top{position:relative}
 .top .header{position:relative;z-index:1}
-/* sits 31px above the header, as in the frame, whether or not the status bar shows */
-.decoTop.mapfade{top:calc(100% - 75px);left:auto;height:380px;overflow:visible;-webkit-mask-image:none;mask-image:none}
+.trend{position:relative}
+.trend>.heroTitle{position:relative;z-index:1}
+/* the temple belongs to the Trending block, so it moves down with it when a poll card sits above (Figma 256:69225) */
+.decoTop.mapfade{top:-109px;left:auto;height:380px;overflow:visible;-webkit-mask-image:none;mask-image:none}
 .heroTitle{padding:10px 24px;width:max-content;white-space:nowrap;text-align:left;font-weight:900;font-size:36px;line-height:46px;letter-spacing:-1px;color:#111214}
 .heroTitle .lt{font-weight:500}
 .carousel .views span,.row .views span,.deck .views span{font-weight:700;color:#c4a3ff}
@@ -711,7 +713,7 @@ b.grad2{font-weight:700}
 .pollSlot>div{min-height:0;min-width:0;overflow:hidden}
 .pollCard,.pollBox,.pollHead{min-width:0;max-width:100%}
 .pollSlot.settled>div{overflow:visible}
-.pollPad{padding:24px 16px 40px}
+.pollPad{padding:38px 20px 24px}
 .pollCard{position:relative;filter:drop-shadow(0 1px 40px rgba(0,0,0,.12));opacity:0;transform:translateY(-12px) scale(.96);transition:opacity .45s .1s,transform .6s .1s cubic-bezier(.2,.9,.25,1.15)}
 .pollSlot.on .pollCard{opacity:1;transform:none}
 .pollBox{position:relative;background:#fff;display:flex;flex-direction:column;gap:24px;align-items:center;padding:4px 4px 12px}
@@ -900,7 +902,6 @@ b.grad2{font-weight:700}
 
   <div class="content">
     <div class="top">
-      <div class="deco decoTop mapfade" aria-hidden="true"><img src="assets/deco-temple.webp" alt=""></div>
       <div class="status" aria-hidden="true">
         <p>9:41</p>
         <div class="dev">
@@ -935,7 +936,8 @@ b.grad2{font-weight:700}
         </div>
       </div></div></section>
 
-      <section>
+      <section class="trend">
+        <div class="deco decoTop mapfade" aria-hidden="true"><img src="assets/deco-temple.webp" alt=""></div>
         <h1 class="heroTitle"><span class="lt">Trending in</span><br>Thailand 🇹🇭</h1>
         <div style="height:18px"></div>
         <div class="carousel" id="carousel" tabindex="0" aria-roledescription="carousel" aria-label="Trending reels"></div>
