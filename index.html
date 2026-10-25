@@ -379,6 +379,8 @@ b.grad2{font-weight:700}
 .screen[hidden]{display:none}
 .screen .mapBg{position:absolute;left:50%;bottom:-90px;width:2057px;height:1231px;margin-left:-963px;object-fit:cover;max-width:none;animation:mapDrift 30s ease-in-out infinite alternate}
 @keyframes mapDrift{to{transform:translate(-40px,18px) scale(1.04)}}
+.screen .mkSky{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 28%,#f7fbff 0%,#e3efff 45%,#c9ddfb 100%)}
+.screen .mkSky canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 .screen .topGlow{position:absolute;left:0;right:0;top:0;height:97px;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,0));pointer-events:none}
 .mapBack{position:absolute;z-index:6;left:16px;top:calc(env(safe-area-inset-top,0px) + 16px);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
   background:rgba(255,255,255,.45);box-shadow:0 2px 8px rgba(0,0,0,.2)}
@@ -982,7 +984,7 @@ b.grad2{font-weight:700}
 
 
 <section class="screen" id="making" hidden role="dialog" aria-label="Making your trip plan">
-  <img class="mapBg" src="assets/map-plan.jpg" alt="">
+  <div class="mkSky" aria-hidden="true"><canvas id="globe" data-cy="300" data-r="215"></canvas></div>
   <div class="topGlow"></div>
   <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
   <div class="bigSheet">
@@ -2811,7 +2813,7 @@ sheet.addEventListener("submit", e => {
 <script>
 /* ---------- Header globe: a real orthographic globe turning very slowly behind the logo ----------
    Same placement as Figma: 673px globe, centre about 50px above the top edge, faded out by the mask. */
-/* ---------- Apple Maps style globe ----------
+/* ---------- Apple Maps style globe (now the moving background of the Making your trip plan screen) ----------
    Texture unwrapped from an Apple Maps globe view, drawn back onto a real 3D sphere with the same
    vertical-perspective camera (fitted to 1.4px), then swayed slowly east and west. */
 (function(){
@@ -2847,12 +2849,12 @@ sheet.addEventListener("submit", e => {
   const lp = g.getAttribLocation(pr, "p"); g.enableVertexAttribArray(lp); g.vertexAttribPointer(lp, 2, g.FLOAT, false, 0, 0);
   const U = n => g.getUniformLocation(pr, n);
   const uRes = U("res"), uCtr = U("ctr"), uR = U("R"), uLon = U("lon0"), uLat = U("lat0");
-  const BASE_LON = 105.6655, LAT = 8.0521, P = 4.68734, RVIS = 336.5, RR = RVIS / Math.sqrt((P - 1) / (P + 1));
+  const BASE_LON = 105.6655, LAT = 8.0521, P = 4.68734, RVIS = +(cv.dataset.r || 336.5), CY = +(cv.dataset.cy || -49.5), RR = RVIS / Math.sqrt((P - 1) / (P + 1));
   let W = 0, H = 0, dpr = 1, lon = BASE_LON, ready = false, running = true, last = 0, t0 = performance.now();
   function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.viewport(0, 0, cv.width, cv.height); }
   function draw(){
     if (!ready) return;
-    g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, -49.5 * dpr); g.uniform1f(uR, RR * dpr);
+    g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, CY * dpr); g.uniform1f(uR, RR * dpr);
     g.uniform1f(uLon, lon * Math.PI / 180); g.uniform1f(uLat, LAT * Math.PI / 180);
     g.clearColor(0, 0, 0, 0); g.clear(g.COLOR_BUFFER_BIT); g.drawArrays(g.TRIANGLE_STRIP, 0, 4);
   }
@@ -2867,9 +2869,10 @@ sheet.addEventListener("submit", e => {
   img.src = "assets/earth-apple.jpg";
   window.__globeGL = true;
   // a slow sway: 18° east and back over a minute, eased at the ends like a real spin slowing down
-  function tick(t){ if (!running) return; if (t - last > 33){ last = t; lon = BASE_LON + 18 * Math.sin((t - t0) / 60000 * Math.PI * 2); draw(); } requestAnimationFrame(tick); }
+  function tick(t){ if (!running) return; if (t - last > 33){ last = t; lon = BASE_LON + 22 * Math.sin((t - t0) / 26000 * Math.PI * 2); draw(); } requestAnimationFrame(tick); }
   const start = () => { if (!running){ running = true; last = 0; requestAnimationFrame(tick); } };
   size(); addEventListener("resize", () => { size(); draw(); });
+  new ResizeObserver(() => { size(); draw(); }).observe(cv);   // the plan screen opens hidden, so size it once it shows
   new IntersectionObserver(es => { if (es[0].isIntersecting && !document.hidden) start(); else running = false; }).observe(cv);
   document.addEventListener("visibilitychange", () => document.hidden ? (running = false) : start());
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) running = false; else requestAnimationFrame(tick);
