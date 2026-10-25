@@ -236,6 +236,7 @@ body.locked{overflow:hidden}
 .npHero::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .75px #fff;z-index:2;pointer-events:none}
 .npTmp{position:absolute;left:0;right:0;z-index:7;height:24px;pointer-events:none}
 .np.busy{pointer-events:none}
+.bb-canvas{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100vw,428px);height:100vh;height:100dvh;pointer-events:none;z-index:60}
 /* Floating reactions: swap --fr-size, or the img rule, for custom art */
 .fr-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:6;border-radius:inherit}
 .fr-item{position:absolute;left:0;bottom:-4px;font-size:var(--fr-size,28px);line-height:1;transform-origin:50% 100%;will-change:transform,opacity;user-select:none;
@@ -2209,6 +2210,109 @@ const Reactions = (() => {
 })();
 const spawnEmoji = (type, container) => Reactions.spawn(type, container);
 
+/* =====================================================================
+   Bubble Burst  (motion modelled on the wabi.ai manifesto orb)
+   Bubbles are born at a point, hang there for a beat, then accelerate up
+   and out in a plume while they grow, and drift off the top.
+
+   triggerBubbleBurst(x, y, emoji?)     one tap: a burst of bubbles
+   triggerBubbleBurst(element, emoji?)  same, from the element's centre
+   BubbleBurst.stream(x, y, emoji, ms)  a steady stream for `ms` milliseconds
+   ===================================================================== */
+const BubbleBurst = (() => {
+  const CFG = {
+    burstCount: 12,        // extra bubbles on a tap
+    burstScale: .65,       // tap bubbles are a little smaller
+    streamEvery: 86,       // ms between bubbles in a stream
+    life: [2, 6],          // seconds a bubble takes to leave (1-3s, slowed 2x)
+    size: 64,              // full-grown bubble diameter, px
+    max: 400               // hard cap on live bubbles
+  };
+  let cv, ctx, dpr = 1, W = 0, H = 0, raf = 0, last = 0;
+  const live = [], pool = [], sprites = new Map();
+  const map = (v, a, b, c, d) => c + (v - a) * (d - c) / (b - a);
+  const easeInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+
+  function setup(){
+    cv = document.createElement("canvas"); cv.className = "bb-canvas"; cv.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cv); ctx = cv.getContext("2d"); resize(); addEventListener("resize", resize);
+  }
+  function resize(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
+
+  // A glossy glass sphere with the emoji inside, drawn once per emoji and reused
+  function sprite(emoji){
+    if (sprites.has(emoji)) return sprites.get(emoji);
+    const S = 160, r = S / 2 - 6, c = document.createElement("canvas"); c.width = c.height = S;
+    const g = c.getContext("2d"), cx = S / 2, cy = S / 2;
+    g.save(); g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.clip();
+    let gr = g.createRadialGradient(cx - r * .3, cy - r * .35, r * .1, cx, cy, r);
+    gr.addColorStop(0, "#ffffff"); gr.addColorStop(.6, "#eef0f7"); gr.addColorStop(1, "#c9cde0");
+    g.fillStyle = gr; g.fillRect(0, 0, S, S);
+    g.font = `${r * 1.25}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(emoji, cx, cy + r * .08);
+    gr = g.createRadialGradient(cx, cy, r * .55, cx, cy, r);           // depth at the rim
+    gr.addColorStop(0, "rgba(20,20,40,0)"); gr.addColorStop(1, "rgba(20,20,40,.28)");
+    g.fillStyle = gr; g.fillRect(0, 0, S, S);
+    gr = g.createRadialGradient(cx - r * .38, cy - r * .48, 0, cx - r * .38, cy - r * .48, r * .62); // highlight
+    gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(.35, "rgba(255,255,255,.45)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, S, S);
+    gr = g.createLinearGradient(0, cy + r * .4, 0, cy + r);             // bounce light at the bottom
+    gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(1, "rgba(255,255,255,.35)");
+    g.fillStyle = gr; g.fillRect(0, 0, S, S);
+    g.restore();
+    g.beginPath(); g.arc(cx, cy, r - .75, 0, Math.PI * 2); g.lineWidth = 1.5; g.strokeStyle = "rgba(255,255,255,.75)"; g.stroke();
+    sprites.set(emoji, c); return c;
+  }
+
+  // Born somewhere in the lower half of an imaginary square around the origin;
+  // low births start dead centre, higher ones spread wider -> a plume, not a curtain.
+  function add(x, y, emoji, scale = 1){
+    if (!cv) setup();
+    const off = cv.getBoundingClientRect(); x -= off.left; y -= off.top;   // canvas sits over the phone column
+    const p = pool.pop() || {};
+    const sy = .5 + Math.random() * .5, margin = map(sy, 1, .5, .5, .05), sx = margin + Math.random() * (1 - 2 * margin);
+    p.ox = x; p.oy = y; p.sx = sx; p.sy = sy; p.ex = map(sx, 0, 1, -1, 2); p.ey = sy - 1;
+    p.age = 0; p.dur = CFG.life[0] + Math.random() * (CFG.life[1] - CFG.life[0]);
+    p.scale = scale; p.img = sprite(emoji); p.field = Math.min(W, H); p.lift = Math.max(p.field, y + CFG.size); // always clears the top
+    if (live.length >= CFG.max) pool.push(live.shift());
+    live.push(p);
+    if (!raf){ last = performance.now(); raf = requestAnimationFrame(tick); }
+  }
+
+  function tick(now){
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < live.length; i++){
+      const p = live[i]; p.age += dt;
+      if (p.age > p.dur * 1.25){ pool.push(p); live.splice(i--, 1); continue; }
+      const t = p.age / p.dur, eased = t * t * t;                               // hang, then accelerate away (keeps going past 1)
+      const x = p.ox + (p.ex - p.sx) * eased * p.field;
+      const y = p.oy + (p.ey - p.sy) * eased * p.lift;
+      const s = CFG.size * p.scale * easeInOutCubic(Math.min(1, t));            // grows the whole way up
+      if (s < 1) continue;
+      if (y < -s){ pool.push(p); live.splice(i--, 1); continue; }
+      ctx.drawImage(p.img, x - s / 2, y - s / 2, s, s);
+    }
+    raf = live.length ? requestAnimationFrame(tick) : 0;
+    if (!raf) ctx.clearRect(0, 0, W, H);
+  }
+
+  const centre = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+  function burst(x, y, emoji = "🎉"){
+    if (x instanceof Element){ emoji = y || emoji; [x, y] = centre(x); }
+    for (let i = 0; i < CFG.burstCount; i++) add(x, y, emoji, CFG.burstScale);
+  }
+  function stream(x, y, emoji = "🎉", ms = 1000){
+    if (x instanceof Element){ ms = emoji === "🎉" ? 1000 : emoji; emoji = y; [x, y] = centre(x); }
+    const n = Math.max(1, Math.round(ms / CFG.streamEvery));
+    for (let i = 0; i < n; i++) setTimeout(() => add(x, y, emoji), i * CFG.streamEvery);
+  }
+  return { burst, stream, add, config: CFG };
+})();
+const triggerBubbleBurst = (x, y, emoji) => BubbleBurst.burst(x, y, emoji);
+// the poll card sits high on the screen, so bubbles move a touch quicker here than on a full page
+BubbleBurst.config.life = [1.3, 3]; BubbleBurst.config.size = 58;
+
 /* ---------- Poll card v2 ---------- */
 function showPoll(q, labels, where = "home"){
   voteTimers.forEach(clearTimeout); voteTimers = [];
@@ -2283,8 +2387,12 @@ function showPoll(q, labels, where = "home"){
       at(520, () => hero.animate([{ transform: pose(1, up) }, { transform: `translate(${cx}px,${up - 2}px) scale(${S * 1.035})` }, { transform: pose(1, up) }], { duration: 420, easing: "cubic-bezier(.3,.7,.3,1)" }));
     });
 
-    // 3. the picked flag floats up behind the tile, like reactions on a live stream
-    at(560, () => Reactions.stream(splitLabel(poll.opts[i].label)[1] || "🎉", np, { count: 16, over: 1000 }));
+    // 3. the picked flag bubbles up out of the tile and floats off into the air
+    at(560, () => {   // a burst of flag bubbles out of the tile, then a short stream, like the wabi orb
+      const em = splitLabel(poll.opts[i].label)[1] || "🎉", r = hero.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + 6;   // out of the top edge, so the tile stays readable
+      BubbleBurst.burst(x, y, em); BubbleBurst.stream(x, y, em, 900);
+    });
 
     // 4. the tile lifts, the friends who picked it drop in, then you slide in from the right and the row bounces
     const tmp = document.createElement("div"); tmp.className = "npV npTmp"; tmp.style.top = "155px";
