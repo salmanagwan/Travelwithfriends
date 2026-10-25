@@ -265,6 +265,9 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .aiTab .disc img{width:28px;height:28px}
 /* AI button: the glossy orb in a white glass disc (Figma 262:69857) */
 .aiTab .disc img.orb,.prBtns .ai .disc img.orb{width:57.25px;height:56px;border-radius:50%;object-fit:cover}
+/* bottom navigation only: smaller orb with a light glass rim (Figma tab bar, AI Search 64px, orb 49x48) */
+.aiTab .disc img.orb{width:49.07px;height:48px}
+.aiTab .disc{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.95),0 1px 8px rgba(0,0,0,.06)}
 .prBtns .ai .disc{background:rgba(255,255,255,.6)!important;border:0!important;box-shadow:none!important;overflow:hidden}
 .toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);opacity:0;z-index:60;
   background:rgba(17,18,20,.86);color:#fff;font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
@@ -464,7 +467,8 @@ b.grad2{font-weight:700}
 @keyframes okPop{from{transform:scale(0)}}
 
 /* Making trip plan */
-#making .bigSheet{height:min(635px,calc(100% - 120px))}
+#making .bigSheet{height:min(635px,calc(100% - 96px))}
+#making .mkBody{padding-bottom:76px}   /* room for 'Planning your days..' so nothing sits on top of it */
 .mkBody{position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;gap:16px}
 .mkCard{position:relative;flex:none;filter:none}
 .mkCard>.box{position:relative;background:#fff;display:flex;flex-direction:column;overflow:hidden;transition:height .55s cubic-bezier(.2,.9,.25,1)}
@@ -507,9 +511,15 @@ b.grad2{font-weight:700}
 
 
 /* Plan sheet: drag up to go edge to edge */
-#plan .bigSheet{transition:top .45s cubic-bezier(.2,.9,.25,1),left .45s cubic-bezier(.2,.9,.25,1),right .45s cubic-bezier(.2,.9,.25,1),bottom .45s cubic-bezier(.2,.9,.25,1)}
-#plan .bigSheet.isFull{top:max(env(safe-area-inset-top,0px),10px);left:0;right:0;bottom:0}
+/* The sheet is always full size; the half state just slides it down and trims 8px off the sides, so only transform and clip animate */
+#plan .bigSheet{top:max(env(safe-area-inset-top,0px),10px)!important;left:0;right:0;bottom:0;translate:0 var(--dy,180px);
+  clip-path:inset(0 8px calc(8px + var(--dy,180px)) 8px round 32px);will-change:translate;
+  transition:translate .5s cubic-bezier(.2,.9,.25,1),clip-path .5s cubic-bezier(.2,.9,.25,1)}
+#plan .bigSheet.isFull{translate:0 0;clip-path:inset(0 0 0 0 round 32px 32px 0 0)}
 #plan .bigSheet.drag{transition:none}
+#plan .prScroll{overflow-x:hidden;touch-action:pan-y}
+#plan .prChips,#plan .spots{touch-action:pan-x pan-y}
+.screen{overscroll-behavior:none}
 .prGrab{position:absolute;left:0;right:0;top:0;height:26px;z-index:5;cursor:grab;touch-action:none}
 .prChips{position:sticky;top:0;z-index:3;background:#fff;margin-top:6px;padding:26px 16px 12px}
 .prChips button{transition:background .2s,color .2s,transform .15s}
@@ -696,7 +706,7 @@ b.grad2{font-weight:700}
 .banner img{width:24px;height:24px}
 .banner.show{transform:translate(-50%,0)}
 /* Plan Ready */
-#plan .bigSheet{top:min(197px,22%)}
+
 #plan .bigSheet{animation:sheetUp .6s cubic-bezier(.2,.9,.25,1) both}
 @keyframes sheetUp{from{transform:translateY(60px);opacity:0}}
 .prScroll{position:absolute;inset:0;isolation:isolate;overflow-y:auto;scrollbar-width:none;padding:0 0 140px;overscroll-behavior:contain}
@@ -713,7 +723,8 @@ b.grad2{font-weight:700}
 .covers .cv:nth-child(3){box-shadow:0 0 3.7px rgba(0,0,0,.2)}
 .prInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
 .prInfo h2{font-weight:900;font-size:20px;line-height:1.3;letter-spacing:-.1px;color:#000;font-variation-settings:"opsz" 14}
-.prMeta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.prMeta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:8px}
+@media (max-width:420px){ .prTop{gap:16px;padding-left:16px} .cvOne{width:92px;height:122px} .cvOne img{left:-2.5px;top:-31px;width:106.6px;height:160px} }
 .prMeta .dots{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;color:#686868;white-space:nowrap}
 .prMeta .dots i,.fRoute i,.dayMeta i{width:4px;height:4px;border-radius:50%;background:#c4c4c4;flex:none}
 .dateChip{display:flex;align-items:center;gap:4px;padding:4px 8px 4px 6px;border-radius:38px;background:#fff;border:.5px solid #ececec;font-weight:600;font-size:14px;color:#686868;white-space:nowrap;
@@ -897,7 +908,7 @@ b.grad2{font-weight:700}
 .sheetClip{position:absolute;inset:0;pointer-events:none;z-index:2}
 .sheetArt{position:absolute;right:-8px;top:-18px;width:96px;height:96px;display:grid;place-items:center;filter:drop-shadow(0 8px 16px rgba(107,43,245,.3))}
 .sheetArt span{width:80px;height:80px;transform:rotate(20deg)}
-.sheetBody{position:relative;flex:1;min-height:0;overflow-y:auto;padding:0 24px 40px;display:flex;flex-direction:column;gap:40px;scrollbar-width:none}
+.sheetBody{position:relative;flex:1;min-height:0;overflow-y:auto;padding:4px 24px 40px;display:flex;flex-direction:column;gap:44px;scrollbar-width:none;overscroll-behavior:contain;scroll-padding:90px 0 40px}
 .sheetBody::-webkit-scrollbar{display:none}
 .sheetTitle h2{font-weight:900;font-size:32px;line-height:1.15;letter-spacing:-1px;font-variation-settings:"opsz" 14}
 .sheetTitle p{margin-top:6px;font-weight:500;font-size:18px;letter-spacing:-.2px;color:#6b6f76}
@@ -1169,7 +1180,7 @@ b.grad2{font-weight:700}
       <p>Publish a poll to align your friends</p>
     </div>
     <div class="qWrap" id="qWrap">
-      <textarea id="pollQuestion" rows="1" placeholder="Write your question" aria-label="Question" aria-describedby="qErr"></textarea>
+      <textarea id="pollQuestion" rows="1" placeholder="Write your question" aria-label="Question" aria-describedby="qErr" enterkeyhint="next"></textarea>
       <div class="qLine"></div>
       <p class="err" id="qErr" role="alert"></p>
     </div>
@@ -1883,7 +1894,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 function fitRead(){
   const box = mkRead.querySelector(".box"), head = box.querySelector(".mkHead");
   const want = head.offsetHeight + mkList.scrollHeight;
-  const cap = Math.min(360, making.querySelector(".mkBody").clientHeight - mkShape.offsetHeight - 16);
+  const body = making.querySelector(".mkBody"), cs = getComputedStyle(body);
+  const cap = Math.max(120, Math.min(360, body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - mkShape.offsetHeight - 16));
   box.style.height = Math.min(want, cap) + "px";
   mkRead.classList.toggle("scrolls", want > cap);
   mkList.scrollTo({ top: mkList.scrollHeight, behavior: "smooth" });
@@ -2139,16 +2151,19 @@ function setView(v){
   renderView();
   if (v !== "overview"){ setFull(true); requestAnimationFrame(() => { const top = prScroll.querySelector(".prChips").offsetTop; prScroll.scrollTo({ top, behavior: "smooth" }); }); }
 }
+function sheetDy(){ const full = parseFloat(getComputedStyle(prSheet).top) || 10; return Math.max(60, Math.min(197, planEl.clientHeight * .22) - full); }
+function placeSheet(){ prSheet.style.setProperty("--dy", sheetDy() + "px"); }
+addEventListener("resize", () => { if (!planEl.hidden) placeSheet(); });
 function setFull(on){
-  prSheet.classList.toggle("isFull", on); prSheet.style.top = "";
+  prSheet.classList.toggle("isFull", on); prSheet.style.translate = ""; prSheet.style.clipPath = "";
   if (!on) prScroll.scrollTo({ top: 0, behavior: "smooth" });
 }
 function showPlan(){
   view = "overview"; renderPlan(); prChat.hidden = true; document.getElementById("prBtns").hidden = false;
   prSheet.classList.remove("isFull");
-  making.hidden = true; planEl.hidden = false; prScroll.scrollTop = 0;
+  making.hidden = true; planEl.hidden = false; prScroll.scrollTop = 0; placeSheet();
   const pg = document.getElementById("planGlobe");
-  if (pg && pg._reset){ pg._reset(); setTimeout(() => pg._zoomTo(100.4, 10.6, 950, 105, 2000), 350); }
+  if (pg && pg._reset){ pg._reset(); setTimeout(() => pg._zoomTo(100.4, 10.8, 640, 110, 2000), 350); }
   prSheet.style.animation = "none"; void planEl.offsetWidth; prSheet.style.animation = "";
   watchSq(planEl); haptic(16);
 }
@@ -2192,9 +2207,10 @@ prScroll.addEventListener("touchstart", e => { pull = prScroll.scrollTop <= 0 ? 
 prScroll.addEventListener("touchmove", e => { if (pull !== null && e.touches[0].clientY - pull > 70 && prSheet.classList.contains("isFull") && view === "overview"){ pull = null; setFull(false); } }, { passive: true });
 document.getElementById("prGrab").addEventListener("pointerdown", e => {
   const g = e.currentTarget; g.setPointerCapture(e.pointerId);
-  const y0 = e.clientY, top0 = prSheet.getBoundingClientRect().top - planEl.getBoundingClientRect().top; let dy = 0;
+  const y0 = e.clientY, D = sheetDy(), base = prSheet.classList.contains("isFull") ? 0 : D; let dy = 0;
   prSheet.classList.add("drag");
-  const move = ev => { dy = ev.clientY - y0; prSheet.style.top = Math.max(8, top0 + dy) + "px"; };
+  const move = ev => { dy = ev.clientY - y0; const t = Math.max(0, Math.min(D + 60, base + dy)), k = Math.min(1, t / D);
+    prSheet.style.translate = `0 ${t}px`; prSheet.style.clipPath = `inset(0 ${8 * k}px ${t + 8 * k}px ${8 * k}px round 32px 32px ${32 * k}px ${32 * k}px)`; };
   const up = () => { g.removeEventListener("pointermove", move); g.removeEventListener("pointerup", up); prSheet.classList.remove("drag");
     if (Math.abs(dy) < 6) setFull(!prSheet.classList.contains("isFull")); else setFull(dy < 0); };
   g.addEventListener("pointermove", move); g.addEventListener("pointerup", up);
@@ -2917,10 +2933,10 @@ function syncSheet(){
 function growQ(){ qEl.style.height = "auto"; qEl.style.height = qEl.scrollHeight + "px"; }
 
 // The sheet hugs its content, so adding Option 3 or a second line grows it upward
-function maxSheetH(){ const vv = window.visualViewport, kb = vv ? Math.max(0, innerHeight - vv.height - vv.offsetTop) : 0;
-  return kb > 0 ? vv.height - 20 : innerHeight - 28; }
+const kbHeight = () => { const vv = window.visualViewport; return vv ? Math.max(0, innerHeight - vv.height - vv.offsetTop) : 0; };
+function maxSheetH(){ return innerHeight - 28; }
 function fitSheet(instant){
-  if (sheet.hidden) return;
+  if (sheet.hidden || sheet.classList.contains("kb")) return;
   const prev = sheet.offsetHeight;
   sheet.style.height = "auto"; sheetBody.style.flex = "none";
   const nat = sheet.offsetHeight;
@@ -2982,8 +2998,17 @@ scrim.addEventListener("click", () => closePoll());
 window.addEventListener("popstate", () => closePoll(true));
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePoll(); });
 
+// keep the field you're typing in comfortably above the keyboard
+function revealFocus(){
+  const el = document.activeElement; if (!el || !sheet.contains(el) || !el.matches("input,textarea")) return;
+  const vv = window.visualViewport, top = vv ? vv.offsetTop : 0, bottom = vv ? vv.offsetTop + vv.height : innerHeight;
+  const r = (el.closest(".optRow,.qWrap") || el).getBoundingClientRect();
+  if (r.bottom > bottom - 28) sheetBody.scrollBy({ top: r.bottom - (bottom - 28) + 12, behavior: "smooth" });
+  else if (r.top < top + 90) sheetBody.scrollBy({ top: r.top - (top + 90), behavior: "smooth" });
+}
+sheet.addEventListener("focusin", () => { setTimeout(revealFocus, 60); setTimeout(revealFocus, 380); });
 qEl.addEventListener("input", () => { guard(qEl, true, qWrap); growQ(); syncSheet(); });
-qEl.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); optsEl.querySelector("input").focus(); } });
+qEl.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); const first = optsEl.querySelector("input"); first.focus({ preventScroll: true }); revealFocus(); } });
 optsEl.addEventListener("input", e => { if (e.target.matches("input")) guard(e.target, false, e.target.parentElement); syncSheet(); });
 optsEl.addEventListener("keydown", e => {
   if (e.key !== "Enter" || !e.target.matches("input")) return;
@@ -3001,8 +3026,11 @@ window.addEventListener("resize", () => fitSheet(true));
 sheet.addEventListener("focusin", e => { if (e.target.matches("input,textarea")) sheet.classList.add("typing"); });
 sheet.addEventListener("focusout", () => setTimeout(() => { if (!sheet.contains(document.activeElement) || !document.activeElement.matches("input,textarea")) sheet.classList.remove("typing"); }, 0));
 if (window.visualViewport){
-  const fit = () => { const vv = visualViewport, kb = Math.max(0, innerHeight - vv.height - vv.offsetTop);
-    sheet.style.bottom = (kb + 8) + "px"; fitSheet(true); };
+  // keyboard up: the sheet goes tall (end to end) and its bottom tucks behind the keyboard; the body gets extra room so every field can scroll above it
+  const fit = () => { if (sheet.hidden) return; const vv = visualViewport, kb = kbHeight();
+    if (kb > 80){ sheet.classList.add("kb"); sheet.style.top = (vv.offsetTop + 12) + "px"; sheet.style.bottom = "auto"; sheet.style.height = (innerHeight - vv.offsetTop - 12) + "px";
+      sheetBody.style.paddingBottom = (kb + 40) + "px"; revealFocus(); }
+    else if (sheet.classList.contains("kb")){ sheet.classList.remove("kb"); sheet.style.top = ""; sheet.style.bottom = "8px"; sheetBody.style.paddingBottom = ""; fitSheet(true); } };
   visualViewport.addEventListener("resize", fit); visualViewport.addEventListener("scroll", fit);
 }
 
@@ -3075,7 +3103,7 @@ document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
   const BASE_LON = 105.6655, P = 4.68734, K = Math.sqrt((P - 1) / (P + 1));
   let LAT = 8.0521, RVIS = +(cv.dataset.r || 336.5), CY = +(cv.dataset.cy || -49.5), zoom = null;
   let W = 0, H = 0, dpr = 1, lon = BASE_LON, ready = false, running = true, last = 0, t0 = performance.now();
-  function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.viewport(0, 0, cv.width, cv.height); }
+  function size(){ dpr = Math.min(3, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.viewport(0, 0, cv.width, cv.height); }
   function draw(){
     if (!ready) return;
     g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, CY * dpr); g.uniform1f(uR, RVIS / K * dpr);
