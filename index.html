@@ -1026,7 +1026,7 @@ b.grad2{font-weight:700}
 
 
 <section class="screen" id="making" hidden role="dialog" aria-label="Making your trip plan">
-  <div class="mkSky" aria-hidden="true"><canvas id="globe" data-cy="300" data-r="215"></canvas></div>
+  <div class="mkSky" aria-hidden="true"><canvas id="globe" class="globeCv" data-cy="300" data-r="215"></canvas></div>
   <div class="topGlow"></div>
   <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
   <div class="bigSheet">
@@ -1053,7 +1053,7 @@ b.grad2{font-weight:700}
 </section>
 
 <section class="screen" id="plan" hidden role="dialog" aria-label="Your trip plan">
-  <img class="mapBg" src="assets/map-plan.jpg" alt="">
+  <div class="mkSky" aria-hidden="true"><canvas class="globeCv" data-cy="175" data-r="200"></canvas></div>
   <div class="topGlow"></div>
   <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
   <div class="bigSheet" id="prSheet">
@@ -2925,8 +2925,7 @@ sheet.addEventListener("submit", e => {
 /* ---------- Apple Maps style globe (now the moving background of the Making your trip plan screen) ----------
    Texture unwrapped from an Apple Maps globe view, drawn back onto a real 3D sphere with the same
    vertical-perspective camera (fitted to 1.4px), then swayed slowly east and west. */
-(function(){
-  const cv = document.getElementById("globe"); if (!cv) return;
+document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
   const g = cv.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false }); if (!g) return;
   const vs = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
   const fs = `precision highp float;
@@ -2985,7 +2984,7 @@ sheet.addEventListener("submit", e => {
   new IntersectionObserver(es => { if (es[0].isIntersecting && !document.hidden) start(); else running = false; }).observe(cv);
   document.addEventListener("visibilitychange", () => document.hidden ? (running = false) : start());
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) running = false; else requestAnimationFrame(tick);
-})();
+})(cv));
 (function(){
   const cv = document.getElementById("globe"); if (!cv || window.__globeGL || !window.d3 || !window.topojson) return;
   const ctx = cv.getContext("2d"), R = 336.5, CY = -49.5;
