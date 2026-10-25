@@ -232,6 +232,12 @@ body.locked{overflow:hidden}
 .npOpt .lb em{display:block;font-style:normal;font-size:18px;letter-spacing:0;margin-top:2px}
 .npOpt .rip{position:absolute;border-radius:50%;background:rgba(107,43,245,.28);transform:scale(0);pointer-events:none}
 .np.voted .npOpt{cursor:default}
+.npVeil{position:absolute;inset:0;background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);z-index:5;pointer-events:none}
+.npFlag{position:absolute;z-index:6;pointer-events:none;line-height:1;will-change:transform}
+.npHero{position:absolute;z-index:7;margin:0;transform-origin:0 0;border-radius:16px;box-shadow:0 10px 30px rgba(17,18,20,.14),0 2px 6px rgba(17,18,20,.06);pointer-events:none}
+.npHero .fill{transition:height .8s cubic-bezier(.2,.9,.25,1.12)}
+.npTmp{position:absolute;left:0;right:0;z-index:7;height:24px;pointer-events:none}
+.np.busy{pointer-events:none}
 .npStacks{display:flex;gap:16px;margin:11px 4.5px 0;height:24px}
 .npV{flex:1;min-width:0;display:flex;justify-content:center}
 .npV img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;flex:none;margin-left:-8.57px;background:#eee}
@@ -2149,44 +2155,103 @@ function showPoll(q, labels, where = "home"){
   voteTimers.push(setTimeout(() => {
     const n = poll.opts.length, stacks = wrap.querySelectorAll(".npV");
     FRIENDS.forEach((src, k) => { const i = k < 3 ? 0 : Math.min(1, n - 1);
-      const img = new Image(); img.src = src; img.alt = ""; stacks[i].appendChild(img); poll.opts[i].voters.push(src); poll.waiting--; });
-    stacks.forEach(st => collideIn([...st.children])); status(); haptic(8);
+      poll.opts[i].voters.push(src); poll.waiting--; });
+    status();
   }, where === "home" ? 750 : 350));
   wrap.querySelector(".npInv").addEventListener("click", () => openInvite("trip"));
   wrap.querySelector(".npOpts").addEventListener("click", e => { const b = e.target.closest(".npOpt"); if (b) npVote(+b.dataset.i, e); });
 
   function npVote(i, e){
     if (poll.committed) return;
-    poll.committed = true; poll.mine = i; np.classList.add("voted");
-    const tiles = wrap.querySelectorAll(".npOpt"), tile = tiles[i], stack = wrap.querySelectorAll(".npV")[i];
-    haptic(14);
-    // the chosen tile pops and a ripple spreads from your finger
-    tile.animate([{ transform: "scale(1)" }, { transform: "scale(1.09)", offset: .35 }, { transform: "scale(.97)", offset: .7 }, { transform: "scale(1)" }], { duration: 640, easing: "cubic-bezier(.2,.9,.3,1)" });
-    const r = tile.getBoundingClientRect(), rip = document.createElement("i"), sz = Math.max(r.width, r.height) * 2.4;
-    rip.className = "rip"; rip.style.cssText = `width:${sz}px;height:${sz}px;left:${(e ? e.clientX - r.left : r.width / 2) - sz / 2}px;top:${(e ? e.clientY - r.top : r.height / 2) - sz / 2}px`;
-    tile.appendChild(rip); rip.animate([{ transform: "scale(0)", opacity: 1 }, { transform: "scale(1)", opacity: 0 }], { duration: 750, easing: "cubic-bezier(.2,.8,.2,1)" }).onfinish = () => rip.remove();
-    // your photo slides in from the right edge of the card and bumps into the stack
-    const img = new Image(); img.src = ME; img.alt = "You"; img.className = "self";
-    bumpStack(stack, () => stack.appendChild(img));
-    const cardR = np.getBoundingClientRect(), ir = img.getBoundingClientRect(), dx = cardR.right + 12 - ir.left;
-    img.animate([{ transform: `translateX(${dx}px) scale(1.5)`, opacity: 0 }, { transform: `translateX(${dx * .4}px) scale(1.4)`, opacity: 1, offset: .25 },
-      { transform: "translateX(-7px) scale(1.12)", offset: .62 }, { transform: "translateX(3px) scale(.94)", offset: .8 }, { transform: "none" }], { duration: 820, easing: "cubic-bezier(.3,.7,.3,1)" });
+    poll.committed = true; poll.mine = i; np.classList.add("voted", "busy");
+    const tiles = wrap.querySelectorAll(".npOpt"), tile = tiles[i], stacks = wrap.querySelectorAll(".npV"), stack = stacks[i];
+    const pct = k => poll.opts[k].voters.length / total * 88;
+    // demo data: most of the crew backs the pick you make, one friend goes elsewhere
+    voteTimers.forEach(clearTimeout); poll.opts.forEach(o => o.voters = []); poll.waiting = 0;
+    FRIENDS.forEach((src, k) => poll.opts[k < 3 || poll.opts.length < 2 ? i : (i + 1) % poll.opts.length].voters.push(src));
     poll.opts[i].voters.push(ME);
-    setTimeout(() => haptic(10), 560);
-    // the answers appear: each tile fills from the bottom to its share of votes, yours first
-    const order = [i, ...[...tiles.keys()].filter(k => k !== i)];
-    order.forEach((k, j) => setTimeout(() => { const fl = tiles[k].querySelector(".fill"), v = poll.opts[k].voters.length; if (v){ fl.classList.add("on"); fl.style.height = (v / total * 88) + "%"; } }, 180 + j * 140));
-    setTimeout(status, 650);
-    // winner, then the trip button rises in
     let win = 0; poll.opts.forEach((o, k) => { if (o.voters.length > poll.opts[win].voters.length) win = k; }); poll.win = win;
     const name = splitLabel(poll.opts[win].label)[0];
-    setTimeout(() => {
-      tiles[win].animate([{ transform: "scale(1)" }, { transform: "scale(1.05)" }, { transform: "scale(1)" }], { duration: 520, easing: "cubic-bezier(.2,.9,.3,1)" });
+    const T = M.reduce ? .4 : 1, at = (ms, fn) => setTimeout(fn, ms * T);
+    haptic(14);
+
+    // 1. a white veil drops over the card and your pick lifts to the centre, bigger
+    const nr = np.getBoundingClientRect(), tr = tile.getBoundingClientRect();
+    const veil = document.createElement("i"); veil.className = "npVeil"; np.appendChild(veil);
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: "ease-out", fill: "forwards" });
+    const hero = tile.cloneNode(true); hero.className = "npOpt npHero"; hero.removeAttribute("data-sq"); hero.style.clipPath = "none";
+    const L = tr.left - nr.left, Tp = tr.top - nr.top, S = 1.41;
+    Object.assign(hero.style, { left: L + "px", top: Tp + "px", width: tr.width + "px", height: tr.height + "px" });
+    const hf = hero.querySelector(".fill"); hf.style.transition = "none"; hf.style.height = "0"; hf.classList.add("on");
+    np.appendChild(hero); tile.style.visibility = "hidden";
+    const cx = (nr.width - tr.width * S) / 2 - L, up = 70 - Tp, lifted = 43 - Tp;
+    const pose = (dy, sc) => `translate(${cx}px,${dy}px) scale(${sc})`;
+    hero.animate([{ transform: "none" }, { transform: pose(up - 6, S * 1.04), offset: .65 }, { transform: pose(up, S) }], { duration: 560, easing: "cubic-bezier(.2,.9,.3,1)", fill: "forwards" });
+
+    // 2. the bar fills up
+    at(520, () => { void hf.offsetHeight; hf.style.transition = ""; hf.style.height = pct(i) + "%"; haptic(10); });
+
+    // 3. a shower of the place's flag rises behind the tile for about a second
+    at(620, () => flagShower(splitLabel(poll.opts[i].label)[1] || "🎉"));
+
+    // 4. the tile lifts, the people who picked it land below, then you slide in from the right
+    const tmp = document.createElement("div"); tmp.className = "npV npTmp"; tmp.style.top = "155px";
+    at(1250, () => {
+      hero.animate([{ transform: pose(up, S) }, { transform: pose(lifted, S) }], { duration: 480, easing: "cubic-bezier(.2,.9,.3,1.15)", fill: "forwards" });
+      np.appendChild(tmp);
+      const friends = poll.opts[i].voters.filter(v => v !== ME);
+      friends.forEach(src => { const im = new Image(); im.src = src; im.alt = ""; tmp.appendChild(im); });
+      if (friends.length) collideIn([...tmp.children]);
+    });
+    at(1700, () => {
+      const me = new Image(); me.src = ME; me.alt = "You"; me.className = "self";
+      bumpStack(tmp, () => tmp.appendChild(me));
+      const dx = nr.right + 16 - me.getBoundingClientRect().left;
+      me.animate([{ transform: `translateX(${dx}px) scale(1.4)`, opacity: 0 }, { transform: `translateX(${dx * .45}px) scale(1.35)`, opacity: 1, offset: .25 },
+        { transform: "translateX(-8px) scale(1.12)", offset: .6 }, { transform: "translateX(3px) scale(.94)", offset: .8 }, { transform: "none" }], { duration: 760, easing: "cubic-bezier(.3,.7,.3,1)" });
+      // the whole row gives a little jolt when you join
+      at(430, () => { haptic(12); tmp.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(1.1) scaleY(.92)", offset: .3 }, { transform: "scaleX(.96) scaleY(1.04)", offset: .62 }, { transform: "none" }], { duration: 520, easing: "ease-out" }); });
+    });
+
+    // 5. everything settles back into the card and the answers show for every option
+    at(3000, () => {
+      poll.opts.forEach((o, k) => o.voters.forEach(src => { const im = new Image(); im.src = src; im.alt = src === ME ? "You" : ""; if (src === ME) im.className = "self"; stacks[k].appendChild(im); }));
+      stack.style.opacity = "0";
+      const a = tmp.getBoundingClientRect(), b2 = stack.getBoundingClientRect();
+      tmp.animate([{ transform: "none" }, { transform: `translate(${b2.left + b2.width / 2 - (a.left + a.width / 2)}px,${b2.top - a.top}px)` }], { duration: 560, easing: "cubic-bezier(.3,.8,.3,1)", fill: "forwards" });
+      hero.animate([{ transform: pose(lifted, S) }, { transform: "translate(0,-4px) scale(.98)", offset: .8 }, { transform: "none" }], { duration: 600, easing: "cubic-bezier(.3,.8,.3,1)", fill: "forwards" })
+        .onfinish = () => {
+          const f = tile.querySelector(".fill"); f.style.transition = "none"; f.classList.add("on"); f.style.height = pct(i) + "%"; void f.offsetHeight; f.style.transition = "";
+          tile.style.visibility = ""; hero.remove(); tmp.remove(); stack.style.opacity = "";
+          [...tiles.keys()].filter(k => k !== i).forEach((k, j) => setTimeout(() => {
+            const v = poll.opts[k].voters.length; if (v){ const fl = tiles[k].querySelector(".fill"); fl.classList.add("on"); fl.style.height = pct(k) + "%"; collideIn([...stacks[k].children]); }
+          }, j * 120));
+          status();
+        };
+      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, delay: 120, easing: "ease-in", fill: "forwards" }).onfinish = () => veil.remove();
+    });
+
+    // then the trip button rises in
+    at(3800, () => {
       pollCtaText.textContent = poll.where === "chat" ? `Go with ${name}` : `Make ${/^[aeiou]/i.test(name) ? "an" : "a"} ${name} Trip`;
-      np.classList.add("ready"); pollCta.tabIndex = 0;
+      np.classList.add("ready"); np.classList.remove("busy"); pollCta.tabIndex = 0;
       pollCta.classList.remove("shine"); void pollCta.offsetWidth; pollCta.classList.add("shine");
       setTimeout(() => { haptic(18); burst(); }, 380);
-    }, 1500);
+    });
+
+    function flagShower(ch){
+      const W = np.clientWidth, H = np.clientHeight;
+      for (let n = 0; n < 22; n++){
+        const sp = document.createElement("span"); sp.className = "npFlag"; sp.textContent = ch;
+        const size = 16 + Math.random() * 16, x = Math.random() * (W - size);
+        sp.style.cssText = `left:${x}px;top:${H + 8}px;font-size:${size}px`;
+        np.appendChild(sp);
+        const rise = H + 60 + Math.random() * 40, drift = (Math.random() - .5) * 60, rot = (Math.random() - .5) * 70;
+        sp.animate([{ transform: "translate(0,0) rotate(0)", opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .7 },
+          { transform: `translate(${drift}px,${-rise}px) rotate(${rot}deg)`, opacity: 0 }],
+          { duration: 800 + Math.random() * 400, delay: Math.random() * 280, easing: "cubic-bezier(.25,.6,.35,1)", fill: "backwards" }).onfinish = () => sp.remove();
+      }
+    }
   }
 }
 
