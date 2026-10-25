@@ -124,7 +124,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .top .header{position:relative;z-index:1}
 /* sits 31px above the header, as in the frame, whether or not the status bar shows */
 .decoTop.mapfade{top:calc(100% - 75px);left:auto;height:380px;overflow:visible;-webkit-mask-image:none;mask-image:none}
-.heroTitle{padding:10px 24px;width:261px;text-align:left;font-weight:900;font-size:40px;line-height:46px;letter-spacing:-1px;color:#111214}
+.heroTitle{padding:10px 24px;width:max-content;white-space:nowrap;text-align:left;font-weight:900;font-size:40px;line-height:46px;letter-spacing:-1px;color:#111214}
 .heroTitle .lt{font-weight:500}
 .carousel .views span,.row .views span,.deck .views span{font-weight:700;color:#c4a3ff}
 .carousel .info{padding:20px 16px 16px;gap:12px}
@@ -890,7 +890,7 @@ body.locked{overflow:hidden}
       </div></div></section>
 
       <section>
-        <h1 class="heroTitle"><span class="lt">Trending in</span> Thailand 🇹🇭</h1>
+        <h1 class="heroTitle"><span class="lt">Trending in</span><br>Thailand 🇹🇭</h1>
         <div style="height:18px"></div>
         <div class="carousel" id="carousel" tabindex="0" aria-roledescription="carousel" aria-label="Trending reels"></div>
       </section>
@@ -1166,9 +1166,9 @@ function render(){
     s.style.visibility = op <= 0.01 ? "hidden" : "visible";
     s.classList.toggle("near", a < 1.2);
     const reel = s.children[1];
-    const m = d >= 0
-      ? `linear-gradient(to right, rgba(0,0,0,${(1-.22*t).toFixed(3)}) 0%, rgba(0,0,0,${(1-t).toFixed(3)}) 53%)`
-      : `linear-gradient(to right, rgba(0,0,0,${(1-t).toFixed(3)}) 50%, rgba(0,0,0,${(1-.28*t).toFixed(3)}) 100%)`;
+    // as in the frame: a side card is solid at its outer edge and fades out toward the middle card
+    const lo = (1 - t).toFixed(3);
+    const m = `linear-gradient(to ${d >= 0 ? "right" : "left"}, rgba(0,0,0,${lo}) 0%, rgba(0,0,0,${lo}) 13.3%, #000 100%)`;
     reel.style.webkitMaskImage = reel.style.maskImage = t < .001 ? "none" : m;
   }
   const c = ((Math.round(pos) % N) + N) % N;
