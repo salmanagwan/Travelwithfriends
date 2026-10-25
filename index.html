@@ -294,9 +294,11 @@ body.locked{overflow:hidden}
 .npTab{position:absolute;right:0;top:0;width:64px;height:40px;transition:opacity .3s}
 .npTab svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .npTab path{fill:#fff;stroke:#e7e8eb;stroke-width:1}
-.npTab .npInv{position:absolute;left:26px;top:4px;width:29.09px;height:29.09px;background:transparent;border-radius:50%;display:grid;place-items:center}
-.npTab .npInv i{width:21.82px;height:21.82px;border:1.364px dashed #6b2bf5;border-radius:50%;display:grid;place-items:center}
-.npTab .npInv img{width:14px;height:14px}
+.npTab .npInv{position:absolute;left:25px;top:2px;width:36px;height:36px;background:transparent;border-radius:12px;display:grid;place-items:center}
+.npTab .npInv img{width:24px;height:24px}
+.npTab .npInv:active{transform:scale(.9)}
+/* in the trip chat the card is a plain rounded card: no tab, no invite corner (Figma 253:58972) */
+.np.flat+.npTab{display:none}
 .np.busy+.npTab{opacity:.3}
 .npAiW{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.9,.25,1)}
 .npAiW>div{min-height:0;overflow:hidden}
@@ -2406,6 +2408,7 @@ function npOutline(W, H){
    + `V${b - 40}C${W} ${b - 21.144} ${W} ${b - 11.716} ${x(5.858)} ${b - 5.858}C${x(11.716)} ${b} ${x(21.144)} ${b} ${x(40)} ${b}`
    + `H40C21.144 ${b} 11.716 ${b} 5.858 ${b - 5.858}C0 ${b - 11.716} 0 ${b - 21.144} 0 ${b - 40}Z`;
 }
+function npRound(W, H, r){ return `M${r} 0H${W - r}A${r} ${r} 0 0 1 ${W} ${r}V${H - r}A${r} ${r} 0 0 1 ${W - r} ${H}H${r}A${r} ${r} 0 0 1 0 ${H - r}V${r}A${r} ${r} 0 0 1 ${r} 0Z`; }
 function npTabOutline(W){
   const x = k => (W - k).toFixed(3);
   return `M${x(58.265)} 9.18C${x(60.802)} 5.121 ${x(62.07)} 3.091 ${x(61.213)} 1.546C${x(60.357)} 0 ${x(57.963)} 0 ${x(53.177)} 0H${x(18.002)}`
@@ -2437,18 +2440,21 @@ function showPoll(q, labels, where = "home"){
       <div class="npHead"><div class="npL"><span class="npBadge"><img src="assets/poll-badge.svg" alt="">POLL</span><span class="npPend">1 vote pending</span></div></div>
       <p class="npQ"></p>
       <div class="npOpts" role="group" aria-label="Vote">${poll.opts.map((o, i) => { const [n, e] = splitLabel(o.label);
-        return `<button type="button" class="npOpt" data-i="${i}" data-sq="16"><i class="fill"></i><span class="lb">${esc(n.replace(/(\d)\s*-\s*(\d)/g, "$1–$2"))}${e ? `<em>${e}</em>` : ""}</span></button>`; }).join("")}</div>
+        const dm = !e && n.match(/^([A-Za-z]{3,9})\s+(\d.*)$/);   // dates read as month over range, like the chat frame
+        const body = dm ? `${esc(dm[1])}<em>${esc(dm[2].replace(/\s*[-–]\s*/g, " - "))}</em>` : `${esc(n.replace(/(\d)\s*-\s*(\d)/g, "$1–$2"))}${e ? `<em>${e}</em>` : ""}`;
+        return `<button type="button" class="npOpt" data-i="${i}" data-sq="16"><i class="fill"></i><span class="lb">${body}</span></button>`; }).join("")}</div>
       <div class="npSW"><div><div class="npStacks">${poll.opts.map(() => `<div class="npV"></div>`).join("")}</div></div></div>
       <div class="npAiW"><div><button type="button" class="npAi" aria-live="polite"><img class="orb" src="assets/ai-orb.png" alt=""><span class="npAiT"><span class="grad2">Check in the community what they have to say</span></span><img class="chev" src="assets/chevron-right-dark.svg" alt=""></button></div></div>
       <div class="npCta"><div></div></div>
     </div>
-    <div class="npTab"><svg aria-hidden="true"><path/></svg><button type="button" class="npInv" aria-label="Invite friends to vote"><i><img src="assets/plus-purple.svg" alt=""></i></button></div>`;
+    <div class="npTab"><svg aria-hidden="true"><path/></svg><button type="button" class="npInv" aria-label="Invite friends to vote"><img src="assets/people-add-grey.svg" alt=""></button></div>`;
   const np = wrap.querySelector(".np"), qEl2 = wrap.querySelector(".npQ"), pend = wrap.querySelector(".npPend");
   // the card outline with the folder-tab notch top right (Figma 256:68784), redrawn whenever the card changes height
   const shapePath = np.querySelector(".npShape path"), tabPath = wrap.querySelector(".npTab path");
-  const drawShape = () => { const W = np.clientWidth, H = np.clientHeight; if (!W) return; const d = npOutline(W, H);
+  const drawShape = () => { const W = np.clientWidth, H = np.clientHeight; if (!W) return; const d = where === "chat" ? npRound(W, H, 20) : npOutline(W, H);
     shapePath.setAttribute("d", d); np.style.clipPath = `path("${d}")`; np.querySelector(".npShape").setAttribute("viewBox", `0 0 ${W} ${H}`);
     tabPath.setAttribute("d", npTabOutline(W)); wrap.querySelector(".npTab svg").setAttribute("viewBox", `${W - 64} 0 64 40`); };
+  if (where === "chat") np.classList.add("flat");
   new ResizeObserver(drawShape).observe(np); requestAnimationFrame(drawShape);
   // the AI strip: slides in once the card has landed; tapping it runs the community check
   const ai = wrap.querySelector(".npAi"), aiT = wrap.querySelector(".npAiT");
