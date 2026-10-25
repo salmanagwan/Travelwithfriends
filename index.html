@@ -125,9 +125,15 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .tvBody{padding:28px 16px 0}
 .tvTitle{padding-left:8px;text-align:left;font-weight:700;font-size:24px;line-height:normal;letter-spacing:0;color:#686868}
 .tvList{display:flex;flex-direction:column;gap:20px;margin-top:16px}
-.tvCard{position:relative;display:flex;gap:12px;padding:8px 4px 8px 8px;border:.7px solid #ececec;border-radius:20px;box-shadow:0 0 4px rgba(0,0,0,.1);background:#fff;text-align:left;width:100%}
-.tvCard:active{transform:scale(.985)}
-.tvThumb{width:84.6px;height:100px;border-radius:13.3px;overflow:hidden;flex:none;background:#000}
+.tvCard{position:relative;display:flex;gap:12px;padding:8.7px 4.7px 8.7px 8.7px;border-radius:20px;box-shadow:0 0 4px rgba(0,0,0,.1);text-align:left;width:100%;cursor:pointer;
+  transition:transform .2s cubic-bezier(.2,.9,.3,1.2);-webkit-tap-highlight-color:transparent;outline:none}
+.tvCard>.bg{position:absolute;inset:0;background:#fff;z-index:0}
+.tvCard>.edge{position:absolute;inset:0;background:#ececec;z-index:0;pointer-events:none}
+.tvCard>.tvThumb,.tvCard>.tvInfo{position:relative;z-index:1}
+.tvCard>.tvMore{position:absolute}
+.tvCard:active:not(:has(.tvMore:active)){transform:scale(.985)}
+.tvCard:focus-visible>.edge{background:#6b2bf5}
+.tvThumb{width:84.6px;height:100px;overflow:hidden;flex:none;background:#000}
 .tvThumb img{width:100%;height:100%;object-fit:cover;display:block}
 .tvInfo{flex:1;min-width:0;height:100px;display:flex;flex-direction:column;justify-content:space-between}
 .tvInfo h3{font-weight:700;font-size:18px;letter-spacing:-.36px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:34px}
@@ -139,10 +145,29 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .tvCrew{display:flex;align-items:center}
 .tvCrew i{width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center;margin-right:-8.75px;position:relative}
 .tvCrew i img{width:24.5px;height:24.5px;border-radius:50%;object-fit:cover}
-.tvMore{position:absolute;right:9px;top:8px;width:24px;height:24px;border-radius:50%;background:#f2f2f2;display:grid;place-items:center}
-.tvMore img{width:16px;height:16px}
-.tvAdd{margin-top:24px;width:100%;height:58px;border:1.5px dashed #969696;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:500;font-size:20px;color:#6b6f76;background:#fff}
+.tvMore{right:7.4px;top:6px;width:28px;height:28px;border-radius:31px;background:#f2f2f2;display:grid;place-items:center;z-index:2;transition:transform .2s cubic-bezier(.2,.9,.3,1.4),background .2s}
+.tvMore img{width:18.67px;height:18.67px}
+.tvMore:active{transform:scale(.9)}
+.tvMore[aria-expanded="true"]{background:#e6e6e6}
+.tvAdd{position:relative;margin-top:24px;width:100%;height:58px;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:500;font-size:20px;color:#6b6f76;background:none;outline:none;-webkit-tap-highlight-color:transparent;transition:transform .2s}
+.tvAdd:active{transform:scale(.98)}
+.tvAdd svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.tvAdd:focus-visible path{stroke:#6b2bf5}
 .tvAdd img{width:24px;height:24px}
+/* three-dot menu on a trip card (Figma 264:70075) */
+.tvMenu{position:absolute;z-index:40;display:flex;flex-direction:column;gap:16px;padding:16px 20px;border-radius:24px;box-shadow:0 2px 10px rgba(0,0,0,.15);transform-origin:top right;
+  opacity:0;transform:scale(.85);transition:opacity .18s ease,transform .32s cubic-bezier(.2,.9,.3,1.25);pointer-events:none}
+.tvMenu.up{transform-origin:bottom right}
+.tvMenu.show{opacity:1;transform:none;pointer-events:auto}
+.tvMenu>.bg{position:absolute;inset:0;background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);box-shadow:inset 0 0 15px rgba(0,0,0,.1)}
+.tvMenu>.edge{position:absolute;inset:0;background:rgba(0,0,0,.1);pointer-events:none}
+.tvMenu button{position:relative;display:flex;align-items:center;gap:12px;font:600 18px var(--sans);color:#101010;white-space:nowrap;text-align:left;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.tvMenu button:active{transform:scale(.96)}
+.tvMenu .ic{position:relative;height:32px;flex:none;overflow:hidden}
+.tvMenu .ic img{position:absolute;max-width:none}
+.tvMenu hr{position:relative;border:0;height:.8px;min-width:182.5px;background:#e7e8eb;margin:0}
+.tvCard.gone{animation:tvOut .36s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes tvOut{to{opacity:0;transform:scale(.92)}}
 .tvCard.fresh{animation:tvIn .7s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes tvIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
 
@@ -513,10 +538,14 @@ b.grad2{font-weight:700}
 /* Plan sheet: drag up to go edge to edge */
 /* The sheet is always full size; the half state just slides it down and trims 8px off the sides, so only transform and clip animate */
 #plan .bigSheet{top:max(env(safe-area-inset-top,0px),10px)!important;left:0;right:0;bottom:0;translate:0 var(--dy,180px);
-  clip-path:inset(0 8px calc(8px + var(--dy,180px)) 8px round 32px);will-change:translate;
+  clip-path:inset(0 0 var(--dy,180px) 0 round 32px 32px 0 0);will-change:translate;
   transition:translate .5s cubic-bezier(.2,.9,.25,1),clip-path .5s cubic-bezier(.2,.9,.25,1)}
 #plan .bigSheet.isFull{translate:0 0;clip-path:inset(0 0 0 0 round 32px 32px 0 0)}
 #plan .bigSheet.drag{transition:none}
+/* half-open: the sheet is slid down by --dy, so lift the + / AI buttons and the + menu back into view */
+#plan .prBtns,#plan .fabMenu .pill{transition:translate .5s cubic-bezier(.2,.9,.25,1)}
+#plan .bigSheet:not(.isFull) .prBtns,#plan .bigSheet:not(.isFull) .fabMenu .pill{translate:0 calc(-1 * var(--dy,180px))}
+#plan .bigSheet.drag .prBtns{transition:none}
 #plan .prScroll{overflow-x:hidden;touch-action:pan-y}
 #plan .prChips,#plan .spots{touch-action:pan-x pan-y}
 .screen{overscroll-behavior:none}
@@ -724,7 +753,7 @@ b.grad2{font-weight:700}
 .prInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
 .prInfo h2{font-weight:900;font-size:20px;line-height:1.3;letter-spacing:-.1px;color:#000;font-variation-settings:"opsz" 14}
 .prMeta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:8px}
-@media (max-width:420px){ .prTop{gap:16px;padding-left:16px} .cvOne{width:92px;height:122px} .cvOne img{left:-2.5px;top:-31px;width:106.6px;height:160px} }
+@media (max-width:420px){ .prTop{gap:16px} .cvOne{width:92px;height:122px} .cvOne img{left:-2.5px;top:-31px;width:106.6px;height:160px} }
 .prMeta .dots{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;color:#686868;white-space:nowrap}
 .prMeta .dots i,.fRoute i,.dayMeta i{width:4px;height:4px;border-radius:50%;background:#c4c4c4;flex:none}
 .dateChip{display:flex;align-items:center;gap:4px;padding:4px 8px 4px 6px;border-radius:38px;background:#fff;border:.5px solid #ececec;font-weight:600;font-size:14px;color:#686868;white-space:nowrap;
@@ -1052,7 +1081,15 @@ b.grad2{font-weight:700}
     <div class="tvBody">
       <h1 class="tvTitle">My Trips</h1>
       <div class="tvList" id="tvList"></div>
-      <button type="button" class="tvAdd" data-soon="New trip"><img src="assets/plus-grey.svg" alt="">Add new trip</button>
+      <div class="tvMenu" id="tvMenu" role="menu" hidden>
+        <i class="bg" data-sq="24"></i><i class="edge" data-ring="24"></i>
+        <button type="button" role="menuitem" data-act="invite"><span class="ic" style="width:32.29px"><img src="assets/menu-icons.png" alt="" style="height:131.16%;left:-20.47%;top:-20.11%;width:389.95%"></span>Invite Friend</button>
+        <hr>
+        <button type="button" role="menuitem" data-act="dup"><span class="ic" style="width:36.058px"><img src="assets/menu-icons.png" alt="" style="height:131.16%;left:-129.1%;top:-20.11%;width:349.2%"></span>Duplicate Trip</button>
+        <hr>
+        <button type="button" role="menuitem" data-act="del"><span class="ic" style="width:31.652px"><img src="assets/menu-icons.png" alt="" style="height:131.16%;left:-283.88%;top:-20.11%;width:397.8%"></span>Delete Trip</button>
+      </div>
+      <button type="button" class="tvAdd" data-soon="New trip" data-sq-dash="14"><svg aria-hidden="true"><path fill="none" stroke="#969696" stroke-width="1.5" stroke-dasharray="6 5" stroke-linecap="round"/></svg><img src="assets/plus-grey.svg" alt="">Add new trip</button>
     </div>
   </section>
   <nav class="navWrap" aria-label="Main">
@@ -1596,7 +1633,7 @@ function say(msg){ toast.textContent = msg; toast.classList.add("show"); clearTi
 const sqObs = new ResizeObserver(es => es.forEach(({target: el}) => {
   const w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
   if (el.dataset.sq) clip(el, w, h, +el.dataset.sq);
-  if (el.dataset.ring) ring(el, w, h, +el.dataset.ring, .5);
+  if (el.dataset.ring) ring(el, w, h, +el.dataset.ring, +(el.dataset.ringT || .5));
   if (el.dataset.sqDash) el.querySelector("path").setAttribute("d", squircle(w - 1.5, h - 1.5, +el.dataset.sqDash, .6, .75, .75));
 }));
 const watchSq = root => { const q = "[data-sq],[data-ring],[data-sq-dash]"; if (root.matches && root.matches(q)) sqObs.observe(root); root.querySelectorAll(q).forEach(el => sqObs.observe(el)); };
@@ -1994,24 +2031,66 @@ const daysTo = d => Math.max(0, Math.round((d - new Date(new Date().toDateString
 function tripCard(t, fresh){
   const crew = t.crew.map((p, i) => `<i style="z-index:${9 - i}"><img src="${PEOPLE[p]}" alt="${p}"></i>`).join("");
   const status = t.done ? `<span class="done">Completed</span>` : `<span class="soon">In ${t.inDays} days</span>`;
-  return `<button type="button" class="tvCard${fresh ? " fresh" : ""}" data-trip="${t.id}">
-      <span class="tvThumb"><img src="${t.img}" alt="" style="object-position:${t.pos || "center"}"></span>
+  return `<div role="button" tabindex="0" class="tvCard${fresh ? " fresh" : ""}" data-trip="${t.id}" data-open="${t.open || t.id}">
+      <i class="bg" data-sq="20"></i><i class="edge" data-ring="20" data-ring-t=".7"></i>
+      <span class="tvThumb" data-sq="13.3"><img src="${t.img}" alt="" style="object-position:${t.pos || "center"}"></span>
       <span class="tvInfo"><span><h3>${esc(t.title)}</h3><span class="tvBadges"><span><img src="assets/cal-grey.svg" alt="">${t.days} days</span><span><img src="assets/pin-grey.svg" alt="">${t.spots} spots</span>${status}</span></span>
         <span class="tvCrew">${crew}</span></span>
-      <span class="tvMore" aria-label="More"><img src="assets/more-dots.svg" alt=""></span>
-    </button>`;
+      <button type="button" class="tvMore" aria-label="Trip options" aria-haspopup="menu" aria-expanded="false"><img src="assets/more-dots-lg.svg" alt=""></button>
+    </div>`;
 }
 function renderTrips(){
   const mine = { id: "plan", title: "Koh Samui, Phuket", days: DAYS.length, spots: totalSpots(), inDays: daysTo(TRIP.start), img: "assets/trip-thai.jpg", pos: "center 35%",
     crew: LAST_TRIP && LAST_TRIP.solo ? ["You"] : ["You", "Isha", "Aman", "Priya"] };
-  const others = [
+  if (!TRIP_LIST) TRIP_LIST = [
+    { id: "plan" },
     { id: "japan", title: "Japan 5 day trip in osaka", days: 5, spots: 14, inDays: 12, img: "assets/trip-japan.jpg", crew: ["You", "Isha", "Aman", "Priya"] },
     { id: "india", title: "India 7 day trip in Mumbai", days: 7, spots: 21, done: true, img: "assets/trip-india.jpg", pos: "right center", crew: ["You", "Isha", "Aman", "Priya"] }
   ];
   const fresh = LAST_TRIP && Date.now() - LAST_TRIP.at < 10 * 60 * 1000 && !LAST_TRIP.shown;
-  tvList.innerHTML = tripCard(mine, fresh) + others.map(t => tripCard(t)).join("");
+  const live = t => t.open === "plan" || t.id === "plan" ? { ...mine, id: t.id, open: "plan" } : t;
+  tvList.innerHTML = TRIP_LIST.map(t => tripCard(live(t), (t.id === "plan" && fresh) || t.id === FRESH_ID)).join("");
+  FRESH_ID = null; watchSq(tvList);
   if (LAST_TRIP) LAST_TRIP.shown = true;
 }
+let TRIP_LIST = null, FRESH_ID = null, dupN = 0;
+/* three-dot menu: invite, duplicate, delete */
+const tvMenu = document.getElementById("tvMenu"); let menuFor = null;
+function closeTripMenu(){
+  if (!menuFor) return; menuFor.querySelector(".tvMore").setAttribute("aria-expanded", "false"); menuFor = null;
+  tvMenu.classList.remove("show"); setTimeout(() => { if (!menuFor) tvMenu.hidden = true; }, 220);
+}
+function openTripMenu(card){
+  if (menuFor === card){ closeTripMenu(); return; }
+  if (menuFor) menuFor.querySelector(".tvMore").setAttribute("aria-expanded", "false");
+  menuFor = card; const btn = card.querySelector(".tvMore"); btn.setAttribute("aria-expanded", "true");
+  tvMenu.hidden = false; tvMenu.classList.remove("show", "up"); watchSq(tvMenu);
+  const host = tvMenu.offsetParent.getBoundingClientRect(), b = btn.getBoundingClientRect(), mh = tvMenu.offsetHeight;
+  const up = b.bottom + 4 + mh > innerHeight - 110;           // keep it clear of the tab bar
+  tvMenu.classList.toggle("up", up);
+  tvMenu.style.right = (host.right - b.right - 5.5) + "px";
+  tvMenu.style.top = (up ? b.top - 4 - mh - host.top : b.bottom + 4 - host.top) + "px";
+  requestAnimationFrame(() => tvMenu.classList.add("show")); haptic(8);
+}
+tvMenu.addEventListener("click", e => {
+  const b = e.target.closest("button[data-act]"); if (!b || !menuFor) return;
+  const card = menuFor, id = card.dataset.trip, i = TRIP_LIST.findIndex(t => t.id === id), act = b.dataset.act;
+  closeTripMenu(); haptic(10);
+  if (act === "invite") openInvite("trip");
+  else if (act === "dup"){
+    const src = TRIP_LIST[i], copy = { ...src, id: id.replace(/~\d+$/, "") + "~" + (++dupN), open: src.open || src.id };
+    TRIP_LIST.splice(i + 1, 0, copy); FRESH_ID = copy.id; renderTrips(); say("Trip duplicated");
+  } else if (act === "del"){
+    const h = card.offsetHeight + 20;
+    card.classList.add("gone");
+    card.animate([{ marginBottom: "0px" }, { marginBottom: -h + "px" }], { duration: 300, delay: 220, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" })
+      .onfinish = () => { TRIP_LIST.splice(TRIP_LIST.findIndex(t => t.id === id), 1); renderTrips(); };
+    say("Trip deleted");
+  }
+});
+document.addEventListener("pointerdown", e => { if (menuFor && !e.target.closest("#tvMenu,.tvMore")) closeTripMenu(); }, true);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeTripMenu(); });
+addEventListener("scroll", () => closeTripMenu(), { passive: true });
 function showTab(name, fromPlan){
   const trips = name === "trips";
   if (trips) renderTrips();
@@ -2023,9 +2102,11 @@ function showTab(name, fromPlan){
   if (!fromPlan) haptic(6);
 }
 document.querySelectorAll(".navWrap .tab[data-tab]").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+tvList.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("tvCard")) { e.preventDefault(); e.target.click(); } });
 tvList.addEventListener("click", e => { const c = e.target.closest(".tvCard"); if (!c) return;
-  if (e.target.closest(".tvMore")) { say("Trip options are coming next"); return; }
-  if (c.dataset.trip === "plan") { document.body.classList.add("locked"); if (location.hash !== "#plan") history.pushState({ plan: true }, "", "#plan"); showPlan(); }
+  if (e.target.closest(".tvMore")) { openTripMenu(c); return; }
+  closeTripMenu();
+  if (c.dataset.open === "plan") { document.body.classList.add("locked"); if (location.hash !== "#plan") history.pushState({ plan: true }, "", "#plan"); showPlan(); }
   else say("This trip opens in the full app"); });
 
 /* ---------- Plan Ready ---------- */
@@ -2210,7 +2291,7 @@ document.getElementById("prGrab").addEventListener("pointerdown", e => {
   const y0 = e.clientY, D = sheetDy(), base = prSheet.classList.contains("isFull") ? 0 : D; let dy = 0;
   prSheet.classList.add("drag");
   const move = ev => { dy = ev.clientY - y0; const t = Math.max(0, Math.min(D + 60, base + dy)), k = Math.min(1, t / D);
-    prSheet.style.translate = `0 ${t}px`; prSheet.style.clipPath = `inset(0 ${8 * k}px ${t + 8 * k}px ${8 * k}px round 32px 32px ${32 * k}px ${32 * k}px)`; };
+    prSheet.style.translate = `0 ${t}px`; prSheet.style.clipPath = `inset(0 0 ${t}px 0 round 32px 32px 0 0)`; prSheet.style.setProperty("--dy", t + "px"); };
   const up = () => { g.removeEventListener("pointermove", move); g.removeEventListener("pointerup", up); prSheet.classList.remove("drag");
     if (Math.abs(dy) < 6) setFull(!prSheet.classList.contains("isFull")); else setFull(dy < 0); };
   g.addEventListener("pointermove", move); g.addEventListener("pointerup", up);
