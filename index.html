@@ -572,12 +572,14 @@ b.grad2{font-weight:700}
 .unEmpty{text-align:center;color:#969696;font-size:14px;padding:24px 0}
 /* + menu over the plan and the chat */
 .fabMenu{position:absolute;inset:0;z-index:6;pointer-events:none}
-.fabMenu .wash{position:absolute;inset:0;background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);opacity:0;transition:opacity .3s}
+/* Figma 253:58217: a light 2px blur that fades from clear at the top to white at the bottom, inside the sheet's rounded corners */
+.fabMenu .wash{position:absolute;inset:0;border-radius:32px 32px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0) 12.94%,#fff 91.29%);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);opacity:0;transition:opacity .3s;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 14%);mask-image:linear-gradient(180deg,transparent 0%,#000 14%)}
 .fabMenu.open{pointer-events:auto}
 .fabMenu.open .wash{opacity:1}
 .fabMenu .pill{position:absolute;height:60px;display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:32px;background:rgba(255,255,255,.5);
   -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
-  box-shadow:inset 1px 1px .5px -.4px rgba(255,255,255,.9),inset -1px -1px .5px -.4px rgba(255,255,255,.5),inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
+  border:.5px solid rgba(24,24,24,.9);box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
   opacity:0;transform:translateY(24px) scale(.9);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.3)}
 .fabMenu .pill img{height:34px;width:auto;max-width:48px;object-fit:contain;position:relative;z-index:1}
 .fabMenu .pill img.sm{height:30px}
@@ -1107,10 +1109,10 @@ b.grad2{font-weight:700}
     <div class="prFoot"></div>
     <div class="fabMenu" id="prMenu">
       <div class="wash"></div>
-      <button class="pill ring" data-act="stays" style="right:21px;bottom:380px"><img src="assets/i3d-stays.png" alt="">Add Stays</button>
-      <button class="pill ring" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
-      <button class="pill ring" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
-      <button class="pill ring" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
+      <button class="pill" data-act="stays" style="right:21px;bottom:380px"><img src="assets/i3d-stays.png" alt="">Add Stays</button>
+      <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
+      <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
+      <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
     </div>
     <div class="prBtns" id="prBtns">
       <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc glass"><img class="orb" src="assets/ai-orb-lg.png" alt=""></span></button>
@@ -1122,9 +1124,9 @@ b.grad2{font-weight:700}
       <div class="aiRow" id="aiRow"></div>
       <div class="fabMenu" id="chatMenu">
         <div class="wash"></div>
-        <button class="pill ring" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
-        <button class="pill ring" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
-        <button class="pill ring" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
+        <button class="pill" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
+        <button class="pill" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
+        <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
       </div>
       <form class="chatBar" id="chatBar" autocomplete="off">
         <input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send">
