@@ -2179,36 +2179,34 @@ sheet.addEventListener("submit", e => {
 <script>
 /* ---------- Header globe: a real orthographic globe turning very slowly behind the logo ----------
    Same placement as Figma: 673px globe, centre about 50px above the top edge, faded out by the mask. */
-/* ---------- Satellite globe (NASA Blue Marble texture) drawn with a tiny WebGL shader ----------
-   Orthographic sphere, same size and spot as Figma, turning about 1.6° a second. Falls back to the vector globe below. */
+/* ---------- Apple Maps style globe ----------
+   Texture unwrapped from an Apple Maps globe view, drawn back onto a real 3D sphere with the same
+   vertical-perspective camera (fitted to 1.4px), then swayed slowly east and west. */
 (function(){
   const cv = document.getElementById("globe"); if (!cv) return;
   const g = cv.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false }); if (!g) return;
   const vs = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
   const fs = `precision highp float;
     uniform sampler2D tex; uniform vec2 res; uniform vec2 ctr; uniform float R; uniform float lon0; uniform float lat0;
-    const float PI=3.14159265;
+    const float PI=3.14159265, P=__P__, LON0=__LON0__, LON1=__LON1__, LAT0=__LAT0__, LAT1=__LAT1__;
+    const vec3 OCEAN=vec3(__OC__);
     void main(){
       vec2 q = vec2(gl_FragCoord.x, res.y - gl_FragCoord.y);
-      float x = (q.x-ctr.x)/R, y = (ctr.y-q.y)/R, r2 = x*x+y*y;
-      if (r2 > 1.0) { gl_FragColor = vec4(0.); return; }
-      float z = sqrt(1.0-r2);
-      float Y = y*cos(lat0) + z*sin(lat0), Z = -y*sin(lat0) + z*cos(lat0);
-      float lat = asin(clamp(Y,-1.,1.)), lon = lon0 + atan(x, Z);
-      vec2 uv = vec2(fract((lon+PI)/(2.*PI)), (PI/2.-lat)/PI);
-      vec3 c = texture2D(tex, uv).rgb;
-      // lift the deep navy ocean to the bright map blue of the Figma globe, keep land as photo
-      float water = smoothstep(-.01, .14, c.b - max(c.r, c.g*.85)) * (1. - smoothstep(.30, .45, dot(c, vec3(.33))));
-      vec3 sea = mix(vec3(.18,.50,.86), vec3(.42,.72,.96), clamp((c.b-.18)*3.5, 0., 1.));
-      c = mix(c * 1.25, sea, water);
-      vec3 L = normalize(vec3(-.35,.45,.85));
-      float d = clamp(dot(vec3(x,y,z), L), 0., 1.);
-      c *= .62 + .55*d;                                   // soft daylight
-      c = mix(c, vec3(.55,.75,1.), pow(1.-z, 3.)*.55);    // thin blue atmosphere at the limb
-      c = pow(c, vec3(.92)) * 1.06;                       // a touch brighter, like Apple's satellite view
-      float a = smoothstep(1.0, 1.0 - 2.0/R, sqrt(r2));
+      float x = (q.x-ctr.x)/R, y = (ctr.y-q.y)/R, rho = sqrt(x*x+y*y);
+      float rmax = sqrt((P-1.)/(P+1.));
+      if (rho > rmax) { gl_FragColor = vec4(0.); return; }
+      float sc = rho < 1e-5 ? 0. : (P - sqrt(max(0., 1. - rho*rho*(P+1.)/(P-1.)))) / ((P-1.)/rho + rho/(P-1.));
+      float cc = sqrt(max(0., 1. - sc*sc));
+      float lat = rho < 1e-5 ? lat0 : asin(clamp(cc*sin(lat0) + y*sc*cos(lat0)/rho, -1., 1.));
+      float lon = lon0 + atan(x*sc, rho*cos(lat0)*cc - y*sin(lat0)*sc);
+      float ld = degrees(lon), fd = degrees(lat);
+      vec2 uv = vec2((ld-LON0)/(LON1-LON0), (LAT1-fd)/(LAT1-LAT0));
+      vec3 c = (uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.) ? OCEAN : texture2D(tex, uv).rgb;
+      float e = rho/rmax;
+      c = mix(c, vec3(.86,.93,1.), smoothstep(.86, 1., e)*.55);     // Apple's soft white limb
+      float a = 1. - smoothstep(1. - 1.6/(R*rmax), 1., e);
       gl_FragColor = vec4(c*a, a);
-    }`;
+    }`.replace("__P__", "4.68734").replace("__LON0__", "5.6655").replace("__LON1__", "205.6655").replace("__LAT0__", "-75.0").replace("__LAT1__", "85.0").replace("__OC__", "0.3020,0.6627,0.9725");
   const sh = (t, src) => { const o = g.createShader(t); g.shaderSource(o, src); g.compileShader(o); return g.getShaderParameter(o, g.COMPILE_STATUS) ? o : null; };
   const v = sh(g.VERTEX_SHADER, vs), f = sh(g.FRAGMENT_SHADER, fs); if (!v || !f) return;
   const pr = g.createProgram(); g.attachShader(pr, v); g.attachShader(pr, f); g.linkProgram(pr); if (!g.getProgramParameter(pr, g.LINK_STATUS)) return;
@@ -2217,25 +2215,27 @@ sheet.addEventListener("submit", e => {
   const lp = g.getAttribLocation(pr, "p"); g.enableVertexAttribArray(lp); g.vertexAttribPointer(lp, 2, g.FLOAT, false, 0, 0);
   const U = n => g.getUniformLocation(pr, n);
   const uRes = U("res"), uCtr = U("ctr"), uR = U("R"), uLon = U("lon0"), uLat = U("lat0");
-  let W = 0, H = 0, dpr = 1, lon = 98, ready = false, running = true, last = 0;
+  const BASE_LON = 105.6655, LAT = 8.0521, P = 4.68734, RVIS = 336.5, RR = RVIS / Math.sqrt((P - 1) / (P + 1));
+  let W = 0, H = 0, dpr = 1, lon = BASE_LON, ready = false, running = true, last = 0, t0 = performance.now();
   function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.viewport(0, 0, cv.width, cv.height); }
   function draw(){
     if (!ready) return;
-    g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, -49.5 * dpr); g.uniform1f(uR, 336.5 * dpr);
-    g.uniform1f(uLon, lon * Math.PI / 180); g.uniform1f(uLat, 22 * Math.PI / 180);
+    g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, -49.5 * dpr); g.uniform1f(uR, RR * dpr);
+    g.uniform1f(uLon, lon * Math.PI / 180); g.uniform1f(uLat, LAT * Math.PI / 180);
     g.clearColor(0, 0, 0, 0); g.clear(g.COLOR_BUFFER_BIT); g.drawArrays(g.TRIANGLE_STRIP, 0, 4);
   }
   const img = new Image();
   img.onload = () => {
     const t = g.createTexture(); g.bindTexture(g.TEXTURE_2D, t);
     g.texImage2D(g.TEXTURE_2D, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, img);
-    g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.REPEAT); g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
+    g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE); g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
     g.generateMipmap(g.TEXTURE_2D); g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR_MIPMAP_LINEAR); g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
     g.uniform1i(U("tex"), 0); ready = true; draw();
   };
-  img.src = "assets/earth-blue-marble.jpg";
+  img.src = "assets/earth-apple.jpg";
   window.__globeGL = true;
-  function tick(t){ if (!running) return; if (t - last > 33){ lon -= (last ? t - last : 0) * .0016; last = t; draw(); } requestAnimationFrame(tick); }
+  // a slow sway: 18° east and back over a minute, eased at the ends like a real spin slowing down
+  function tick(t){ if (!running) return; if (t - last > 33){ last = t; lon = BASE_LON + 18 * Math.sin((t - t0) / 60000 * Math.PI * 2); draw(); } requestAnimationFrame(tick); }
   const start = () => { if (!running){ running = true; last = 0; requestAnimationFrame(tick); } };
   size(); addEventListener("resize", () => { size(); draw(); });
   new IntersectionObserver(es => { if (es[0].isIntersecting && !document.hidden) start(); else running = false; }).observe(cv);
