@@ -43,18 +43,16 @@ img,video{display:block}
 }
 
 .mapfade{position:absolute;left:0;top:0;width:100%;height:359px;overflow:hidden;pointer-events:none;
-  -webkit-mask-image:radial-gradient(205px 225px at 50% -45px,#000 0%,transparent 100%);
-          mask-image:radial-gradient(205px 225px at 50% -45px,#000 0%,transparent 100%)}
-.mapfade img{position:absolute;transform:translateX(-50%);object-fit:cover;max-width:none}
-.mapfade img:nth-child(1){left:calc(50% + 30px);top:-98px;width:884px;height:529px}
-.mapfade img:nth-child(2){left:calc(50% + 13px);top:212px;width:892px;height:453px}
+  -webkit-mask-image:radial-gradient(250px 225px at 50% -30px,#000 30%,transparent 100%);
+          mask-image:radial-gradient(250px 225px at 50% -30px,#000 30%,transparent 100%)}
+.mapfade canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
 .content{position:relative;z-index:1;display:flex;flex-direction:column;gap:40px}
 .top{display:flex;flex-direction:column;gap:12px;padding-top:max(12px, env(safe-area-inset-top))}
 @media (min-width:600px){.top{padding-top:0}}
 .header{display:flex;align-items:center;justify-content:space-between;padding:0 16px}
 .logo{height:44px;display:flex;align-items:center}
-.logo img{height:40px;width:auto;display:block}
+.logo img{height:44px;width:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,40,90,.12))}
 .actions{display:flex;gap:12px;align-items:center}
 .aiBtn{width:40px;height:40px;border-radius:32px;display:grid;place-items:center;
   background:rgba(255,255,255,.1);box-shadow:0 1px 8px rgba(0,0,0,.1)}
@@ -732,10 +730,7 @@ body.locked{overflow:hidden}
 </svg>
 
 <main class="phone">
-  <div class="mapfade" aria-hidden="true">
-    <img src="assets/map-thailand.jpg" alt="">
-    <img src="assets/map.jpg" alt="">
-  </div>
+  <div class="mapfade" aria-hidden="true"><canvas id="globe"></canvas></div>
 
   <div class="content">
     <div class="top">
@@ -748,7 +743,7 @@ body.locked{overflow:hidden}
         </div>
       </div>
       <header class="header">
-        <div class="logo"><img src="assets/logo-v2.png" alt="Sidequest"></div>
+        <div class="logo"><img src="assets/logo-header.svg" alt="Sidequest"></div>
         <div class="actions">
           <button class="aiBtn glass disperse strong ring" id="pollBtn" aria-label="Create a poll" aria-haspopup="dialog"><span><img src="assets/ai-badge.png" alt=""></span></button>
           <img class="me" src="assets/avatar.png" alt="Your profile">
@@ -2176,6 +2171,55 @@ sheet.addEventListener("submit", e => {
   if (pollTarget === "chat"){ closePoll(); setTimeout(() => { showPoll(q, labels, "chat"); say("Poll shared in the trip chat"); }, 300); return; }
   openInvite("poll", { q, labels, target: pollTarget });
 });
+</script>
+
+<script src="assets/vendor/d3-array.min.js"></script>
+<script src="assets/vendor/d3-geo.min.js"></script>
+<script src="assets/vendor/topojson-client.min.js"></script>
+<script>
+/* ---------- Header globe: a real orthographic globe turning very slowly behind the logo ----------
+   Same placement as Figma: 673px globe, centre about 50px above the top edge, faded out by the mask. */
+(function(){
+  const cv = document.getElementById("globe"); if (!cv || !window.d3 || !window.topojson) return;
+  const ctx = cv.getContext("2d"), R = 336.5, CY = -49.5;
+  let land = null, W = 0, H = 0, dpr = 1, lon = -98, last = 0, running = true;
+  const proj = d3.geoOrthographic().scale(R).clipAngle(90).precision(.6);
+  const path = d3.geoPath(proj, ctx);
+  function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; proj.translate([W / 2, CY]); }
+  function draw(){
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    proj.rotate([lon, -22, 0]);
+    const cx = W / 2;
+    // ocean with a lit centre and darker limb
+    const og = ctx.createRadialGradient(cx - 60, CY + 120, 40, cx, CY, R);
+    og.addColorStop(0, "#5fb4f0"); og.addColorStop(.6, "#3f97e2"); og.addColorStop(1, "#2a74c9");
+    ctx.beginPath(); path({ type: "Sphere" }); ctx.fillStyle = og; ctx.fill();
+    if (land){
+      ctx.beginPath(); path(land);
+      const lg = ctx.createLinearGradient(0, CY + R * .2, 0, CY + R);
+      lg.addColorStop(0, "#9fd16f"); lg.addColorStop(.55, "#b9d77c"); lg.addColorStop(1, "#d9cf8f");
+      ctx.fillStyle = lg; ctx.fill();
+      ctx.lineWidth = .6; ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.stroke();
+    }
+    // soft terminator shading on the rim
+    const sh = ctx.createRadialGradient(cx, CY, R * .55, cx, CY, R);
+    sh.addColorStop(0, "rgba(0,30,80,0)"); sh.addColorStop(1, "rgba(0,30,80,.22)");
+    ctx.beginPath(); path({ type: "Sphere" }); ctx.fillStyle = sh; ctx.fill();
+  }
+  function tick(t){
+    if (!running) return;
+    if (t - last > 33){ lon += (t - (last || t)) * .0016; last = t; draw(); }   // about 1.6° a second
+    requestAnimationFrame(tick);
+  }
+  size(); draw();
+  fetch("assets/vendor/land-50m.json").then(r => r.json()).then(topo => { land = topojson.feature(topo, topo.objects.land); draw(); }).catch(() => {});
+  addEventListener("resize", () => { size(); draw(); });
+  // only spin while the header is on screen and the tab is visible
+  const io = new IntersectionObserver(es => { const on = es[0].isIntersecting && !document.hidden; if (on && !running){ running = true; last = 0; requestAnimationFrame(tick); } else if (!on) running = false; });
+  io.observe(cv);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) running = false; else if (!running){ running = true; last = 0; requestAnimationFrame(tick); } });
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) running = false; else requestAnimationFrame(tick);
+})();
 </script>
 </body>
 </html>
