@@ -216,7 +216,7 @@ body.locked{overflow:hidden}
 .npPend{font-weight:600;font-size:14px;letter-spacing:-.2px;color:#f74e78;transition:color .3s}
 .npPend.done{color:#1e9e5a}
 .npInv{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center}
-.npInv i{width:25px;height:25px;border:1.2px dashed #969696;border-radius:7px;display:grid;place-items:center}
+.npInv i{width:25px;height:25px;border:1.2px dashed #969696;border-radius:50%;display:grid;place-items:center}
 .npInv img{width:16px;height:16px}
 .npInv:active{transform:scale(.92)}
 .npDiv{border-top:.7px solid #ececec;margin:8px -12px 16px}
@@ -225,20 +225,22 @@ body.locked{overflow:hidden}
 .npOpt{position:relative;flex:1;min-width:0;height:71px;border-radius:16px;background:#f2f2f2;overflow:hidden;display:flex;align-items:center;justify-content:center;
   text-align:center;font-weight:500;font-size:20px;line-height:1.2;letter-spacing:-1px;color:#111214;padding:0 6px;transition:transform .35s cubic-bezier(.2,.9,.3,1.5)}
 .npOpt:active{transform:scale(.95)}
-.npOpt .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(107,43,245,.4);transition:height 1.05s cubic-bezier(.2,.9,.25,1.12)}
-.npOpt .fill:not(.on)::before{display:none}
-.npOpt .fill::before{content:"";position:absolute;left:0;right:0;top:-3px;height:6px;border-radius:50%;background:rgba(107,43,245,.25);filter:blur(2px)}
+.npOpt .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(107,43,245,.4)}
 .npOpt .lb{position:relative;z-index:1;overflow-wrap:anywhere}
 .npOpt .lb em{display:block;font-style:normal;font-size:18px;letter-spacing:0;margin-top:2px}
 .npOpt .rip{position:absolute;border-radius:50%;background:rgba(107,43,245,.28);transform:scale(0);pointer-events:none}
 .np.voted .npOpt{cursor:default}
-.npVeil{position:absolute;inset:0;background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);z-index:5;pointer-events:none}
-.npFlag{position:absolute;z-index:6;pointer-events:none;line-height:1;will-change:transform}
-.npHero{position:absolute;z-index:7;margin:0;transform-origin:0 0;border-radius:16px;box-shadow:0 10px 30px rgba(17,18,20,.14),0 2px 6px rgba(17,18,20,.06);pointer-events:none}
-.npHero .fill{transition:height .8s cubic-bezier(.2,.9,.25,1.12)}
+.npVeil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.35) 0%,#fff 54%);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);z-index:5;pointer-events:none}
+.npFx{position:absolute;inset:0;z-index:6;pointer-events:none}
+.npHero{position:absolute;z-index:7;margin:0;transform-origin:0 0;border-radius:16px;box-shadow:0 2px 9px rgba(0,0,0,.1);pointer-events:none;will-change:transform}
+.npHero::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .75px #fff;z-index:2;pointer-events:none}
 .npTmp{position:absolute;left:0;right:0;z-index:7;height:24px;pointer-events:none}
 .np.busy{pointer-events:none}
-.npStacks{display:flex;gap:16px;margin:11px 4.5px 0;height:24px}
+.npSW{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.3,.8,.3,1)}
+.npSW>div{min-height:0;overflow:hidden}
+.np.showV .npSW{grid-template-rows:1fr}
+.np.vDone .npSW>div{overflow:visible}
+.npStacks{display:flex;gap:16px;padding:11px 4.5px 0;height:35px}
 .npV{flex:1;min-width:0;display:flex;justify-content:center}
 .npV img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;flex:none;margin-left:-8.57px;background:#eee}
 .npV img:first-child{margin-left:0}
@@ -820,7 +822,7 @@ body.locked{overflow:hidden}
       <header class="header">
         <div class="logo"><img src="assets/logo-header.svg" alt="Sidequest"></div>
         <div class="actions">
-          <button class="aiBtn glass disperse strong ring" id="pollBtn" aria-label="Create a poll" aria-haspopup="dialog"><span><img src="assets/ai-badge.png" alt=""></span></button>
+          <button class="aiBtn glass disperse strong ring" id="pollBtn" aria-label="Create a poll" aria-haspopup="dialog"><span><img src="assets/ai-badge-v2.png" alt=""></span></button>
           <img class="me" src="assets/avatar.png" alt="Your profile">
         </div>
       </header>
@@ -833,7 +835,7 @@ body.locked{overflow:hidden}
             <div class="pollHead" data-sq="16">
               <div class="pollMeta"><b>Poll</b><i></i><span id="pollStatus">1 vote pending</span></div>
               <p class="pollQ" id="pollQ"></p>
-              <div class="poll3d" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
+              <div class="poll3d" aria-hidden="true"><span><img src="assets/poll-3d-v2.png" alt=""></span></div>
             </div>
             <div class="track" id="track" role="radiogroup" aria-label="Your vote"></div>
             <div class="pollResult" id="pollResult" hidden><p class="prQ" id="prQ"></p><div class="prRow"><div class="prCol"><b class="prLabel">Poll Result</b><span class="prWin" id="prWin"></span></div><span class="prStack" id="prStack"></span></div></div>
@@ -935,7 +937,7 @@ body.locked{overflow:hidden}
       <div class="aiRow" id="aiRow"></div>
       <div class="fabMenu" id="chatMenu">
         <div class="wash"></div>
-        <button class="pill ring" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d.png" alt="">Add Poll</button>
+        <button class="pill ring" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
         <button class="pill ring" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
         <button class="pill ring" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
       </div>
@@ -972,7 +974,7 @@ body.locked{overflow:hidden}
 <form class="sheet" id="pollSheet" hidden role="dialog" aria-modal="true" aria-labelledby="pollTitle" autocomplete="off">
   <div class="sheetBg" data-sq="32"></div>
   <div class="sheetEdge" data-ring="32"></div>
-  <div class="sheetClip" data-sq="32" aria-hidden="true"><div class="sheetArt"><span><img src="assets/poll-3d.png" alt=""></span></div></div>
+  <div class="sheetClip" data-sq="32" aria-hidden="true"><div class="sheetArt"><span><img src="assets/poll-3d-v2.png" alt=""></span></div></div>
   <div class="grab" id="pollGrab" aria-hidden="true"></div>
   <div class="sheetBody">
     <div class="sheetTitle">
@@ -2116,20 +2118,84 @@ document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInvite
 
 
 
+
+/* ---------- Country flags: add the flag when someone types a country without one (typos are fine) ---------- */
+const COUNTRY_DATA = "AF afghanistan|AL albania|DZ algeria|AD andorra|AO angola|AR argentina|AM armenia|AU australia,oz,sydney,melbourne|AT austria,vienna|AZ azerbaijan,baku|BS bahamas|BH bahrain|BD bangladesh|BB barbados|BY belarus|BE belgium,brussels|BZ belize|BJ benin|BT bhutan|BO bolivia|BA bosnia|BW botswana|BR brazil,rio|BN brunei|BG bulgaria|KH cambodia,siem reap|CM cameroon|CA canada,toronto,vancouver|CL chile|CN china,beijing,shanghai|CO colombia|CR costa rica|HR croatia,dubrovnik|CU cuba|CY cyprus|CZ czechia,czech republic,prague|DK denmark,copenhagen|DO dominican republic|EC ecuador|EG egypt,cairo|SV el salvador|EE estonia|ET ethiopia|FJ fiji|FI finland,helsinki,lapland|FR france,paris,nice|GE georgia,tbilisi|DE germany,berlin,munich|GH ghana|GR greece,santorini,athens,mykonos|GT guatemala|HN honduras|HK hong kong|HU hungary,budapest|IS iceland,reykjavik|IN india,goa,kerala,ladakh,manali,rajasthan,jaipur,mumbai,delhi,rishikesh|ID indonesia,bali,jakarta,lombok|IR iran|IQ iraq|IE ireland,dublin|IL israel|IT italy,rome,venice,florence,milan,amalfi|JM jamaica|JP japan,tokyo,kyoto,osaka|JO jordan,petra|KZ kazakhstan,almaty|KE kenya,nairobi|KW kuwait|KG kyrgyzstan|LA laos|LV latvia|LB lebanon|LT lithuania|LU luxembourg|MO macau|MG madagascar|MY malaysia,kuala lumpur,langkawi|MV maldives|MT malta|MU mauritius|MX mexico,cancun|MC monaco|MN mongolia|ME montenegro|MA morocco,marrakech|MM myanmar|NA namibia|NP nepal,kathmandu,pokhara|NL netherlands,holland,amsterdam|NZ new zealand,queenstown|NG nigeria|NO norway,oslo|OM oman,muscat|PK pakistan|PA panama|PY paraguay|PE peru,machu picchu|PH philippines,manila,palawan,boracay|PL poland,krakow|PT portugal,lisbon,porto|QA qatar,doha|RO romania|RU russia,moscow|RW rwanda|SA saudi arabia|SN senegal|RS serbia|SC seychelles|SG singapore|SK slovakia|SI slovenia|ZA south africa,cape town|KR south korea,korea,seoul|ES spain,barcelona,madrid,ibiza|LK sri lanka,srilanka,colombo|SE sweden,stockholm|CH switzerland,zurich,geneva,interlaken|TW taiwan,taipei|TJ tajikistan|TZ tanzania,zanzibar|TH thailand,bangkok,phuket,krabi,pattaya,chiang mai,koh samui|TN tunisia|TR turkey,turkiye,istanbul,cappadocia|AE uae,united arab emirates,dubai,abu dhabi|UG uganda|UA ukraine|GB uk,united kingdom,england,britain,great britain,london,scotland,edinburgh|US usa,us,united states,america,new york,nyc,las vegas,california,hawaii|UY uruguay|UZ uzbekistan|VN vietnam,hanoi,ho chi minh,da nang|ZM zambia|ZW zimbabwe";
+const COUNTRIES = COUNTRY_DATA.split("|").flatMap(r => { const [code, ...rest] = r.split(" "); return rest.join(" ").split(",").map(n => ({ code, key: n.replace(/[^a-z]/g, "") })); });
+const flagOf = code => String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+function editDist(a, b){ const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[a.length][b.length]; }
+function guessFlag(text){
+  const k = String(text).toLowerCase().replace(/[^a-z]/g, ""); if (k.length < 2) return "";
+  let best = null, bd = 99;
+  for (const c of COUNTRIES){ if (c.key === k) return flagOf(c.code);
+    if (k.length < 4 || c.key.length < 3) continue;
+    const dd = editDist(k, c.key); if (dd < bd){ bd = dd; best = c; } }
+  return best && bd <= Math.max(1, Math.floor(best.key.length / 4)) ? flagOf(best.code) : "";
+}
+const hasEmoji = t => /\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(t);
+const withFlag = l => { if (hasEmoji(l)) return l; const f = guessFlag(l); return f ? `${l.trim()} ${f}` : l; };
+
+/* ---------- Spring: real spring physics baked into keyframes ---------- */
+function springVals(from, to, { k = 260, c = 16, v0 = 0, max = 1.6 } = {}){
+  const out = []; let x = from, v = v0; const dt = 1 / 120;
+  for (let t = 0, i = 0; t < max; t += dt, i++){
+    const a = -k * (x - to) - c * v; v += a * dt; x += v * dt;
+    if (i % 2 === 0) out.push(x);
+    if (t > .15 && Math.abs(x - to) < .05 && Math.abs(v) < .5) break;
+  }
+  out.push(to); return { vals: out, ms: out.length * 1000 / 60 };
+}
+function springAnim(el, from, to, fmt, opts = {}, extra = {}){
+  const { vals, ms } = springVals(from, to, opts);
+  return el.animate(vals.map(v => ({ transform: fmt(v) })), { duration: ms, easing: "linear", ...extra });
+}
+
+/* ---------- Confetti on canvas: flags (or paper bits) shower up from the bottom ---------- */
+function confettiShower(host, flag, dur = 1150){
+  const cv = document.createElement("canvas"), dpr = Math.min(3, devicePixelRatio || 1), W = host.clientWidth, H = host.clientHeight;
+  cv.className = "npFx"; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; host.appendChild(cv);
+  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
+  let sprite = null;
+  if (flag){ const S = 64; sprite = document.createElement("canvas"); sprite.width = sprite.height = S; const sc = sprite.getContext("2d");
+    sc.font = `${S * .8}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sc.textAlign = "center"; sc.textBaseline = "middle"; sc.fillText(flag, S / 2, S / 2 + 3); }
+  const COLORS = ["#6b2bf5", "#a684ff", "#f74e78", "#ffc542", "#2ecc8f", "#3fa9ff"];
+  const N = flag ? 34 : 70, P = [];
+  for (let i = 0; i < N; i++) P.push({ x: Math.random() * W, y: H + 10 + Math.random() * 30, vx: (Math.random() - .5) * 70, vy: -(300 + Math.random() * 230),
+    born: Math.random() * 320, size: flag ? 16 + Math.random() * 14 : 5 + Math.random() * 5, rot: Math.random() * 6.28, vr: (Math.random() - .5) * 7,
+    flip: Math.random() * 6.28, vf: 6 + Math.random() * 8, col: COLORS[i % COLORS.length], round: Math.random() < .3 });
+  const t0 = performance.now();
+  (function frame(now){
+    const t = now - t0; ctx.clearRect(0, 0, W, H);
+    for (const p of P){
+      const age = (t - p.born) / 1000; if (age < 0) continue;
+      const life = dur - p.born, k = (t - p.born) / life; if (k >= 1) continue;
+      const x = p.x + p.vx * age + Math.sin(age * 5 + p.flip) * 8, y = p.y + p.vy * age + 160 * age * age;
+      const a = Math.min(1, k / .1) * (k > .72 ? 1 - (k - .72) / .28 : 1);
+      ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(p.rot + p.vr * age); ctx.scale(Math.cos(p.flip + p.vf * age * (flag ? .5 : 1)), 1);
+      if (sprite) ctx.drawImage(sprite, -p.size / 2, -p.size / 2, p.size, p.size);
+      else { ctx.fillStyle = p.col; if (p.round){ ctx.beginPath(); ctx.arc(0, 0, p.size / 2.4, 0, 6.28); ctx.fill(); } else ctx.fillRect(-p.size / 2, -p.size * .3, p.size, p.size * .6); }
+      ctx.restore();
+    }
+    if (t < dur + 50) requestAnimationFrame(frame); else cv.remove();
+  })(t0);
+}
+
 /* ---------- Poll card v2 ---------- */
 function showPoll(q, labels, where = "home"){
   voteTimers.forEach(clearTimeout); voteTimers = [];
-  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, committed: false, waiting: FRIENDS.length, stage: "v2", where };
+  labels = labels.map(withFlag);
+  poll = { q, opts: labels.map(l => ({ label: l, voters: [] })), mine: -1, committed: false, waiting: 0, stage: "v2", where };
   const total = FRIENDS.length + 1;
   const wrap = document.createElement("div"); wrap.className = "npWrap";
   wrap.innerHTML = `<div class="np" data-sq="20">
-      <div class="npHead"><div class="npL"><span class="npBadge"><img src="assets/poll-fill-purple.svg" alt="">POLL</span><span class="npPend">1 vote pending</span></div>
+      <div class="npHead"><div class="npL"><span class="npBadge"><img src="assets/poll-badge.svg" alt="">POLL</span><span class="npPend">1 vote pending</span></div>
         <button type="button" class="npInv" aria-label="Invite friends to vote"><i><img src="assets/person-add-grey.svg" alt=""></i></button></div>
       <div class="npDiv"></div>
       <p class="npQ"></p>
       <div class="npOpts" role="group" aria-label="Vote">${poll.opts.map((o, i) => { const [n, e] = splitLabel(o.label);
         return `<button type="button" class="npOpt" data-i="${i}" data-sq="16"><i class="fill"></i><span class="lb">${esc(n.replace(/(\d)\s*-\s*(\d)/g, "$1–$2"))}${e ? `<em>${e}</em>` : ""}</span></button>`; }).join("")}</div>
-      <div class="npStacks">${poll.opts.map(() => `<div class="npV"></div>`).join("")}</div>
+      <div class="npSW"><div><div class="npStacks">${poll.opts.map(() => `<div class="npV"></div>`).join("")}</div></div></div>
       <div class="npCta"><div></div></div>
     </div><i class="npEdge" data-ring="20"></i>`;
   const np = wrap.querySelector(".np"), qEl2 = wrap.querySelector(".npQ"), pend = wrap.querySelector(".npPend");
@@ -2151,17 +2217,11 @@ function showPoll(q, labels, where = "home"){
   }
   watchSq(wrap);
   wrap.querySelectorAll(".npOpt").forEach((b, i) => b.animate([{ opacity: 0, transform: "translateY(14px) scale(.9)" }, { opacity: 1, transform: "none" }], { duration: 560, delay: 300 + i * 80, easing: "cubic-bezier(.2,.9,.3,1.3)", fill: "backwards" }));
-  // friends' votes are already in: their stacks land together
-  voteTimers.push(setTimeout(() => {
-    const n = poll.opts.length, stacks = wrap.querySelectorAll(".npV");
-    FRIENDS.forEach((src, k) => { const i = k < 3 ? 0 : Math.min(1, n - 1);
-      poll.opts[i].voters.push(src); poll.waiting--; });
-    status();
-  }, where === "home" ? 750 : 350));
+  // friends have already voted; their faces show once you vote
   wrap.querySelector(".npInv").addEventListener("click", () => openInvite("trip"));
-  wrap.querySelector(".npOpts").addEventListener("click", e => { const b = e.target.closest(".npOpt"); if (b) npVote(+b.dataset.i, e); });
+  wrap.querySelector(".npOpts").addEventListener("click", e => { const b = e.target.closest(".npOpt"); if (b) npVote(+b.dataset.i); });
 
-  function npVote(i, e){
+  function npVote(i){
     if (poll.committed) return;
     poll.committed = true; poll.mine = i; np.classList.add("voted", "busy");
     const tiles = wrap.querySelectorAll(".npOpt"), tile = tiles[i], stacks = wrap.querySelectorAll(".npV"), stack = stacks[i];
@@ -2172,86 +2232,91 @@ function showPoll(q, labels, where = "home"){
     poll.opts[i].voters.push(ME);
     let win = 0; poll.opts.forEach((o, k) => { if (o.voters.length > poll.opts[win].voters.length) win = k; }); poll.win = win;
     const name = splitLabel(poll.opts[win].label)[0];
-    const T = M.reduce ? .4 : 1, at = (ms, fn) => setTimeout(fn, ms * T);
+    const at = (ms, fn) => setTimeout(fn, ms);
     haptic(14);
 
-    // 1. a white veil drops over the card and your pick lifts to the centre, bigger
-    const nr = np.getBoundingClientRect(), tr = tile.getBoundingClientRect();
+    // 1. veil over the card, your pick glides to the centre and grows (measured from layout, so edge tiles centre too)
+    const L = tile.offsetLeft, Tp = tile.offsetTop, w = tile.offsetWidth, h = tile.offsetHeight, S = 1.41, NW = np.clientWidth;
     const veil = document.createElement("i"); veil.className = "npVeil"; np.appendChild(veil);
-    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: "ease-out", fill: "forwards" });
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: "ease-out", fill: "forwards" });
     const hero = tile.cloneNode(true); hero.className = "npOpt npHero"; hero.removeAttribute("data-sq"); hero.style.clipPath = "none";
-    const L = tr.left - nr.left, Tp = tr.top - nr.top, S = 1.41;
-    Object.assign(hero.style, { left: L + "px", top: Tp + "px", width: tr.width + "px", height: tr.height + "px" });
-    const hf = hero.querySelector(".fill"); hf.style.transition = "none"; hf.style.height = "0"; hf.classList.add("on");
+    Object.assign(hero.style, { left: L + "px", top: Tp + "px", width: w + "px", height: h + "px" });
+    const hf = hero.querySelector(".fill"); hf.style.height = "0";
     np.appendChild(hero); tile.style.visibility = "hidden";
-    const cx = (nr.width - tr.width * S) / 2 - L, up = 70 - Tp, lifted = 43 - Tp;
-    const pose = (dy, sc) => `translate(${cx}px,${dy}px) scale(${sc})`;
-    hero.animate([{ transform: "none" }, { transform: pose(up - 6, S * 1.04), offset: .65 }, { transform: pose(up, S) }], { duration: 560, easing: "cubic-bezier(.2,.9,.3,1)", fill: "forwards" });
+    const cx = (NW - w * S) / 2 - L, up = 70 - Tp, lifted = 43 - Tp;
+    const pose = (p, dy) => `translate(${cx * p}px,${dy * p}px) scale(${1 + (S - 1) * p})`;
+    springAnim(hero, 0, 1, p => pose(p, up), { k: 210, c: 21 }, { fill: "forwards" });
 
-    // 2. the bar fills up
-    at(520, () => { void hf.offsetHeight; hf.style.transition = ""; hf.style.height = pct(i) + "%"; haptic(10); });
+    // 2. the bar fills with a soft spring, the tile breathes once as it lands
+    at(480, () => {
+      springAnim(hf, 0, pct(i) / 100, v => `scaleY(${v})`, { k: 120, c: 15 }, { fill: "forwards" });
+      hf.style.height = "100%"; hf.style.transformOrigin = "bottom";
+      haptic(10);
+      at(520, () => hero.animate([{ transform: pose(1, up) }, { transform: `translate(${cx}px,${up - 2}px) scale(${S * 1.035})` }, { transform: pose(1, up) }], { duration: 420, easing: "cubic-bezier(.3,.7,.3,1)" }));
+    });
 
-    // 3. a shower of the place's flag rises behind the tile for about a second
-    at(620, () => flagShower(splitLabel(poll.opts[i].label)[1] || "🎉"));
+    // 3. flags (or confetti) shower up behind the tile
+    at(600, () => { const em = splitLabel(poll.opts[i].label)[1] || ""; confettiShower(np, /\p{Regional_Indicator}/u.test(em) ? em : ""); });
 
-    // 4. the tile lifts, the people who picked it land below, then you slide in from the right
+    // 4. the tile lifts, the friends who picked it drop in, then you slide in from the right and the row bounces
     const tmp = document.createElement("div"); tmp.className = "npV npTmp"; tmp.style.top = "155px";
-    at(1250, () => {
-      hero.animate([{ transform: pose(up, S) }, { transform: pose(lifted, S) }], { duration: 480, easing: "cubic-bezier(.2,.9,.3,1.15)", fill: "forwards" });
+    at(1450, () => {
+      hero.getAnimations().forEach(a => a.cancel());
+      springAnim(hero, up, lifted, dy => `translate(${cx}px,${dy}px) scale(${S})`, { k: 240, c: 20 }, { fill: "forwards" });
       np.appendChild(tmp);
       const friends = poll.opts[i].voters.filter(v => v !== ME);
-      friends.forEach(src => { const im = new Image(); im.src = src; im.alt = ""; tmp.appendChild(im); });
-      if (friends.length) collideIn([...tmp.children]);
+      friends.forEach((src, k) => { const im = new Image(); im.src = src; im.alt = ""; tmp.appendChild(im);
+        im.style.opacity = "0";
+        at(140 + k * 70, () => { im.style.opacity = ""; springAnim(im, -22, 0, y => `translateY(${y}px) scale(${1 + y / -60})`, { k: 420, c: 13 }); }); });
     });
-    at(1700, () => {
+    at(2050, () => {
       const me = new Image(); me.src = ME; me.alt = "You"; me.className = "self";
-      bumpStack(tmp, () => tmp.appendChild(me));
-      const dx = nr.right + 16 - me.getBoundingClientRect().left;
-      me.animate([{ transform: `translateX(${dx}px) scale(1.4)`, opacity: 0 }, { transform: `translateX(${dx * .45}px) scale(1.35)`, opacity: 1, offset: .25 },
-        { transform: "translateX(-8px) scale(1.12)", offset: .6 }, { transform: "translateX(3px) scale(.94)", offset: .8 }, { transform: "none" }], { duration: 760, easing: "cubic-bezier(.3,.7,.3,1)" });
-      // the whole row gives a little jolt when you join
-      at(430, () => { haptic(12); tmp.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(1.1) scaleY(.92)", offset: .3 }, { transform: "scaleX(.96) scaleY(1.04)", offset: .62 }, { transform: "none" }], { duration: 520, easing: "ease-out" }); });
+      const others = [...tmp.children], before = others.map(e => e.getBoundingClientRect().left);
+      tmp.appendChild(me);
+      // everyone shifts to make room, with a spring
+      others.forEach((e, k) => { const dx = before[k] - e.getBoundingClientRect().left; if (Math.abs(dx) > .5) springAnim(e, dx, 0, x => `translateX(${x}px)`, { k: 300, c: 22 }); });
+      const dx = np.getBoundingClientRect().right + 10 - me.getBoundingClientRect().left;
+      // you fly in fast, overshoot into the row, and settle
+      const fly = springVals(dx, 0, { k: 380, c: 19 });
+      me.animate(fly.vals.map(x => ({ transform: `translateX(${x}px)` })), { duration: fly.ms, easing: "linear" });
+      // the moment you hit the row: you squash, your neighbours get knocked left and spring back, nearest first
+      const hit = fly.vals.findIndex(x => x <= 0) * 1000 / 60;
+      at(hit, () => {
+        haptic(12);
+        me.animate([{ transform: "scale(1)" }, { transform: "scale(.82,1.14)", offset: .25 }, { transform: "scale(1.08,.94)", offset: .55 }, { transform: "scale(.98,1.02)", offset: .8 }, { transform: "none" }], { duration: 420, easing: "ease-out", composite: "add" });
+        others.slice().reverse().forEach((e, d) => at(d * 45, () => springAnim(e, 0, 0, x => `translateX(${x}px)`, { k: 340, c: 11, v0: -150 / (d + 1) })));
+      });
     });
 
-    // 5. everything settles back into the card and the answers show for every option
-    at(3000, () => {
+    // 5. back to the card: the tile and row slide home, the other answers are simply there, the veil lifts
+    at(3350, () => {
       poll.opts.forEach((o, k) => o.voters.forEach(src => { const im = new Image(); im.src = src; im.alt = src === ME ? "You" : ""; if (src === ME) im.className = "self"; stacks[k].appendChild(im); }));
+      poll.opts.forEach((o, k) => { if (k !== i && o.voters.length) tiles[k].querySelector(".fill").style.height = pct(k) + "%"; });
+      // measure where the row ends up once the stacks line opens
+      const sw = wrap.querySelector(".npSW"); sw.style.transition = "none"; np.classList.add("showV");
+      const b2 = stack.getBoundingClientRect(), tileEnd = tile.getBoundingClientRect(), npEnd = np.getBoundingClientRect();
+      np.classList.remove("showV"); void sw.offsetHeight; sw.style.transition = ""; np.classList.add("showV");
       stack.style.opacity = "0";
-      const a = tmp.getBoundingClientRect(), b2 = stack.getBoundingClientRect();
+      const a = tmp.getBoundingClientRect();
       tmp.animate([{ transform: "none" }, { transform: `translate(${b2.left + b2.width / 2 - (a.left + a.width / 2)}px,${b2.top - a.top}px)` }], { duration: 560, easing: "cubic-bezier(.3,.8,.3,1)", fill: "forwards" });
-      hero.animate([{ transform: pose(lifted, S) }, { transform: "translate(0,-4px) scale(.98)", offset: .8 }, { transform: "none" }], { duration: 600, easing: "cubic-bezier(.3,.8,.3,1)", fill: "forwards" })
+      const hx = tileEnd.left - npEnd.left - L, hy = tileEnd.top - npEnd.top - Tp;
+      hero.getAnimations().forEach(an => an.cancel());
+      springAnim(hero, 1, 0, p => `translate(${cx * p + hx * (1 - p)}px,${lifted * p + hy * (1 - p)}px) scale(${1 + (S - 1) * p})`, { k: 230, c: 24 }, { fill: "forwards" })
         .onfinish = () => {
-          const f = tile.querySelector(".fill"); f.style.transition = "none"; f.classList.add("on"); f.style.height = pct(i) + "%"; void f.offsetHeight; f.style.transition = "";
-          tile.style.visibility = ""; hero.remove(); tmp.remove(); stack.style.opacity = "";
-          [...tiles.keys()].filter(k => k !== i).forEach((k, j) => setTimeout(() => {
-            const v = poll.opts[k].voters.length; if (v){ const fl = tiles[k].querySelector(".fill"); fl.classList.add("on"); fl.style.height = pct(k) + "%"; collideIn([...stacks[k].children]); }
-          }, j * 120));
+          tile.querySelector(".fill").style.height = pct(i) + "%";
+          tile.style.visibility = ""; hero.remove(); tmp.remove(); stack.style.opacity = ""; np.classList.add("vDone");
           status();
         };
-      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, delay: 120, easing: "ease-in", fill: "forwards" }).onfinish = () => veil.remove();
+      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 380, delay: 100, easing: "ease-in", fill: "forwards" }).onfinish = () => veil.remove();
     });
 
     // then the trip button rises in
-    at(3800, () => {
+    at(4150, () => {
       pollCtaText.textContent = poll.where === "chat" ? `Go with ${name}` : `Make ${/^[aeiou]/i.test(name) ? "an" : "a"} ${name} Trip`;
       np.classList.add("ready"); np.classList.remove("busy"); pollCta.tabIndex = 0;
       pollCta.classList.remove("shine"); void pollCta.offsetWidth; pollCta.classList.add("shine");
       setTimeout(() => { haptic(18); burst(); }, 380);
     });
-
-    function flagShower(ch){
-      const W = np.clientWidth, H = np.clientHeight;
-      for (let n = 0; n < 22; n++){
-        const sp = document.createElement("span"); sp.className = "npFlag"; sp.textContent = ch;
-        const size = 16 + Math.random() * 16, x = Math.random() * (W - size);
-        sp.style.cssText = `left:${x}px;top:${H + 8}px;font-size:${size}px`;
-        np.appendChild(sp);
-        const rise = H + 60 + Math.random() * 40, drift = (Math.random() - .5) * 60, rot = (Math.random() - .5) * 70;
-        sp.animate([{ transform: "translate(0,0) rotate(0)", opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .7 },
-          { transform: `translate(${drift}px,${-rise}px) rotate(${rot}deg)`, opacity: 0 }],
-          { duration: 800 + Math.random() * 400, delay: Math.random() * 280, easing: "cubic-bezier(.25,.6,.35,1)", fill: "backwards" }).onfinish = () => sp.remove();
-      }
-    }
   }
 }
 
@@ -2446,6 +2511,8 @@ optsEl.addEventListener("keydown", e => {
   const inputs = [...optsEl.querySelectorAll("input")], i = inputs.indexOf(e.target);
   if (inputs[i + 1]) inputs[i + 1].focus(); else if (!createBtn.disabled) sheet.requestSubmit(); else if (inputs.length < MAX_OPTS) addOption(true);
 });
+// typed a country but no flag? add it when they leave the field
+optsEl.addEventListener("focusout", e => { const t = e.target; if (t.matches && t.matches("input") && t.value.trim()){ const v = withFlag(t.value); if (v !== t.value){ t.value = v; syncSheet(); } } });
 optsEl.addEventListener("click", e => { const x = e.target.closest(".x"); if (!x) return; x.parentElement.remove(); renumber(); syncSheet(); });
 addMore.addEventListener("click", () => addOption(true));
 window.addEventListener("resize", () => fitSheet(true));
