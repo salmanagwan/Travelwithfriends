@@ -620,11 +620,12 @@ body.locked{overflow:hidden}
 @keyframes cardShim{to{transform:translateX(130%)}}
 .pollCard.shimmer{animation:breathe 1.15s cubic-bezier(.45,0,.2,1)}
 @keyframes breathe{40%{transform:scale(.985)}100%{transform:none}}
-.pollResult{width:100%;display:flex;flex-direction:column;gap:6px}
+.pollResult{width:100%;display:flex;flex-direction:column;gap:20px}
+.prCol{display:flex;flex-direction:column;gap:4px;min-width:0}
 .pollResult[hidden]{display:none}
 .prLabel{font-weight:800;font-size:12px;letter-spacing:.72px;text-transform:uppercase;color:var(--accent);font-variation-settings:"opsz" 14}
 .prQ{font-weight:600;font-size:18px;letter-spacing:-.2px;line-height:1.25;color:#111214;overflow-wrap:anywhere;font-variation-settings:"opsz" 14}
-.prRow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.prRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .prWin{font-weight:900;font-size:24px;color:#111214;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transform-origin:left top;font-variation-settings:"opsz" 14}
 .prStack{display:flex;flex:none}
 .prStack img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px}
@@ -765,7 +766,7 @@ body.locked{overflow:hidden}
               <div class="poll3d" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
             </div>
             <div class="track" id="track" role="radiogroup" aria-label="Your vote"></div>
-            <div class="pollResult" id="pollResult" hidden><b class="prLabel">Poll Result</b><p class="prQ" id="prQ"></p><div class="prRow"><span class="prWin" id="prWin"></span><span class="prStack" id="prStack"></span></div></div>
+            <div class="pollResult" id="pollResult" hidden><p class="prQ" id="prQ"></p><div class="prRow"><div class="prCol"><b class="prLabel">Poll Result</b><span class="prWin" id="prWin"></span></div><span class="prStack" id="prStack"></span></div></div>
             <div class="pollCtaWrap"><div><button type="button" class="pollCta" id="pollCta" data-sq="16" tabindex="-1"><span id="pollCtaText">Make a trip</span><span class="spark" aria-hidden="true"><img src="assets/sparkle-white.svg" alt=""></span></button></div></div>
           </div>
           <div class="pollEdge" data-ring="20"></div>
@@ -1524,7 +1525,7 @@ function toResult(){
   const q1 = pollQ.getBoundingClientRect(), w1 = winOpt.getBoundingClientRect(), s1 = winStack.getBoundingClientRect(), l1 = pollCard.querySelector(".pollMeta b").getBoundingClientRect();
   const [name, flag] = splitLabel(poll.opts[win].label);
   document.getElementById("prQ").textContent = poll.q;
-  document.getElementById("prWin").textContent = flag ? `${flag}  ${name}` : name;
+  document.getElementById("prWin").textContent = flag ? `${name} ${flag}` : name;
   document.getElementById("prStack").innerHTML = [...winStack.querySelectorAll("img")].map(i => `<img src="${i.src}" alt="">`).join("");
   const h0 = box.offsetHeight;
   poll.stage = "result"; res.hidden = false; pollCard.classList.remove("shimmer"); pollCard.classList.add("result");
