@@ -967,7 +967,9 @@ function render(){
     const x = sg * (a <= 1 ? GAP * a : GAP + (a - 1) * 46);
     const sc = a <= 1 ? 1 - .2 * a : Math.max(.6, .8 - (a - 1) * .08);
     const op = a <= 1 ? 1 - .2 * t : Math.max(0, .8 - (a - 1) * 1.1);
-    s.style.transform = `translate3d(${x.toFixed(2)}px,0,0) scale(${sc.toFixed(4)})`;
+    // side cards turn slightly toward the middle, like a cover flow
+    const ry = -sg * Math.min(a, 1.4) * 18;
+    s.style.transform = `perspective(900px) translate3d(${x.toFixed(2)}px,0,0) rotateY(${ry.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
     s.style.opacity = op.toFixed(3);
     s.style.zIndex = String(100 - Math.round(a * 10));
     s.style.visibility = op <= 0.01 ? "hidden" : "visible";
