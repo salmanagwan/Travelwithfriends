@@ -146,6 +146,36 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .tvCard.fresh{animation:tvIn .7s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes tvIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
 
+
+/* ---------- Date picker: iOS style wheels in a bottom sheet ---------- */
+.dpScrim{position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.28);opacity:0;transition:opacity .3s}
+.dpScrim.on{opacity:1}
+.dpScrim[hidden],.dpSheet[hidden]{display:none}
+.dpSheet{position:fixed;z-index:141;left:50%;bottom:0;width:100%;max-width:428px;transform:translate(-50%,100%);background:rgba(250,250,252,.98);border-radius:28px 28px 0 0;
+  padding:8px 16px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.12);transition:transform .45s cubic-bezier(.2,.9,.25,1)}
+.dpSheet.on{transform:translate(-50%,0)}
+.dpGrab{width:40px;height:5px;border-radius:3px;background:#d9d9dd;margin:0 auto 10px}
+.dpTop{display:flex;align-items:center;justify-content:space-between;height:36px}
+.dpTop b{font-weight:700;font-size:17px;letter-spacing:-.3px}
+.dpTop button{font-size:17px;color:#6b2bf5;padding:6px 4px}
+.dpTop .dpDone{font-weight:700}
+.dpSeg{display:flex;gap:8px;margin:12px 0 6px;padding:4px;border-radius:14px;background:#ececf0}
+.dpSeg button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 6px;border-radius:11px;transition:background .25s,box-shadow .25s}
+.dpSeg button[aria-pressed="true"]{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.dpSeg small{font-size:12px;color:#8e8e93;font-weight:500}
+.dpSeg span{font-weight:700;font-size:17px;color:#111214;letter-spacing:-.3px}
+.dpSeg button[aria-pressed="true"] span{color:#6b2bf5}
+.dpWheels{position:relative;display:grid;grid-template-columns:1.4fr .8fr 1fr;height:216px;margin-top:6px;
+  -webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.dpBand{position:absolute;left:0;right:0;top:90px;height:36px;border-radius:10px;background:rgba(118,118,128,.12);pointer-events:none}
+.dpCol{height:216px;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;padding:90px 0;overscroll-behavior:contain}
+.dpCol::-webkit-scrollbar{display:none}
+.dpCol div{height:36px;line-height:36px;text-align:center;font-size:21px;color:#111214;scroll-snap-align:center;letter-spacing:-.3px;transition:color .2s,opacity .2s}
+.dpCol div.off{color:#c7c7cc}
+.dpNote{text-align:center;font-size:13px;color:#8e8e93;margin-top:8px}
+.dateChip{cursor:pointer}
+.dateChip:active{transform:scale(.95)}
+
 /* ---------- Landing (Figma 256:65361) ---------- */
 .deco{position:absolute;right:0;width:283px;height:380px;pointer-events:none;z-index:0}
 .deco img{width:100%;height:100%;display:block}
@@ -233,6 +263,9 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .aiTab .glow{position:absolute;left:-7px;top:-7px;width:78px;height:78px;pointer-events:none}
 .aiTab .disc{position:absolute;inset:0;border-radius:32px;background:rgba(255,255,255,.6);display:grid;place-items:center}
 .aiTab .disc img{width:28px;height:28px}
+/* AI button: the glossy orb in a white glass disc (Figma 262:69857) */
+.aiTab .disc img.orb,.prBtns .ai .disc img.orb{width:57.25px;height:56px;border-radius:50%;object-fit:cover}
+.prBtns .ai .disc{background:rgba(255,255,255,.6)!important;border:0!important;box-shadow:none!important;overflow:hidden}
 .toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);opacity:0;z-index:60;
   background:rgba(17,18,20,.86);color:#fff;font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -669,6 +702,8 @@ b.grad2{font-weight:700}
 .prHandle{position:absolute;left:50%;top:8px;width:72px;height:5px;margin-left:-36px;border-radius:50px;background:#ececec;z-index:3}
 .prTop{display:flex;gap:20px;align-items:center;padding:32px 16px 0 20px}
 .covers{position:relative;width:101.5px;height:120px;flex:none}
+.cvOne{position:relative;width:102px;height:135px;flex:none;background:#000;overflow:hidden;border-radius:20px}
+.cvOne img{position:absolute;left:-2.77px;top:-34.15px;width:118.15px;height:177.23px;max-width:none;object-fit:cover}
 .covers .cv{position:absolute;inset:0;background:#000;overflow:hidden}
 .covers .cv img{position:absolute;max-width:none;object-fit:cover}
 .covers .cv:nth-child(1){transform:rotate(12deg) translate(4px,6px)}
@@ -1017,16 +1052,24 @@ b.grad2{font-weight:700}
       </div>
       <button class="aiTab" data-soon="Smart search" aria-label="Smart search">
         <img class="glow" src="assets/ai-glow.png" alt="">
-        <span class="disc glass"><img src="assets/tab-ai.svg" alt=""></span>
+        <span class="disc glass"><img class="orb" src="assets/ai-orb-lg.png" alt=""></span>
       </button>
     </div>
   </nav>
   <div class="toast" id="toast" role="status"></div>
+  <div class="dpScrim" id="dpScrim" hidden></div>
+  <div class="dpSheet" id="dpSheet" hidden role="dialog" aria-modal="true" aria-label="Trip dates">
+    <div class="dpGrab"></div>
+    <div class="dpTop"><button type="button" class="dpCancel">Cancel</button><b>Trip dates</b><button type="button" class="dpDone">Done</button></div>
+    <div class="dpSeg"><button type="button" data-end="from" aria-pressed="true"><small>From</small><span id="dpFrom"></span></button><button type="button" data-end="to" aria-pressed="false"><small>To</small><span id="dpTo"></span></button></div>
+    <div class="dpWheels"><div class="dpBand"></div><div class="dpCol" data-k="m"></div><div class="dpCol" data-k="d"></div><div class="dpCol" data-k="y"></div></div>
+    <p class="dpNote" id="dpNote"></p>
+  </div>
 </main>
 
 
 <section class="screen" id="making" hidden role="dialog" aria-label="Making your trip plan">
-  <div class="mkSky" aria-hidden="true"><canvas id="globe" class="globeCv" data-cy="300" data-r="215"></canvas></div>
+  <div class="mkSky" aria-hidden="true"><canvas id="globe" class="globeCv" data-cy="345" data-r="300"></canvas></div>
   <div class="topGlow"></div>
   <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
   <div class="bigSheet">
@@ -1053,7 +1096,7 @@ b.grad2{font-weight:700}
 </section>
 
 <section class="screen" id="plan" hidden role="dialog" aria-label="Your trip plan">
-  <div class="mkSky" aria-hidden="true"><canvas class="globeCv" data-cy="175" data-r="200"></canvas></div>
+  <div class="mkSky" aria-hidden="true"><canvas class="globeCv" id="planGlobe" data-cy="345" data-r="300"></canvas></div>
   <div class="topGlow"></div>
   <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
   <div class="bigSheet" id="prSheet">
@@ -1070,7 +1113,7 @@ b.grad2{font-weight:700}
       <button class="pill ring" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
     </div>
     <div class="prBtns" id="prBtns">
-      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><span class="glowC"></span><span class="disc glass strong ring"><img class="s" src="assets/sparkle-ai.svg" alt=""></span></button>
+      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc glass"><img class="orb" src="assets/ai-orb-lg.png" alt=""></span></button>
       <button class="add" id="prAdd" aria-label="Add to this trip" aria-expanded="false"><img src="assets/plus-white.svg" alt=""></button>
     </div>
     <div class="prChat" id="prChat" hidden>
@@ -2016,11 +2059,7 @@ const spotTile = st => `<div class="spot" data-sq="12.8"><img src="${st.img}" al
 function headerHTML(){
   const avs = SOLO ? ["You"] : ["You", "Isha", "Priya", "Aman", "Arpit"];
   return `<div class="prTop">
-      <div class="covers">
-        <div class="cv" data-sq="22"><img src="assets/cover-1.jpg" alt="" style="left:-21px;top:-45px;width:118px;height:178px;transform:rotate(-6deg)"></div>
-        <div class="cv" data-sq="22"><img src="assets/cover-2.jpg" alt="" style="left:-8px;top:-1px;width:184px;height:123px"></div>
-        <div class="cv" data-sq="22"><img src="assets/cover-3.jpg" alt="" style="left:-3px;top:-34px;width:118px;height:177px"></div>
-      </div>
+      <div class="cvOne" data-sq="20"><img src="assets/trip-thai.jpg" alt=""></div>
       <div class="prInfo">
         <div><h2>Koh Samui, Phuket<br>${DAYS.length}-day Trip 🇹🇭</h2>
           <div class="prMeta"><span class="dots">${DAYS.length} days<i></i><span id="prSpots">${totalSpots()} spots</span></span><span class="dateChip" id="prDates"><img src="assets/calendar-fill.svg" alt="">${fmtRange(TRIP.start, DAYS.length, true)}</span></div></div>
@@ -2105,6 +2144,8 @@ function showPlan(){
   view = "overview"; renderPlan(); prChat.hidden = true; document.getElementById("prBtns").hidden = false;
   prSheet.classList.remove("isFull");
   making.hidden = true; planEl.hidden = false; prScroll.scrollTop = 0;
+  const pg = document.getElementById("planGlobe");
+  if (pg && pg._reset){ pg._reset(); setTimeout(() => pg._zoomTo(100.4, 10.6, 950, 105, 2000), 350); }
   prSheet.style.animation = "none"; void planEl.offsetWidth; prSheet.style.animation = "";
   watchSq(planEl); haptic(16);
 }
@@ -2232,6 +2273,74 @@ async function changeDates(){
   say("Trip dates updated to Jan 4 - 10"); haptic(18);
 }
 chatBarEl.addEventListener("submit", e => { e.preventDefault(); const inp = document.getElementById("chatInput"), t = inp.value.trim(); if (!t) return; inp.value = ""; bubble("You", t); haptic(6); });
+
+
+/* ---------- Trip dates: pick From or To on wheels; the trip keeps its length, and every date in the plan follows ---------- */
+const dp = document.getElementById("dpSheet"), dpScrim = document.getElementById("dpScrim");
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const YEARS = [2026, 2027];
+let dpEnd = "from", dpStart = null, dpLock = false;
+const dpLen = () => DAYS.length;
+const dpFmt = d => `${MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()}, ${d.getFullYear()}`;
+function dpBuild(){
+  const cols = dp.querySelectorAll(".dpCol");
+  cols[0].innerHTML = MONTHS.map(m => `<div>${m}</div>`).join("");
+  cols[1].innerHTML = Array.from({ length: 31 }, (_, i) => `<div>${i + 1}</div>`).join("");
+  cols[2].innerHTML = YEARS.map(y => `<div>${y}</div>`).join("");
+}
+function dpShown(){ return dpEnd === "from" ? dpStart : addDays(dpStart, dpLen() - 1); }
+function dpSetWheels(d, smooth){
+  dpLock = true;
+  const [cm, cd, cy] = dp.querySelectorAll(".dpCol");
+  const dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  cd.querySelectorAll("div").forEach((el, i) => el.classList.toggle("off", i >= dim));
+  [[cm, d.getMonth()], [cd, d.getDate() - 1], [cy, YEARS.indexOf(d.getFullYear())]].forEach(([c, i]) => c.scrollTo({ top: i * 36, behavior: smooth ? "smooth" : "auto" }));
+  setTimeout(() => dpLock = false, smooth ? 380 : 60);
+}
+function dpLabels(){
+  document.getElementById("dpFrom").textContent = dpFmt(dpStart);
+  document.getElementById("dpTo").textContent = dpFmt(addDays(dpStart, dpLen() - 1));
+  document.getElementById("dpNote").textContent = `${dpLen()}-day trip · moving one end moves the other`;
+}
+function dpRead(){
+  if (dpLock) return;
+  const [cm, cd, cy] = dp.querySelectorAll(".dpCol");
+  const m = Math.round(cm.scrollTop / 36), y = YEARS[Math.round(cy.scrollTop / 36)] || YEARS[0];
+  const dim = new Date(y, m + 1, 0).getDate(), d = Math.min(dim, Math.round(cd.scrollTop / 36) + 1);
+  const picked = new Date(y, m, d);
+  dpStart = dpEnd === "from" ? picked : addDays(picked, -(dpLen() - 1));
+  dpLabels(); haptic(4);
+  if (Math.round(cd.scrollTop / 36) + 1 > dim) dpSetWheels(picked, true);
+  cd.querySelectorAll("div").forEach((el, i) => el.classList.toggle("off", i >= dim));
+}
+dp.querySelectorAll(".dpCol").forEach(c => { let t; c.addEventListener("scroll", () => { clearTimeout(t); t = setTimeout(dpRead, 110); }, { passive: true }); });
+dp.querySelectorAll(".dpSeg button").forEach(b => b.addEventListener("click", () => {
+  dpEnd = b.dataset.end; dp.querySelectorAll(".dpSeg button").forEach(x => x.setAttribute("aria-pressed", x === b)); dpSetWheels(dpShown(), true); haptic(6); }));
+function openDates(){
+  if (!dp.querySelector(".dpCol div")) dpBuild();
+  dpStart = new Date(TRIP.start); dpEnd = "from";
+  dp.querySelectorAll(".dpSeg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.end === "from"));
+  dpLabels(); dp.hidden = dpScrim.hidden = false;
+  requestAnimationFrame(() => { dpSetWheels(dpStart, false); dp.classList.add("on"); dpScrim.classList.add("on"); });
+  haptic(8);
+}
+function closeDates(){ dp.classList.remove("on"); dpScrim.classList.remove("on"); setTimeout(() => { dp.hidden = dpScrim.hidden = true; }, 420); }
+dpScrim.addEventListener("click", closeDates);
+dp.querySelector(".dpCancel").addEventListener("click", closeDates);
+dp.querySelector(".dpDone").addEventListener("click", () => { closeDates(); if (dpStart && +dpStart !== +TRIP.start) setTimeout(() => applyDates(dpStart), 380); });
+// the new dates flow through the plan: header chip, day chips, flight card, the flight change card, and My Trips
+function applyDates(start){
+  TRIP.start = new Date(start);
+  const dc = document.getElementById("prDates");
+  if (dc){ dc.innerHTML = `<img src="assets/calendar-fill.svg" alt="">${fmtRange(TRIP.start, DAYS.length, true)}`; dc.classList.remove("flash"); void dc.offsetWidth; dc.classList.add("flash"); }
+  syncChips();
+  const fl0 = prScroll.querySelector(".flight");
+  if (fl0) swapIn(fl0, flightHTML({ from: TRIP.from, dates: fmtRange(TRIP.start, DAYS.length), price: TRIP.price, note: TRIP.note })).querySelector(".box").classList.add("flash");
+  const br = prScroll.querySelector(".breakCard"); if (br) swapIn(br, breakHTML()).classList.add("flash");
+  prScroll.querySelectorAll(".dayCard").forEach((card, i) => setTimeout(() => shuffleDay(card, i), 200 + i * 110));
+  say(`Trip dates updated to ${fmtRange(TRIP.start, DAYS.length)}`); haptic(14);
+}
+planEl.addEventListener("click", e => { if (e.target.closest("#prDates")) { e.stopPropagation(); openDates(); } }, true);
 
 /* ---------- Invite Friends sheet ---------- */
 const invite = document.getElementById("invite"), invScrim = document.getElementById("invScrim");
@@ -2931,7 +3040,7 @@ document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
   const fs = `precision highp float;
     uniform sampler2D tex; uniform vec2 res; uniform vec2 ctr; uniform float R; uniform float lon0; uniform float lat0;
     const float PI=3.14159265, P=__P__, LON0=__LON0__, LON1=__LON1__, LAT0=__LAT0__, LAT1=__LAT1__;
-    const vec3 OCEAN=vec3(__OC__);
+    const vec3 OCEAN=vec3(__OC__); const vec3 DEEP=vec3(.235,.5,.78); const float LONC=radians(105.6655), LATC=radians(8.0521);
     void main(){
       vec2 q = vec2(gl_FragCoord.x, res.y - gl_FragCoord.y);
       float x = (q.x-ctr.x)/R, y = (ctr.y-q.y)/R, rho = sqrt(x*x+y*y);
@@ -2943,7 +3052,10 @@ document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
       float lon = lon0 + atan(x*sc, rho*cos(lat0)*cc - y*sin(lat0)*sc);
       float ld = degrees(lon), fd = degrees(lat);
       vec2 uv = vec2((ld-LON0)/(LON1-LON0), (LAT1-fd)/(LAT1-LAT0));
-      vec3 c = (uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.) ? OCEAN : texture2D(tex, uv).rgb;
+      vec3 c = (uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.) ? DEEP : texture2D(tex, uv).rgb;
+      // the texture only holds the hemisphere Apple showed; past its edge, fade into deep ocean so no pale band appears as it turns
+      float cd = sin(lat)*sin(LATC) + cos(lat)*cos(LATC)*cos(lon - LONC);
+      c = mix(c, DEEP, 1. - smoothstep(cos(radians(77.)), cos(radians(60.)), cd));
       float e = rho/rmax;
       c = mix(c, vec3(.86,.93,1.), smoothstep(.86, 1., e)*.55);     // Apple's soft white limb
       float a = 1. - smoothstep(1. - 1.6/(R*rmax), 1., e);
@@ -2957,12 +3069,13 @@ document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
   const lp = g.getAttribLocation(pr, "p"); g.enableVertexAttribArray(lp); g.vertexAttribPointer(lp, 2, g.FLOAT, false, 0, 0);
   const U = n => g.getUniformLocation(pr, n);
   const uRes = U("res"), uCtr = U("ctr"), uR = U("R"), uLon = U("lon0"), uLat = U("lat0");
-  const BASE_LON = 105.6655, LAT = 8.0521, P = 4.68734, RVIS = +(cv.dataset.r || 336.5), CY = +(cv.dataset.cy || -49.5), RR = RVIS / Math.sqrt((P - 1) / (P + 1));
+  const BASE_LON = 105.6655, P = 4.68734, K = Math.sqrt((P - 1) / (P + 1));
+  let LAT = 8.0521, RVIS = +(cv.dataset.r || 336.5), CY = +(cv.dataset.cy || -49.5), zoom = null;
   let W = 0, H = 0, dpr = 1, lon = BASE_LON, ready = false, running = true, last = 0, t0 = performance.now();
   function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.viewport(0, 0, cv.width, cv.height); }
   function draw(){
     if (!ready) return;
-    g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, CY * dpr); g.uniform1f(uR, RR * dpr);
+    g.uniform2f(uRes, cv.width, cv.height); g.uniform2f(uCtr, cv.width / 2, CY * dpr); g.uniform1f(uR, RVIS / K * dpr);
     g.uniform1f(uLon, lon * Math.PI / 180); g.uniform1f(uLat, LAT * Math.PI / 180);
     g.clearColor(0, 0, 0, 0); g.clear(g.COLOR_BUFFER_BIT); g.drawArrays(g.TRIANGLE_STRIP, 0, 4);
   }
@@ -2977,7 +3090,18 @@ document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
   img.src = "assets/earth-apple.jpg";
   window.__globeGL = true;
   // a slow sway: 18° east and back over a minute, eased at the ends like a real spin slowing down
-  function tick(t){ if (!running) return; if (t - last > 33){ last = t; lon = BASE_LON + 22 * Math.sin((t - t0) / 26000 * Math.PI * 2); draw(); } requestAnimationFrame(tick); }
+  // zoom: glide the camera onto a place (lon, lat), growing the globe until it reads as a map
+  const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  cv._zoomTo = (lon1, lat1, r1, cy1, ms = 1800) => { zoom = { a: { lon, lat: LAT, r: RVIS, cy: CY }, b: { lon: lon1, lat: lat1, r: r1, cy: cy1 }, t0: performance.now(), ms }; start(); };
+  cv._reset = () => { zoom = null; LAT = 8.0521; RVIS = +(cv.dataset.r || 336.5); CY = +(cv.dataset.cy || -49.5); t0 = performance.now(); draw(); };
+  function tick(t){ if (!running) return;
+    if (t - last > 16){ last = t;
+      if (zoom){ const k = ease(Math.min(1, (t - zoom.t0) / zoom.ms)), A = zoom.a, B = zoom.b;
+        lon = A.lon + (B.lon - A.lon) * k; LAT = A.lat + (B.lat - A.lat) * k; RVIS = A.r * Math.pow(B.r / A.r, k); CY = A.cy + (B.cy - A.cy) * k;
+        if (k >= 1){ draw(); running = false; return; } }
+      else lon = BASE_LON + 14 * Math.sin((t - t0) / 26000 * Math.PI * 2);
+      draw(); }
+    requestAnimationFrame(tick); }
   const start = () => { if (!running){ running = true; last = 0; requestAnimationFrame(tick); } };
   size(); addEventListener("resize", () => { size(); draw(); });
   new ResizeObserver(() => { size(); draw(); }).observe(cv);   // the plan screen opens hidden, so size it once it shows
