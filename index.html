@@ -604,12 +604,29 @@ body.locked{overflow:hidden}
 .pollCard.final .poll3d span{width:46px;height:46px;transform:rotate(15deg)}
 .pollCtaWrap{width:100%;display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.9,.25,1),margin .55s;margin-top:-24px}
 .pollCtaWrap>div{min-height:0;overflow:hidden;display:flex;justify-content:center}
-.pollCard.final .pollCtaWrap{grid-template-rows:1fr;margin-top:-8px}
-.pollCard.final .pollBox{padding-bottom:16px}
 .pollBox{transition:padding .45s}
 .pollCta{position:relative;width:calc(100% - 24px);max-width:364px;height:48px;margin:2px 0 0;display:flex;align-items:center;justify-content:center;gap:4px;background:#101010;color:#fff;
   font-weight:700;font-size:18px;letter-spacing:-.3px;font-variation-settings:"opsz" 14;overflow:hidden;opacity:0;transform:translateY(10px) scale(.96);transition:opacity .4s .15s,transform .55s .15s cubic-bezier(.2,.9,.3,1.3)}
-.pollCard.final .pollCta{opacity:1;transform:none}
+/* shimmer pass, then the card becomes the Poll Result card (Figma 232:29581) */
+.pollBox::after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;transform:translateX(-130%);
+  background:linear-gradient(105deg,transparent 25%,rgba(107,43,245,.10) 38%,rgba(107,43,245,.22) 46%,rgba(255,255,255,.95) 50%,rgba(107,43,245,.22) 54%,rgba(107,43,245,.10) 62%,transparent 75%)}
+.pollCard.shimmer .pollBox::after{animation:cardShim 1.3s cubic-bezier(.45,0,.2,1)}
+@keyframes cardShim{to{transform:translateX(130%)}}
+.pollCard.shimmer{animation:breathe 1.15s cubic-bezier(.45,0,.2,1)}
+@keyframes breathe{40%{transform:scale(.985)}100%{transform:none}}
+.pollResult{width:100%;display:flex;flex-direction:column;gap:6px}
+.pollResult[hidden]{display:none}
+.prLabel{font-weight:800;font-size:12px;letter-spacing:.72px;text-transform:uppercase;color:var(--accent);font-variation-settings:"opsz" 14}
+.prQ{font-weight:600;font-size:18px;letter-spacing:-.2px;line-height:1.25;color:#111214;overflow-wrap:anywhere;font-variation-settings:"opsz" 14}
+.prRow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.prWin{font-weight:900;font-size:24px;color:#111214;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transform-origin:left top;font-variation-settings:"opsz" 14}
+.prStack{display:flex;flex:none}
+.prStack img{width:24px;height:24px;border-radius:50%;border:1px solid #fff;object-fit:cover;margin-left:-8.57px}
+.prStack img:first-child{margin-left:0}
+.pollCard.result .pollBox{padding:16px;gap:24px}
+.pollCard.result .pollHead,.pollCard.result .track{display:none}
+.pollCard.result .pollCtaWrap{grid-template-rows:1fr;margin-top:0;transition:none}
+.pollCard.result .pollCta{opacity:1;transform:none;width:100%;max-width:none;margin:0;transition:none}
 .pollCta:active{transform:scale(.98)}
 .pollCta::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);pointer-events:none}
 .pollCta.shine::after{animation:shine 1.1s .55s cubic-bezier(.4,0,.2,1)}
@@ -742,6 +759,7 @@ body.locked{overflow:hidden}
               <div class="poll3d" aria-hidden="true"><span><img src="assets/poll-3d.png" alt=""></span></div>
             </div>
             <div class="track" id="track" role="radiogroup" aria-label="Your vote"></div>
+            <div class="pollResult" id="pollResult" hidden><b class="prLabel">Poll Result</b><p class="prQ" id="prQ"></p><div class="prRow"><span class="prWin" id="prWin"></span><span class="prStack" id="prStack"></span></div></div>
             <div class="pollCtaWrap"><div><button type="button" class="pollCta" id="pollCta" data-sq="16" tabindex="-1"><span id="pollCtaText">Make a trip</span><span class="spark" aria-hidden="true"><img src="assets/sparkle-white.svg" alt=""></span></button></div></div>
           </div>
           <div class="pollEdge" data-ring="20"></div>
@@ -1323,7 +1341,7 @@ function showPoll(q, labels, where = "home"){
     msgsEl.appendChild(w); pollSlot.hidden = true; scrollChat();
   } else if (pollCard.parentElement !== pollSlot.querySelector(".pollPad")) pollSlot.querySelector(".pollPad").appendChild(pollCard);
   pollQ.textContent = q;
-  pollCard.classList.remove("spread", "lineGone", "final");
+  pollCard.classList.remove("spread", "lineGone", "final", "shimmer", "result"); document.getElementById("pollResult").hidden = true;
   pollCta.classList.remove("shine"); pollCta.tabIndex = -1;
   track.innerHTML = `<div class="bar"><i class="ghost"></i><i class="fill"></i></div>` +
     poll.opts.map((o, i) => { const [n, e] = splitLabel(o.label);
@@ -1402,7 +1420,7 @@ function settleLayout(final){
   return { sizes, xs: [-pad + w[0] / 2, W + pad - w[1] / 2] };
 }
 function layoutTrack(){
-  if (!poll || !track.clientWidth) return;
+  if (!poll || !track.clientWidth || poll.stage === "result") return;
   const spread = poll.stage !== "live", lay = spread ? settleLayout(poll.stage === "final") : null, xs = spread ? lay.xs : optX(), W = track.clientWidth;
   optX().forEach((x, i) => track.querySelectorAll(".dot")[i].style.left = x + "px");
   let bottom = 0;
@@ -1486,10 +1504,41 @@ function maybeSettle(){
     track.querySelectorAll(".opt").forEach((d, k) => d.classList.toggle("win", k === win));
     track.querySelectorAll(".voters").forEach((d, k) => d.classList.toggle("lose", k !== win));
     pollCtaText.textContent = poll.where === "chat" ? `Go with ${splitLabel(poll.opts[win].label)[0]}` : `Make a ${splitLabel(poll.opts[win].label)[0]} Trip`;
-    pollCard.classList.add("final"); layoutTrack();
-    pollCta.tabIndex = 0; pollCta.classList.add("shine"); haptic(18);
-    burst();
+    pollCard.classList.add("final"); layoutTrack(); haptic(14);
+    // hold on the winner, then a shimmer pass, then the result card
+    setTimeout(() => { pollCard.classList.remove("shimmer"); void pollCard.offsetWidth; pollCard.classList.add("shimmer"); }, 1300);
+    setTimeout(toResult, 2550);
   }, 1150);
+}
+// Shared-element morph: the question, the winner and its photo stack glide into the compact result card
+function toResult(){
+  if (!poll || poll.stage !== "final") return;
+  const win = poll.win, box = pollCard.querySelector(".pollBox"), res = document.getElementById("pollResult");
+  const winOpt = track.querySelector(".opt.win"), winStack = track.querySelectorAll(".voters")[win];
+  const q1 = pollQ.getBoundingClientRect(), w1 = winOpt.getBoundingClientRect(), s1 = winStack.getBoundingClientRect(), l1 = pollCard.querySelector(".pollMeta b").getBoundingClientRect();
+  const [name, flag] = splitLabel(poll.opts[win].label);
+  document.getElementById("prQ").textContent = poll.q;
+  document.getElementById("prWin").textContent = flag ? `${flag}  ${name}` : name;
+  document.getElementById("prStack").innerHTML = [...winStack.querySelectorAll("img")].map(i => `<img src="${i.src}" alt="">`).join("");
+  const h0 = box.offsetHeight;
+  poll.stage = "result"; res.hidden = false; pollCard.classList.remove("shimmer"); pollCard.classList.add("result");
+  box.style.height = "auto"; const h1 = box.offsetHeight; box.style.height = h0 + "px"; void box.offsetHeight;
+  box.style.transition = "height .62s cubic-bezier(.2,.9,.25,1)"; box.style.height = h1 + "px";
+  setTimeout(() => { box.style.transition = ""; box.style.height = ""; }, 700);
+  const ease = "cubic-bezier(.2,.9,.25,1)";
+  const fly = (el, r, extra = {}) => { const r2 = el.getBoundingClientRect();
+    el.animate([{ transform: `translate(${r.left - r2.left}px, ${r.top - r2.top}px) scale(${extra.s || 1})`, transformOrigin: "left top", opacity: extra.o ?? 1 }, { transform: "none", transformOrigin: "left top", opacity: 1 }],
+      { duration: 640, easing: ease }); };
+  fly(document.getElementById("prQ"), q1, { s: 16 / 18 });
+  fly(res.querySelector(".prLabel"), l1);
+  const pw = document.getElementById("prWin"), pwr = pw.getBoundingClientRect();
+  fly(pw, { left: w1.left + w1.width / 2 - pwr.width / 2, top: w1.top }, {});
+  fly(document.getElementById("prStack"), s1);
+  pollCta.animate([{ opacity: 0, transform: "translateY(18px) scale(.96)", filter: "blur(4px)" }, { opacity: 1, transform: "none", filter: "none" }],
+    { duration: 560, delay: 220, easing: "cubic-bezier(.2,.9,.3,1.25)", fill: "backwards" });
+  pollCtaText.textContent = poll.where === "chat" ? `Go with ${name}` : `Make a ${name} Trip`;
+  pollCta.tabIndex = 0; pollCta.classList.remove("shine"); void pollCta.offsetWidth; pollCta.classList.add("shine");
+  setTimeout(() => { haptic(18); burst(); }, 300);
 }
 // A few tiny stars pop out of the sparkle when the button lands
 function burst(){
