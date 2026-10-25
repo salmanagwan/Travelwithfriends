@@ -2151,33 +2151,37 @@ function springAnim(el, from, to, fmt, opts = {}, extra = {}){
   return el.animate(vals.map(v => ({ transform: fmt(v) })), { duration: ms, easing: "linear", ...extra });
 }
 
-/* ---------- Confetti on canvas: flags (or paper bits) shower up from the bottom ---------- */
-function confettiShower(host, flag, dur = 1150){
+/* ---------- Live-stream style emoji float: the picked flag drifts up from the bottom, sways and fades ---------- */
+function emojiFloat(host, emoji, { count = 16, spawn = 950, cx = null } = {}){
   const cv = document.createElement("canvas"), dpr = Math.min(3, devicePixelRatio || 1), W = host.clientWidth, H = host.clientHeight;
   cv.className = "npFx"; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; host.appendChild(cv);
   const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-  let sprite = null;
-  if (flag){ const S = 64; sprite = document.createElement("canvas"); sprite.width = sprite.height = S; const sc = sprite.getContext("2d");
-    sc.font = `${S * .8}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sc.textAlign = "center"; sc.textBaseline = "middle"; sc.fillText(flag, S / 2, S / 2 + 3); }
-  const COLORS = ["#6b2bf5", "#a684ff", "#f74e78", "#ffc542", "#2ecc8f", "#3fa9ff"];
-  const N = flag ? 34 : 70, P = [];
-  for (let i = 0; i < N; i++) P.push({ x: Math.random() * W, y: H + 10 + Math.random() * 30, vx: (Math.random() - .5) * 70, vy: -(300 + Math.random() * 230),
-    born: Math.random() * 320, size: flag ? 16 + Math.random() * 14 : 5 + Math.random() * 5, rot: Math.random() * 6.28, vr: (Math.random() - .5) * 7,
-    flip: Math.random() * 6.28, vf: 6 + Math.random() * 8, col: COLORS[i % COLORS.length], round: Math.random() < .3 });
-  const t0 = performance.now();
+  const S = 128, sprite = document.createElement("canvas"); sprite.width = sprite.height = S; const sc = sprite.getContext("2d");
+  sc.font = `${S * .78}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sc.textAlign = "center"; sc.textBaseline = "middle"; sc.fillText(emoji, S / 2, S / 2 + 4);
+  const mid = cx == null ? W / 2 : cx, P = [];
+  for (let i = 0; i < count; i++) P.push({
+    born: (i / count) * spawn + Math.random() * 60,
+    life: 1500 + Math.random() * 450,
+    x: mid + (Math.random() - .5) * W * .55,
+    size: 24 + Math.random() * 12,
+    amp: 8 + Math.random() * 12, freq: 1 + Math.random() * .7, ph: Math.random() * 6.28,
+    rise: H + 40 + Math.random() * 30 });
+  const ease = t => 1 - Math.pow(1 - t, 1.6);
+  const t0 = performance.now(), end = Math.max(...P.map(p => p.born + p.life));
   (function frame(now){
     const t = now - t0; ctx.clearRect(0, 0, W, H);
     for (const p of P){
-      const age = (t - p.born) / 1000; if (age < 0) continue;
-      const life = dur - p.born, k = (t - p.born) / life; if (k >= 1) continue;
-      const x = p.x + p.vx * age + Math.sin(age * 5 + p.flip) * 8, y = p.y + p.vy * age + 160 * age * age;
-      const a = Math.min(1, k / .1) * (k > .72 ? 1 - (k - .72) / .28 : 1);
-      ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(p.rot + p.vr * age); ctx.scale(Math.cos(p.flip + p.vf * age * (flag ? .5 : 1)), 1);
-      if (sprite) ctx.drawImage(sprite, -p.size / 2, -p.size / 2, p.size, p.size);
-      else { ctx.fillStyle = p.col; if (p.round){ ctx.beginPath(); ctx.arc(0, 0, p.size / 2.4, 0, 6.28); ctx.fill(); } else ctx.fillRect(-p.size / 2, -p.size * .3, p.size, p.size * .6); }
-      ctx.restore();
+      const k = (t - p.born) / p.life; if (k < 0 || k >= 1) continue;
+      const sec = (t - p.born) / 1000;
+      const y = H + 16 - p.rise * ease(k), x = p.x + Math.sin(sec * p.freq * 6.28 + p.ph) * p.amp * Math.min(1, k * 3);
+      // pop in, then settle; fade over the last stretch
+      const pop = k < .12 ? .4 + (k / .12) * .75 : k < .22 ? 1.15 - ((k - .12) / .1) * .15 : 1;
+      const a = k < .06 ? k / .06 : k > .5 ? Math.max(0, 1 - (k - .5) / .5) : 1;
+      const sz = p.size * pop;
+      ctx.globalAlpha = a; ctx.drawImage(sprite, x - sz / 2, y - sz / 2, sz, sz);
     }
-    if (t < dur + 50) requestAnimationFrame(frame); else cv.remove();
+    ctx.globalAlpha = 1;
+    if (t < end + 30) requestAnimationFrame(frame); else cv.remove();
   })(t0);
 }
 
@@ -2255,8 +2259,8 @@ function showPoll(q, labels, where = "home"){
       at(520, () => hero.animate([{ transform: pose(1, up) }, { transform: `translate(${cx}px,${up - 2}px) scale(${S * 1.035})` }, { transform: pose(1, up) }], { duration: 420, easing: "cubic-bezier(.3,.7,.3,1)" }));
     });
 
-    // 3. flags (or confetti) shower up behind the tile
-    at(600, () => { const em = splitLabel(poll.opts[i].label)[1] || ""; confettiShower(np, /\p{Regional_Indicator}/u.test(em) ? em : ""); });
+    // 3. the picked flag floats up behind the tile, like reactions on a live stream
+    at(560, () => emojiFloat(np, splitLabel(poll.opts[i].label)[1] || "🎉"));
 
     // 4. the tile lifts, the friends who picked it drop in, then you slide in from the right and the row bounces
     const tmp = document.createElement("div"); tmp.className = "npV npTmp"; tmp.style.top = "155px";
