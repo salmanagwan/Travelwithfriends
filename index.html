@@ -1949,8 +1949,9 @@ function openMaking(dest, opts = {}){
   heads[0].textContent = SOLO ? "Reading your preferences and Collections" : "Reading all of your friends preferences and Collections";
   delete heads[0].dataset.wr;
   if (desc) desc.textContent = SOLO ? "While keeping your preferences and collections in mind, keeping each day relaxed, not packed" : "While keeping everyones preferences and collections in mind, keeping each day relaxed, not packed";
-  mkList.innerHTML = ""; mkRead.className = "mkCard"; mkShape.className = "mkCard mkShape wait";
-  mkShape.querySelector(".spin").classList.add("wait"); mkRead.querySelector(".box").style.height = "";
+  // both jobs run side by side: reading everyone's picks and shaping the plan, so both loaders spin from the start
+  mkList.innerHTML = ""; mkRead.className = "mkCard"; mkShape.className = "mkCard mkShape";
+  mkShape.querySelector(".spin").classList.remove("wait"); mkRead.querySelector(".box").style.height = "";
   making.classList.remove("leaving"); planEl.hidden = true;
   making.hidden = false; document.body.classList.add("locked");
   making.querySelectorAll(".mkHead p").forEach((p, i) => { M.words(p, 45, 200 + i * 500); M.play(p); });
