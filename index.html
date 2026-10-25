@@ -411,16 +411,16 @@ body.locked{overflow:hidden}
 .npAiW>div{min-height:0;overflow:hidden}
 .np.aiOn .npAiW{grid-template-rows:1fr}
 .np.voted .npAiW{grid-template-rows:0fr}
-.npAi{position:relative;display:flex;align-items:center;gap:8px;width:100%;height:32px;margin-top:24px;padding:8px;border-radius:40px;text-align:left;
-  background:linear-gradient(90deg,rgba(0,64,183,.1) 0%,rgba(72,157,226,.1) 44.18%,rgba(217,83,237,.1) 78.54%);font-weight:500;font-size:14px;letter-spacing:-.5px;overflow:hidden;
+/* the community strip uses the same AI suggestion chip as the trip chat */
+.npAi{position:relative;display:inline-flex;align-items:center;gap:4px;max-width:100%;margin-top:24px;padding:8px 14px 8px 8px;border-radius:38px;text-align:left;
+  background:#fff;border:.5px solid rgba(107,43,245,.2);box-shadow:inset 0 -4px 7px rgba(0,0,0,.08),0 1px 2px rgba(107,43,245,.1);font-weight:500;font-size:15px;letter-spacing:-.3px;overflow:hidden;
   opacity:0;transform:translateY(8px);transition:opacity .4s .15s,transform .5s .15s cubic-bezier(.2,.9,.3,1.2)}
 .np.aiOn .npAi{opacity:1;transform:none}
-.npAi .orb{width:16px;height:16px;flex:none;object-fit:contain}
-.npAi .chev{position:absolute;right:8px;top:50%;width:16.8px;height:16.8px;margin-top:-8.4px;transform:scaleX(-1);transition:opacity .2s}
-.npAi[data-state] .chev{opacity:0}
-.npAi[data-state] .npAiT{padding-right:0}
-.npAi:active{transform:scale(.985)}
-.npAiT{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:18px}
+.npAi .orb{width:20px;height:20px;flex:none;object-fit:contain}
+.npAi:active{transform:scale(.97)}
+.npAiT{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.aiG{background:linear-gradient(90deg,#6b2bf5 0%,#101010 16.5%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;background-size:200% 100%;animation:aiShine 2.4s ease-in-out infinite}
+b.aiG{font-weight:700;background-image:linear-gradient(90deg,#6b2bf5,#101010);background-size:100% 100%;animation:none}
 .grad2{background:linear-gradient(90deg,#003dae 0%,#217ac3 44.18%,#bd2ad4 78.54%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 b.grad2{font-weight:700}
 .greyG{background:linear-gradient(90deg,#111214,#6b6f76);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
@@ -2761,7 +2761,7 @@ function npInsight(np, ai, t, names){
   haptic(10);
   ai.classList.add("busy"); swap(`<span class="greyG">Checking on reddit, instagram and other apps....</span>`);
   setTimeout(() => swap(`<span class="greyG">${esc(line)}</span>`), 2200);
-  setTimeout(() => { swap(`<span class="greyG">Best option right now is</span> <b class="grad2">${esc(best)}</b>`); ai.classList.remove("busy"); ai.classList.add("done"); haptic(12); }, 4300);
+  setTimeout(() => { swap(`<span class="greyG">Best option right now is</span> <b class="aiG">${esc(best)}</b>`); ai.classList.remove("busy"); ai.classList.add("done"); haptic(12); }, 4300);
 }
 
 /* ---------- Poll card v2 ---------- */
@@ -2780,7 +2780,7 @@ function showPoll(q, labels, where = "home"){
         const body = dm ? `${esc(dm[1])}<em>${esc(dm[2].replace(/\s*[-–]\s*/g, " - "))}</em>` : `${esc(n.replace(/(\d)\s*-\s*(\d)/g, "$1–$2"))}${e ? `<em>${e}</em>` : ""}`;
         return `<button type="button" class="npOpt" data-i="${i}" data-sq="16"><i class="fill"></i><span class="lb">${body}</span></button>`; }).join("")}</div>
       <div class="npSW"><div><div class="npStacks">${poll.opts.map(() => `<div class="npV"></div>`).join("")}</div></div></div>
-      <div class="npAiW"><div><button type="button" class="npAi" aria-live="polite"><img class="orb" src="assets/ai-orb.png" alt=""><span class="npAiT"><span class="grad2">Check in the community what they have to say</span></span><img class="chev" src="assets/chevron-right-dark.svg" alt=""></button></div></div>
+      <div class="npAiW"><div><button type="button" class="npAi" aria-live="polite"><img class="orb" src="assets/sparkle-purple.svg" alt=""><span class="npAiT"><span class="aiG">Check what the community has to say</span></span></button></div></div>
       <div class="npCta"><div></div></div>
     </div>
     <div class="npTab"><svg aria-hidden="true"><path/></svg><button type="button" class="npInv" aria-label="Invite friends to vote"><img src="assets/people-add-grey.svg" alt=""></button></div>`;
