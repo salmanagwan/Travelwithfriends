@@ -457,7 +457,7 @@ body.locked{overflow:hidden}
 .invFoot button:not(:disabled):active{transform:scale(.97)}
 /* top banner (Figma "Poll invite Sent") */
 .banner{position:fixed;z-index:150;top:0;left:50%;width:100%;max-width:428px;height:calc(56px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);
-  background:#2fbf71;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:18px;transform:translate(-50%,-110%);transition:transform .45s cubic-bezier(.2,.9,.25,1.1);pointer-events:none}
+  background:#2fbf71;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:18px;transform:translate(-50%,calc(-100% - 48px));transition:transform .45s cubic-bezier(.2,.9,.25,1.1);pointer-events:none}
 .banner img{width:24px;height:24px}
 .banner.show{transform:translate(-50%,0)}
 /* Plan Ready */
@@ -1978,6 +1978,9 @@ function closeInvite(){ if (invite.hidden) return; invScrim.classList.remove("sh
   setTimeout(() => { if (!invite.classList.contains("show")){ invite.hidden = true; invScrim.hidden = true; } }, 450); }
 let bannerT;
 function banner(text){ const b = document.getElementById("banner"); document.getElementById("bannerText").textContent = text;
+  // sit on the phone's top edge, not the browser's (desktop shows the phone as a framed card)
+  const ph = document.querySelector(".phone").getBoundingClientRect(), top = Math.max(0, ph.top);
+  b.style.top = top + "px"; b.style.borderRadius = top > 0 && innerWidth >= 460 ? "32px 32px 0 0" : "";
   b.classList.add("show"); haptic(14); clearTimeout(bannerT); bannerT = setTimeout(() => b.classList.remove("show"), 2600); }
 // Send (or share) finishes the job: for a new poll, the poll goes live
 function finishInvite(how){
