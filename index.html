@@ -205,6 +205,37 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .soundTip{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,.55);font-size:13px;font-weight:600;transition:opacity .2s,transform .2s;pointer-events:none}
 .soundTip.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 body.locked{overflow:hidden}
+/* ---------- Motion system: build-up reveals, word-by-word text, glass light ---------- */
+.wr .w{display:inline-block;white-space:pre;will-change:transform,opacity,filter}
+.wr:not(.in) .w{opacity:0}
+.wr.in .w{animation:wIn .72s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * var(--step,55ms) + var(--d,0ms))}
+@keyframes wIn{from{opacity:0;transform:translateY(.55em) rotate(2deg);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+.rv:not(.in){opacity:0}
+.rv.in{animation:rvIn .85s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0ms)}
+@keyframes rvIn{from{opacity:0;transform:translateY(24px) scale(.965);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+.rvPop.in{animation-name:rvPop;animation-timing-function:cubic-bezier(.2,.9,.3,1.35)}
+@keyframes rvPop{from{opacity:0;transform:scale(.6);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
+/* skeleton that fills in, like a screen being built */
+.skel{position:absolute;inset:0;z-index:6;background:#eceef3;pointer-events:none;transition:opacity .6s ease .05s;overflow:hidden}
+.skel i{position:absolute;background:#dde1e8;border-radius:999px}
+.skel::after{content:"";position:absolute;top:0;bottom:0;width:60%;left:-70%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);animation:skelSweep 1.15s ease-in-out infinite}
+@keyframes skelSweep{to{left:120%}}
+.reel.building video,.reel.building .poster{filter:blur(14px) saturate(.6);transform:scale(1.08)}
+.reel video,.reel .poster{transition:filter .8s cubic-bezier(.2,.8,.2,1),transform 1s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.reel.built .skel{opacity:0}
+.reel.building .creator,.reel.building .save,.reel.building .info,.reel.building .bandBlur{opacity:0;transform:translateY(8px)}
+.reel .creator,.reel .save,.reel .info{transition:opacity .5s ease .25s,transform .6s cubic-bezier(.2,.8,.2,1) .25s}
+/* glass catching the light: a sheen sweep, and a highlight that follows your finger */
+.sheen{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:3}
+.sheen::before{content:"";position:absolute;top:-30%;bottom:-30%;width:45%;left:-70%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.8),transparent);transform:skewX(-18deg)}
+.sheen.go::before{animation:sheenGo 1.2s cubic-bezier(.4,0,.2,1)}
+@keyframes sheenGo{to{left:135%}}
+.sheen::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .35s;background:radial-gradient(90px 90px at var(--mx,50%) var(--my,50%),rgba(255,255,255,.55),transparent 70%)}
+.lit .sheen::after{opacity:1}
+.glassPress{transition:transform .5s cubic-bezier(.2,.9,.3,1.6)}
+.glassPress.pressed{transform:scale(.94);transition-duration:.15s}
+@media (prefers-reduced-motion:reduce){.wr .w,.rv{opacity:1!important;animation:none!important;filter:none!important;transform:none!important}.skel{display:none}}
+
 /* ---------- Trip planning screens (Figma "Making trip plan" and "Plan Ready") ---------- */
 .screen{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:428px;height:100vh;height:100dvh;z-index:105;overflow:hidden;background:#cfe3c4}
 .screen[hidden]{display:none}
@@ -1342,7 +1373,7 @@ function showPoll(q, labels, where = "home"){
     const w = document.createElement("div"); w.className = "chatPoll msgIn"; w.appendChild(pollCard);
     msgsEl.appendChild(w); pollSlot.hidden = true; scrollChat();
   } else if (pollCard.parentElement !== pollSlot.querySelector(".pollPad")) pollSlot.querySelector(".pollPad").appendChild(pollCard);
-  pollQ.textContent = q;
+  pollQ.textContent = q; delete pollQ.dataset.wr; M.words(pollQ, 55, 450); M.play(pollQ);
   pollCard.classList.remove("spread", "lineGone", "final", "shimmer", "result"); document.getElementById("pollResult").hidden = true;
   pollCta.classList.remove("shine"); pollCta.tabIndex = -1;
   track.innerHTML = `<div class="bar"><i class="ghost"></i><i class="fill"></i></div>` +
@@ -1671,6 +1702,7 @@ function openMaking(dest){
   mkShape.querySelector(".spin").classList.add("wait"); mkRead.querySelector(".box").style.height = "";
   making.classList.remove("leaving"); planEl.hidden = true;
   making.hidden = false; document.body.classList.add("locked");
+  making.querySelectorAll(".mkHead p").forEach((p, i) => { M.words(p, 45, 200 + i * 500); M.play(p); });
   making.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
   watchSq(making);
   requestAnimationFrame(fitRead);
@@ -1803,6 +1835,8 @@ function syncChips(){
 function renderPlan(){
   prScroll.innerHTML = `${headerHTML()}<div class="prChips"></div><div class="prView" id="prView"></div>`;
   syncChips(); renderView(); watchSq(prScroll);
+  const h2 = prScroll.querySelector(".prInfo h2"); M.words(h2, 70, 250); M.play(h2);
+  prScroll.querySelectorAll(".crew > *").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateX(-10px) scale(.7)" }, { opacity: 1, transform: "none" }], { duration: 480, delay: 600 + i * 60, easing: "cubic-bezier(.2,.9,.3,1.4)", fill: "backwards" }));
 }
 function setView(v){
   closeMenus();
@@ -1879,7 +1913,9 @@ function bubble(who, text, anim = true){
   el.className = "msg" + (me ? " self" : "") + (anim ? " msgIn" : "");
   const b = `<div class="bubble" data-sq="16"><b>${who}</b><p>${esc(text)}</p></div>`, av = `<img src="${PEOPLE[who]}" alt="">`;
   el.innerHTML = me ? b + av : av + b;
-  msgsEl.appendChild(el); watchSq(el); scrollChat(); return el;
+  msgsEl.appendChild(el); watchSq(el); scrollChat();
+  if (anim){ const p = el.querySelector(".bubble p"); M.words(p, 28, 120); M.play(p); }
+  return el;
 }
 function scrollChat(){ requestAnimationFrame(() => msgsEl.scrollTo({ top: msgsEl.scrollHeight, behavior: "smooth" })); }
 async function typing(who, ms){
@@ -1969,6 +2005,8 @@ function openInvite(mode = "trip", pending = null){
   document.getElementById("invUrl").textContent = "sidequest.com/invite/" + (mode === "poll" ? "iuhjj.." : "ksp7d..");
   invScrim.hidden = false; invite.hidden = false; watchSq(invite);
   requestAnimationFrame(() => requestAnimationFrame(() => { invScrim.classList.add("show"); invite.classList.add("show"); }));
+  M.words(document.getElementById("invTitle"), 70, 200); M.play(document.getElementById("invTitle"));
+  invPeople.querySelectorAll(".invP").forEach((p, i) => p.animate([{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "none" }], { duration: 520, delay: 380 + i * 70, easing: "cubic-bezier(.2,.9,.3,1.4)", fill: "backwards" }));
 }
 function closeInvite(){ if (invite.hidden) return; invScrim.classList.remove("show"); invite.classList.remove("show");
   setTimeout(() => { if (!invite.classList.contains("show")){ invite.hidden = true; invScrim.hidden = true; } }, 450); }
@@ -2031,6 +2069,93 @@ invSend.addEventListener("click", () => finishInvite("send"));
 document.getElementById("invClose").addEventListener("click", closeInvite);
 invScrim.addEventListener("click", closeInvite);
 document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInvite(); closeMenus(); } });
+
+
+/* ---------- Motion system ---------- */
+const M = (() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // split an element's text into word spans so each word can rise in on its own
+  function words(el, step = 55, delay = 0){
+    if (!el) return el;
+    if (!el.dataset.wr){
+      const walk = node => [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3){
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(part => { if (!part) return;
+            if (/^\s+$/.test(part)) frag.appendChild(document.createTextNode(part));
+            else { const sp = document.createElement("span"); sp.className = "w"; sp.textContent = part; frag.appendChild(sp); } });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && !n.classList.contains("w")) walk(n);
+      });
+      walk(el); el.dataset.wr = 1;
+      el.querySelectorAll(".w").forEach((w, i) => w.style.setProperty("--i", i));
+    }
+    el.classList.add("wr"); el.style.setProperty("--step", step + "ms"); el.style.setProperty("--d", delay + "ms");
+    return el;
+  }
+  function play(el){ if (!el) return; el.classList.remove("in"); void el.offsetWidth; el.classList.add("in"); }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); e.target.dispatchEvent(new Event("revealed")); io.unobserve(e.target); } }), { threshold: .2 });
+  function reveal(el, delay = 0, cls = "rv"){ if (!el) return; el.classList.add(cls); if (cls !== "rv") el.classList.add("rv"); el.style.setProperty("--d", delay + "ms"); io.observe(el); return el; }
+  function onView(el, step, delay){ words(el, step, delay); io.observe(el); }
+  // skeleton build-up on a reel card
+  function build(reel, wait){
+    if (reel.querySelector(".skel")) return;
+    const sk = document.createElement("div"); sk.className = "skel";
+    sk.innerHTML = '<i style="left:12px;top:12px;width:32px;height:32px"></i><i style="left:52px;top:21px;width:38%;height:12px"></i><i style="left:16px;bottom:52px;width:62%;height:16px;border-radius:8px"></i><i style="left:16px;bottom:16px;width:64px;height:22px"></i><i style="left:90px;bottom:16px;width:72px;height:22px"></i>';
+    reel.appendChild(sk); reel.classList.add("building");
+    const go = () => setTimeout(() => { reel.classList.remove("building"); reel.classList.add("built"); setTimeout(() => sk.remove(), 900); }, wait);
+    return go;
+  }
+  function sheen(el){ if (!el) return; let s = el.querySelector(":scope > .sheen"); if (!s){ s = document.createElement("i"); s.className = "sheen"; el.appendChild(s); } s.classList.remove("go"); void s.offsetWidth; s.classList.add("go"); }
+  function lightUp(el){
+    if (!el) return; sheen(el); el.querySelector(":scope > .sheen").classList.remove("go");
+    const set = e => { const r = el.getBoundingClientRect(); el.style.setProperty("--mx", (e.clientX - r.left) + "px"); el.style.setProperty("--my", (e.clientY - r.top) + "px"); };
+    el.addEventListener("pointerdown", e => { set(e); el.classList.add("lit"); });
+    el.addEventListener("pointermove", e => { if (el.classList.contains("lit")) set(e); });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(t => el.addEventListener(t, () => el.classList.remove("lit")));
+  }
+  function press(el){ if (!el) return; el.classList.add("glassPress");
+    el.addEventListener("pointerdown", () => el.classList.add("pressed"));
+    ["pointerup", "pointerleave", "pointercancel"].forEach(t => el.addEventListener(t, () => el.classList.remove("pressed"))); }
+  return { words, play, reveal, onView, build, sheen, lightUp, press, reduce };
+})();
+
+// Home: the screen builds itself up, like the reference reel
+(function homeIntro(){
+  if (M.reduce) return;
+  const content = document.querySelector(".phone .content");
+  content.animate([{ transform: "scale(1.035)", filter: "blur(6px)", opacity: 0 }, { transform: "none", filter: "blur(0)", opacity: 1 }], { duration: 900, easing: "cubic-bezier(.2,.8,.2,1)" });
+  M.reveal(document.querySelector(".logo"), 120);
+  M.reveal(document.querySelector(".aiBtn"), 260, "rvPop");
+  M.reveal(document.querySelector(".me"), 340, "rvPop");
+  M.onView(document.querySelector("h1"), 70, 300);
+  document.querySelectorAll(".secHead h2").forEach(h => M.onView(h, 45, 0));
+  document.querySelectorAll(".secHead a").forEach(a => M.reveal(a, 350));
+  // trending: centre card first, then the sides; each one fills in from a skeleton
+  const order = tSlots.map((s, i) => ({ s, d: Math.abs(wrap(i - pos)) })).sort((a, b) => a.d - b.d);
+  order.forEach(({ s, d }) => { const reel = s.querySelector(".reel"); if (d > 1.5) return;
+    reel.classList.add("rv"); reel.style.setProperty("--d", (420 + d * 140) + "ms");
+    const go = M.build(reel, 900 + d * 220); requestAnimationFrame(() => { reel.classList.add("in"); go(); }); });
+  // cafe row: cards cascade in from the right when the row scrolls into view
+  [...document.querySelectorAll("#cafes .slot")].forEach((s, i) => {
+    const reel = s.querySelector(".reel"), go = M.build(reel, 650 + i * 160);
+    M.reveal(s, i * 110); s.addEventListener("revealed", go, { once: true }); });
+  const dw = document.querySelector(".deckWrap"); M.reveal(dw, 0);
+  dSlots.slice(0, 1).forEach(s => { const go = M.build(s.querySelector(".reel"), 700); dw.addEventListener("revealed", go, { once: true }); });
+  // tab bar glides up, then light sweeps across the glass
+  const tb = document.querySelector(".tabbar");
+  tb.animate([{ transform: "translateY(40px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 800, delay: 500, easing: "cubic-bezier(.2,.9,.3,1.15)", fill: "backwards" });
+  setTimeout(() => { M.sheen(document.querySelector(".capsule")); }, 1150);
+  setTimeout(() => { M.sheen(document.querySelector(".aiTab .disc")); M.sheen(document.querySelector(".aiBtn")); }, 1450);
+  // the AI button catches the light again every few seconds
+  setInterval(() => { if (!document.hidden) M.sheen(document.querySelector(".aiTab .disc")); }, 7000);
+})();
+// glass reacts to your finger everywhere
+[".capsule", ".aiTab .disc", ".aiBtn"].forEach(q => document.querySelectorAll(q).forEach(M.lightUp));
+document.querySelectorAll(".aiBtn,.aiTab,.save,.tab").forEach(M.press);
+// the globe drifts a little slower than the page as you scroll
+(function parallax(){ if (M.reduce) return; const mf = document.querySelector(".mapfade"); let tk = false;
+  addEventListener("scroll", () => { if (tk) return; tk = true; requestAnimationFrame(() => { mf.style.transform = `translateY(${Math.min(200, scrollY * .35)}px)`; tk = false; }); }, { passive: true }); })();
 
 /* ---------- Create a Poll sheet ---------- */
 const sheet = document.getElementById("pollSheet"), scrim = document.getElementById("pollScrim");
@@ -2110,6 +2235,8 @@ function openPoll(target){
   scrim.hidden = false; sheet.hidden = false;
   addOption(); addOption(); growQ(); fitSheet(true);
   requestAnimationFrame(() => requestAnimationFrame(() => { scrim.classList.add("show"); sheet.classList.add("show"); }));
+  M.words(document.getElementById("pollTitle"), 70, 180); M.play(document.getElementById("pollTitle"));
+  M.words(document.querySelector(".sheetTitle p"), 30, 380); M.play(document.querySelector(".sheetTitle p"));
   document.body.classList.add("locked");
   history.pushState({poll: true}, "", "#poll");
 }
