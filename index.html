@@ -236,6 +236,12 @@ body.locked{overflow:hidden}
 .npHero::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .75px #fff;z-index:2;pointer-events:none}
 .npTmp{position:absolute;left:0;right:0;z-index:7;height:24px;pointer-events:none}
 .np.busy{pointer-events:none}
+/* Floating reactions: swap --fr-size, or the img rule, for custom art */
+.fr-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:6;border-radius:inherit}
+.fr-item{position:absolute;left:0;bottom:-4px;font-size:var(--fr-size,28px);line-height:1;transform-origin:50% 100%;will-change:transform,opacity;user-select:none;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;opacity:0}
+.fr-item img{width:1em;height:1em;display:block;object-fit:contain}
+
 .npSW{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.3,.8,.3,1)}
 .npSW>div{min-height:0;overflow:hidden}
 .np.showV .npSW{grid-template-rows:1fr}
@@ -2151,39 +2157,57 @@ function springAnim(el, from, to, fmt, opts = {}, extra = {}){
   return el.animate(vals.map(v => ({ transform: fmt(v) })), { duration: ms, easing: "linear", ...extra });
 }
 
-/* ---------- Live-stream style emoji float: the picked flag drifts up from the bottom, sways and fades ---------- */
-function emojiFloat(host, emoji, { count = 16, spawn = 950, cx = null } = {}){
-  const cv = document.createElement("canvas"), dpr = Math.min(3, devicePixelRatio || 1), W = host.clientWidth, H = host.clientHeight;
-  cv.className = "npFx"; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; host.appendChild(cv);
-  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-  const S = 128, sprite = document.createElement("canvas"); sprite.width = sprite.height = S; const sc = sprite.getContext("2d");
-  sc.font = `${S * .78}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sc.textAlign = "center"; sc.textBaseline = "middle"; sc.fillText(emoji, S / 2, S / 2 + 4);
-  const mid = cx == null ? W / 2 : cx, P = [];
-  for (let i = 0; i < count; i++) P.push({
-    born: (i / count) * spawn + Math.random() * 60,
-    life: 1500 + Math.random() * 450,
-    x: mid + (Math.random() - .5) * W * .55,
-    size: 24 + Math.random() * 12,
-    amp: 8 + Math.random() * 12, freq: 1 + Math.random() * .7, ph: Math.random() * 6.28,
-    rise: H + 40 + Math.random() * 30 });
-  const ease = t => 1 - Math.pow(1 - t, 1.6);
-  const t0 = performance.now(), end = Math.max(...P.map(p => p.born + p.life));
-  (function frame(now){
-    const t = now - t0; ctx.clearRect(0, 0, W, H);
-    for (const p of P){
-      const k = (t - p.born) / p.life; if (k < 0 || k >= 1) continue;
-      const sec = (t - p.born) / 1000;
-      const y = H + 16 - p.rise * ease(k), x = p.x + Math.sin(sec * p.freq * 6.28 + p.ph) * p.amp * Math.min(1, k * 3);
-      // pop in, then settle; fade over the last stretch
-      const pop = k < .12 ? .4 + (k / .12) * .75 : k < .22 ? 1.15 - ((k - .12) / .1) * .15 : 1;
-      const a = k < .06 ? k / .06 : k > .5 ? Math.max(0, 1 - (k - .5) / .5) : 1;
-      const sz = p.size * pop;
-      ctx.globalAlpha = a; ctx.drawImage(sprite, x - sz / 2, y - sz / 2, sz, sz);
+/* ---------- Floating reactions (live stream style) ----------
+   spawnEmoji(type, container?) drops one reaction at the bottom of the container.
+   type can be an emoji ("🇹🇭") or an image URL ("assets/heart.svg"). Looks are set in CSS (.fr-*), motion in FR_CONFIG. */
+const FR_CONFIG = {
+  spread: .6,              // share of the container width reactions can start from (centred)
+  scale: [.8, 1.25],       // size multiplier range on top of --fr-size
+  duration: [1600, 2300],  // ms to travel up and fade
+  rise: [.85, 1.1],        // how far up they travel, as a share of container height (+ their own size)
+  sway: [6, 16],           // side to side amount, px
+  freq: [.9, 1.6],         // side to side speed, swings per second
+  fadeFrom: .55            // start fading at this share of the journey
+};
+const Reactions = (() => {
+  const live = new Set(); let raf = 0, fallback = null;
+  const rnd = ([a, b]) => a + Math.random() * (b - a);
+  const isImg = t => /^(https?:|data:|\/|\.{0,2}\/)|\.(png|svg|jpe?g|webp|gif)(\?.*)?$/i.test(t);
+  function layerFor(host){
+    let layer = host.querySelector(":scope > .fr-layer");
+    if (!layer){ layer = document.createElement("div"); layer.className = "fr-layer"; layer.setAttribute("aria-hidden", "true"); host.appendChild(layer); }
+    return layer;
+  }
+  function spawn(type, host = fallback || document.body){
+    const layer = layerFor(host), W = layer.clientWidth, H = layer.clientHeight;
+    const el = document.createElement("span"); el.className = "fr-item";
+    if (isImg(type)){ const im = new Image(); im.src = type; im.alt = ""; el.appendChild(im); } else el.textContent = type;
+    layer.appendChild(el);
+    const size = el.offsetHeight || 28;
+    const p = { el, layer, t0: performance.now(), dur: rnd(FR_CONFIG.duration), scale: rnd(FR_CONFIG.scale),
+      x: W / 2 + (Math.random() - .5) * W * FR_CONFIG.spread - size / 2,
+      rise: H * rnd(FR_CONFIG.rise) + size, sway: rnd(FR_CONFIG.sway), freq: rnd(FR_CONFIG.freq), ph: Math.random() * Math.PI * 2 };
+    live.add(p); if (!raf) raf = requestAnimationFrame(tick);
+    return el;
+  }
+  function tick(now){
+    for (const p of live){
+      const k = (now - p.t0) / p.dur;
+      if (k >= 1 || !p.layer.isConnected){ p.el.remove(); live.delete(p); if (p.layer.isConnected && !p.layer.children.length) p.layer.remove(); continue; }
+      const up = p.rise * (1 - Math.pow(1 - k, 1.7));                                    // eases out as it nears the top
+      const side = Math.sin((now - p.t0) / 1000 * p.freq * Math.PI * 2 + p.ph) * p.sway * Math.min(1, k * 4);
+      const pop = k < .1 ? .3 + k / .1 * .85 : k < .2 ? 1.15 - (k - .1) / .1 * .15 : 1;   // pops in, settles
+      const op = k < .05 ? k / .05 : k > FR_CONFIG.fadeFrom ? 1 - (k - FR_CONFIG.fadeFrom) / (1 - FR_CONFIG.fadeFrom) : 1;
+      p.el.style.transform = `translate3d(${p.x + side}px,${-up}px,0) scale(${p.scale * pop})`;
+      p.el.style.opacity = op.toFixed(3);
     }
-    ctx.globalAlpha = 1;
-    if (t < end + 30) requestAnimationFrame(frame); else cv.remove();
-  })(t0);
-}
+    raf = live.size ? requestAnimationFrame(tick) : 0;
+  }
+  // a short stream of reactions, like a burst of taps
+  function stream(type, host, { count = 16, over = 1000 } = {}){ for (let i = 0; i < count; i++) setTimeout(() => spawn(type, host), (i / count) * over + Math.random() * 50); }
+  return { spawn, stream, setContainer: el => { fallback = el; } };
+})();
+const spawnEmoji = (type, container) => Reactions.spawn(type, container);
 
 /* ---------- Poll card v2 ---------- */
 function showPoll(q, labels, where = "home"){
@@ -2260,7 +2284,7 @@ function showPoll(q, labels, where = "home"){
     });
 
     // 3. the picked flag floats up behind the tile, like reactions on a live stream
-    at(560, () => emojiFloat(np, splitLabel(poll.opts[i].label)[1] || "🎉"));
+    at(560, () => Reactions.stream(splitLabel(poll.opts[i].label)[1] || "🎉", np, { count: 16, over: 1000 }));
 
     // 4. the tile lifts, the friends who picked it drop in, then you slide in from the right and the row bounces
     const tmp = document.createElement("div"); tmp.className = "npV npTmp"; tmp.style.top = "155px";
