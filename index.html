@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<script>
+/* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
+window.BUILD = "60";
+(function(){
+  function check(){
+    fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
+      v = (v || "").trim(); if (!v || v === window.BUILD) return;
+      let n = 0; try { n = +sessionStorage.getItem("sqReload" + v) || 0; sessionStorage.setItem("sqReload" + v, n + 1); } catch (e) {}
+      if (n < 2) location.replace(location.pathname + "?v=" + v + location.hash);
+    }).catch(() => {});
+  }
+  check();
+  addEventListener("pageshow", e => { if (e.persisted) check(); });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") check(); });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sidequest Home</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -546,7 +563,9 @@ b.grad2{font-weight:700}
 #plan .prBtns,#plan .fabMenu .pill{transition:translate .5s cubic-bezier(.2,.9,.25,1)}
 #plan .bigSheet:not(.isFull) .prBtns,#plan .bigSheet:not(.isFull) .fabMenu .pill{translate:0 calc(-1 * var(--dy,180px))}
 #plan .bigSheet.drag .prBtns{transition:none}
-#plan .prScroll{overflow-x:hidden;touch-action:pan-y}
+#plan{overflow:hidden}
+#plan .prScroll{overflow-x:hidden;overscroll-behavior:none;touch-action:pan-y}
+#plan .prScroll>*{max-width:100%}
 #plan .prChips,#plan .spots{touch-action:pan-x pan-y}
 .screen{overscroll-behavior:none}
 .prGrab{position:absolute;left:0;right:0;top:0;height:26px;z-index:5;cursor:grab;touch-action:none}
@@ -779,6 +798,10 @@ b.grad2{font-weight:700}
 .pCard>.edge{position:absolute;inset:0;background:#ececec;pointer-events:none}
 .flight .box{padding:4px;align-items:stretch}
 .flTop{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 4px;gap:8px}
+.flTop>div:first-child{flex:1;min-width:0}
+.fRoute,.fPrice{overflow:hidden;text-overflow:ellipsis}
+.fRoute .dt{overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media (max-width:360px){.fPrice{font-size:17px}.bookBtn{padding:8px 16px}}
 .fRoute{display:flex;align-items:center;gap:8px;font-weight:700;font-size:12px;letter-spacing:.05px;color:#138cff;white-space:nowrap}
 .fRoute .r{display:flex;align-items:center;gap:6px}
 .fRoute img{width:16px;height:16px}
@@ -2284,6 +2307,7 @@ chatPlus.addEventListener("click", () => { const o = !chatMenu.classList.contain
 prScroll.addEventListener("scroll", () => { if (!prSheet.classList.contains("isFull") && prScroll.scrollTop > 12) setFull(true); }, { passive: true });
 prScroll.addEventListener("wheel", e => { if (prSheet.classList.contains("isFull") && prScroll.scrollTop <= 0 && e.deltaY < -40) setFull(false); }, { passive: true });
 let pull = null;
+prScroll.addEventListener("scroll", () => { if (prScroll.scrollLeft) prScroll.scrollLeft = 0; }, { passive: true });
 prScroll.addEventListener("touchstart", e => { pull = prScroll.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
 prScroll.addEventListener("touchmove", e => { if (pull !== null && e.touches[0].clientY - pull > 70 && prSheet.classList.contains("isFull") && view === "overview"){ pull = null; setFull(false); } }, { passive: true });
 document.getElementById("prGrab").addEventListener("pointerdown", e => {
