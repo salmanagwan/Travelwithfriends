@@ -1597,9 +1597,9 @@ const mkList = document.getElementById("mkList"), mkRead = document.getElementBy
 const TICK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 const CREW = [
   { n: "Isha",  p: "assets/friend-1.jpg", prefs: [["🏖️","Beaches"],["🛕","Temples"],["📸","Photo spots"]], saved: [["assets/spot-temple.jpg","🛕"],["posters/sea-breeze.jpg","🏖️"],["posters/magical-cafes.jpg","📸"]] },
-  { n: "Priya", p: "assets/friend-5.jpg", prefs: [["☕","Cafe hopping"],["🛍️","Night markets"],["🧘","Slow mornings"]], saved: [["posters/hidden-cafe.jpg","☕"],["assets/spot-cafe.jpg","☕"],["posters/club-green-mango.jpg","🛍️"]] },
+  { n: "Priya", p: "assets/friend-5.jpg", prefs: [["☕","Cafe hopping"],["🛍️","Night markets"],["🧘","Slow mornings"]], saved: [["posters/hidden-cafe.jpg","☕"],["assets/spot-cafe.jpg","☕"],["posters/club-green-mango.jpg","🛍️"],["posters/magical-cafes.jpg","☕"],["assets/spot-beachcafe.jpg","🧘"],["posters/samui-cafes.jpg","☕"],["posters/elephant-cafe.jpg","🐘"]] },
   { n: "Aman",  p: "assets/friend-2.jpg", prefs: [["🤿","Snorkelling"],["🍜","Street food"],["🌅","Sunsets"]], saved: [["posters/blue-ocean.jpg","🤿"],["posters/foodie.jpg","🍜"],["posters/date-spot.jpg","🌅"]] },
-  { n: "Arpit", p: "assets/friend-4.jpg", prefs: [["🎉","Nightlife"],["🛵","Scooter rides"],["🍹","Beach bars"]], saved: [["posters/club-samui-nights.jpg","🎉"],["posters/fire-show.jpg","🔥"],["posters/babou.jpg","🍹"]] },
+  { n: "Arpit", p: "assets/friend-4.jpg", prefs: [["🎉","Nightlife"],["🛵","Scooter rides"],["🍹","Beach bars"]], saved: [["posters/club-samui-nights.jpg","🎉"],["posters/fire-show.jpg","🔥"],["posters/babou.jpg","🍹"],["posters/club-ibiza.jpg","🎉"],["posters/club-oxa.jpg","🎉"],["posters/wildchild.jpg","🍹"]] },
   { n: "your",  p: "assets/poll-me.jpg",  prefs: [["🌴","Islands"],["☕","Cafes"],["🛕","Temples"]], saved: [["posters/elephant-cafe.jpg","🐘"],["assets/spot-beachcafe.jpg","☕"],["posters/hero.jpg","🌴"]] }
 ];
 let runId = 0;
@@ -1621,6 +1621,7 @@ function mkCardFor(c, kind){
   const who = c.n === "your" ? "your" : c.n + "’s";
   item.innerHTML = `<div class="mkRow"><img class="av" src="${c.p}" alt=""><span>Collecting ${who} ${kind}</span><i class="tick">${TICK}</i></div>` +
     (kind === "preferences" ? `<div class="mkChips"></div>` : `<div class="mkTiles"></div>`);
+  if (kind === "collections") item.querySelector(".mkRow span").textContent = `Collecting ${who} collections`;
   mkList.appendChild(item); watchSq(item); enter(item, 60); fitRead();
   return item;
 }
@@ -1641,17 +1642,18 @@ async function runMaking(id){
     await wait(200); item.classList.add("got"); haptic(6);
     await wait(220);
   }
-  // everyone's bookmarks: saved spots slide in from the left, each with its category
+  // everyone's collections: saved spots slide in from the left, each with its category
   for (const c of CREW){
     if (!alive()) return;
-    const item = mkCardFor(c, "bookmarks"), row = item.querySelector(".mkTiles");
+    const item = mkCardFor(c, "collections"), row = item.querySelector(".mkTiles");
     await wait(420);
     for (const [src, e] of c.saved){
       if (!alive()) return;
       const t = document.createElement("div"); t.className = "tile"; t.dataset.sq = "12";
       t.innerHTML = `<img src="${src}" alt=""><b>${e}</b>`;
       row.appendChild(t); watchSq(t); enter(t, -30); fitRead();
-      await wait(260);
+      row.scrollTo({ left: row.scrollWidth, behavior: "smooth" });
+      await wait(c.saved.length > 3 ? 210 : 260);
     }
     await wait(200); item.classList.add("got"); haptic(6);
     await wait(220);
