@@ -420,7 +420,7 @@ body.locked{overflow:hidden}
 .invLink button{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;transition:background .2s}
 .invLink button:active{background:#f2f2f2}
 .invLink button img{width:24px;height:24px}
-.invLink.copied span{color:#2fbf71}
+.invLink button:focus,.invLink button:focus-visible{outline:0}
 .invOr{width:324px;max-width:100%;flex:none;display:flex;align-items:center;gap:12px;font-weight:600;font-size:20px;letter-spacing:-1px;color:#c4c4c4}
 .invOr i{flex:1;height:0;border-top:1.8px dashed #c4c4c4}
 .invFind{width:100%;flex:none;display:flex;flex-direction:column;gap:24px}
@@ -1950,8 +1950,7 @@ invResults.addEventListener("click", e => { const b = e.target.closest("button[d
 document.getElementById("invCopy").addEventListener("click", () => {
   const url = "https://" + document.getElementById("invUrl").textContent.replace("..", "");
   try { navigator.clipboard && navigator.clipboard.writeText(url); } catch(_){}
-  const row = document.querySelector(".invLink"); row.classList.add("copied"); haptic(8); say("Invite link copied");
-  setTimeout(() => row.classList.remove("copied"), 1400);
+  banner(invMode === "poll" ? "Poll invite copied" : "Invite link copied");
 });
 document.getElementById("invShare").addEventListener("click", async () => {
   const url = "https://" + document.getElementById("invUrl").textContent.replace("..", "");
