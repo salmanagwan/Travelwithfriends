@@ -117,6 +117,35 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .views img{width:14px;height:14px}
 
 
+
+/* ---------- My Trips (Figma 253:61533) ---------- */
+.tripsView{position:relative;z-index:1;min-height:100vh;min-height:100dvh;background:#fff;padding-bottom:140px}
+.tripsView[hidden]{display:none}
+.phone>.content[hidden]{display:none}
+.tvBody{padding:28px 16px 0}
+.tvTitle{padding-left:8px;text-align:left;font-weight:700;font-size:24px;line-height:normal;letter-spacing:0;color:#686868}
+.tvList{display:flex;flex-direction:column;gap:20px;margin-top:16px}
+.tvCard{position:relative;display:flex;gap:12px;padding:8px 4px 8px 8px;border:.7px solid #ececec;border-radius:20px;box-shadow:0 0 4px rgba(0,0,0,.1);background:#fff;text-align:left;width:100%}
+.tvCard:active{transform:scale(.985)}
+.tvThumb{width:84.6px;height:100px;border-radius:13.3px;overflow:hidden;flex:none;background:#000}
+.tvThumb img{width:100%;height:100%;object-fit:cover;display:block}
+.tvInfo{flex:1;min-width:0;height:100px;display:flex;flex-direction:column;justify-content:space-between}
+.tvInfo h3{font-weight:700;font-size:18px;letter-spacing:-.36px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:34px}
+.tvBadges{display:flex;gap:8px;margin-top:9px;overflow:hidden}
+.tvBadges span{display:flex;align-items:center;gap:4px;height:24px;padding:0 7px;border-radius:8px;background:#f2f2f2;font-weight:500;font-size:12px;color:#686868;white-space:nowrap}
+.tvBadges img{width:16px;height:16px}
+.tvBadges .soon{background:rgba(245,161,45,.12);color:#ec8e0b}
+.tvBadges .done{background:rgba(47,191,113,.12);color:#2fbf71}
+.tvCrew{display:flex;align-items:center}
+.tvCrew i{width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center;margin-right:-8.75px;position:relative}
+.tvCrew i img{width:24.5px;height:24.5px;border-radius:50%;object-fit:cover}
+.tvMore{position:absolute;right:9px;top:8px;width:24px;height:24px;border-radius:50%;background:#f2f2f2;display:grid;place-items:center}
+.tvMore img{width:16px;height:16px}
+.tvAdd{margin-top:24px;width:100%;height:58px;border:1.5px dashed #969696;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:500;font-size:20px;color:#6b6f76;background:#fff}
+.tvAdd img{width:24px;height:24px}
+.tvCard.fresh{animation:tvIn .7s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes tvIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
+
 /* ---------- Landing (Figma 256:65361) ---------- */
 .deco{position:absolute;right:0;width:283px;height:380px;pointer-events:none;z-index:0}
 .deco img{width:100%;height:100%;display:block}
@@ -967,11 +996,22 @@ b.grad2{font-weight:700}
       </section>
     </div>
   </div>
+  <section class="tripsView" id="tripsView" hidden aria-label="My Trips">
+    <div class="top">
+      <div class="status" aria-hidden="true"><p>9:41</p><div class="dev"><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="25" height="17" alt=""></div></div>
+      <header class="header"><div class="logo"><img src="assets/logo-header.svg" alt="Sidequest"></div><div class="actions"><img class="me" src="assets/avatar.png" alt="Your profile"></div></header>
+    </div>
+    <div class="tvBody">
+      <h1 class="tvTitle">My Trips</h1>
+      <div class="tvList" id="tvList"></div>
+      <button type="button" class="tvAdd" data-soon="New trip"><img src="assets/plus-grey.svg" alt="">Add new trip</button>
+    </div>
+  </section>
   <nav class="navWrap" aria-label="Main">
     <div class="tabbar">
       <div class="capsule glass">
-        <button class="tab" aria-current="page"><img src="assets/tab-home.svg" alt=""><span>Home</span></button>
-        <button class="tab" data-soon="Trips"><img src="assets/tab-trips.svg" alt=""><span>Trips</span></button>
+        <button class="tab" data-tab="home" aria-current="page"><img src="assets/tab-home.svg" data-on="assets/tab-home.svg" data-off="assets/tab-home-off.svg" alt=""><span>Home</span></button>
+        <button class="tab" data-tab="trips"><img src="assets/tab-trips.svg" data-on="assets/tab-trips-on.svg" data-off="assets/tab-trips.svg" alt=""><span>Trips</span></button>
         <button class="tab" data-soon="Collection"><img src="assets/tab-collection.svg" alt=""><span>Collection</span></button>
         <button class="tab" data-soon="Explore"><img src="assets/tab-explore.svg" alt=""><span>Explore</span></button>
       </div>
@@ -1422,7 +1462,7 @@ function fullCard(x){
   el.querySelector(".backBtn").addEventListener("click", e => { e.stopPropagation(); closeReel(); });
   const fs = el.querySelector(".fSave");
   fs.addEventListener("click", e => { e.stopPropagation(); fs.setAttribute("aria-pressed", fs.getAttribute("aria-pressed") === "true" ? "false" : "true"); });
-  el.querySelector(".fCta").addEventListener("click", e => { e.stopPropagation(); toast.textContent = "Trip planning is coming next"; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("show"), 1600); });
+  el.querySelector(".fCta").addEventListener("click", e => { e.stopPropagation(); haptic(14); closeViewerForTrip(); setTimeout(() => openMaking("Thailand", { solo: true }), 280); });
   el.addEventListener("click", e => {          // tap the video to toggle sound
     if (e.target.closest("button")) return;
     vMuted = !vMuted; vScroll.querySelectorAll("video").forEach(x => x.muted = vMuted);
@@ -1455,6 +1495,17 @@ function openReel(list, index, fromEl){
       {duration: 460, easing: "cubic-bezier(.2,.9,.2,1)"});
   }
   history.pushState({reel:true}, "", "#reel");
+}
+// leaving the reel to build a trip: fade the viewer out and hand over to the plan screens
+function closeViewerForTrip(){
+  if (viewer.hidden) return;
+  viewer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: "ease-in", fill: "forwards" }).onfinish = () => {
+    viewer.hidden = true; viewer.getAnimations().forEach(a => a.cancel());
+    vIO && vIO.disconnect(); cancelAnimationFrame(vRaf);
+    vScroll.querySelectorAll("video").forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
+    vScroll.innerHTML = "";
+  };
+  if (location.hash === "#reel") history.replaceState(null, "", location.pathname + location.search);
 }
 function closeReel(fromPop){
   if (viewer.hidden) return;
@@ -1779,6 +1830,8 @@ const CREW = [
   { n: "your",  p: "assets/poll-me.jpg",  prefs: [["🌴","Islands"],["☕","Cafes"],["🛕","Temples"]], saved: [["posters/elephant-cafe.jpg","🐘"],["assets/spot-beachcafe.jpg","☕"],["posters/hero.jpg","🌴"]] }
 ];
 let runId = 0;
+let SOLO = false;          // a trip made from a reel on your own: only your preferences, only you in the group
+let LAST_TRIP = null;      // the trip you just made, shown on top of My Trips
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
 // Card 1 grows with its content up to 360px, then its list scrolls under the sticky heading
@@ -1804,8 +1857,9 @@ function mkCardFor(c, kind){
 async function runMaking(id){
   const alive = () => id === runId && !making.hidden;
   await wait(450);
+  const crew = SOLO ? CREW.filter(c => c.n === "your") : CREW;
   // everyone's preferences: chips slide in from the left
-  for (const c of CREW){
+  for (const c of crew){
     if (!alive()) return;
     const item = mkCardFor(c, "preferences");
     await wait(480);
@@ -1819,7 +1873,7 @@ async function runMaking(id){
     await wait(220);
   }
   // everyone's collections: saved spots slide in from the left, each with its category
-  for (const c of CREW){
+  for (const c of crew){
     if (!alive()) return;
     const item = mkCardFor(c, "collections"), row = item.querySelector(".mkTiles");
     await wait(420);
@@ -1844,8 +1898,14 @@ async function runMaking(id){
   await wait(450); if (!alive()) return;
   showPlan(true);
 }
-function openMaking(dest){
+function openMaking(dest, opts = {}){
   runId++;
+  SOLO = !!opts.solo;
+  LAST_TRIP = { solo: SOLO, at: Date.now() };
+  const heads = making.querySelectorAll(".mkHead p"), desc = making.querySelector("#mkShape .desc");
+  heads[0].textContent = SOLO ? "Reading your preferences and Collections" : "Reading all of your friends preferences and Collections";
+  delete heads[0].dataset.wr;
+  if (desc) desc.textContent = SOLO ? "While keeping your preferences and collections in mind, keeping each day relaxed, not packed" : "While keeping everyones preferences and collections in mind, keeping each day relaxed, not packed";
   mkList.innerHTML = ""; mkRead.className = "mkCard"; mkShape.className = "mkCard mkShape wait";
   mkShape.querySelector(".spin").classList.add("wait"); mkRead.querySelector(".box").style.height = "";
   making.classList.remove("leaving"); planEl.hidden = true;
@@ -1859,13 +1919,56 @@ function openMaking(dest){
 }
 function closePlanScreens(fromPop){
   if (making.hidden && planEl.hidden) return;
+  const fromPlan = !planEl.hidden;
   runId++; making.hidden = true; planEl.hidden = true;
+  if (fromPlan) showTab("trips", true);
   if (viewer.hidden && sheet.hidden) document.body.classList.remove("locked");
   if (!fromPop && location.hash === "#plan") history.back();
 }
 document.querySelectorAll(".screen [data-close]").forEach(b => b.addEventListener("click", () => closePlanScreens()));
 window.addEventListener("popstate", () => { if (location.hash !== "#plan" && location.hash !== "#poll") closePlanScreens(true); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && sheet.hidden && invite.hidden) closePlanScreens(); });
+
+
+/* ---------- Tabs: Home and My Trips ---------- */
+const tripsView = document.getElementById("tripsView"), homeContent = document.querySelector(".phone > .content"), tvList = document.getElementById("tvList");
+const daysTo = d => Math.max(0, Math.round((d - new Date(new Date().toDateString())) / 864e5));
+function tripCard(t, fresh){
+  const crew = t.crew.map((p, i) => `<i style="z-index:${9 - i}"><img src="${PEOPLE[p]}" alt="${p}"></i>`).join("");
+  const status = t.done ? `<span class="done">Completed</span>` : `<span class="soon">In ${t.inDays} days</span>`;
+  return `<button type="button" class="tvCard${fresh ? " fresh" : ""}" data-trip="${t.id}">
+      <span class="tvThumb"><img src="${t.img}" alt="" style="object-position:${t.pos || "center"}"></span>
+      <span class="tvInfo"><span><h3>${esc(t.title)}</h3><span class="tvBadges"><span><img src="assets/cal-grey.svg" alt="">${t.days} days</span><span><img src="assets/pin-grey.svg" alt="">${t.spots} spots</span>${status}</span></span>
+        <span class="tvCrew">${crew}</span></span>
+      <span class="tvMore" aria-label="More"><img src="assets/more-dots.svg" alt=""></span>
+    </button>`;
+}
+function renderTrips(){
+  const mine = { id: "plan", title: "Koh Samui, Phuket", days: DAYS.length, spots: totalSpots(), inDays: daysTo(TRIP.start), img: "assets/trip-thai.jpg", pos: "center 35%",
+    crew: LAST_TRIP && LAST_TRIP.solo ? ["You"] : ["You", "Isha", "Aman", "Priya"] };
+  const others = [
+    { id: "japan", title: "Japan 5 day trip in osaka", days: 5, spots: 14, inDays: 12, img: "assets/trip-japan.jpg", crew: ["You", "Isha", "Aman", "Priya"] },
+    { id: "india", title: "India 7 day trip in Mumbai", days: 7, spots: 21, done: true, img: "assets/trip-india.jpg", pos: "right center", crew: ["You", "Isha", "Aman", "Priya"] }
+  ];
+  const fresh = LAST_TRIP && Date.now() - LAST_TRIP.at < 10 * 60 * 1000 && !LAST_TRIP.shown;
+  tvList.innerHTML = tripCard(mine, fresh) + others.map(t => tripCard(t)).join("");
+  if (LAST_TRIP) LAST_TRIP.shown = true;
+}
+function showTab(name, fromPlan){
+  const trips = name === "trips";
+  if (trips) renderTrips();
+  tripsView.hidden = !trips; homeContent.hidden = trips;
+  document.querySelectorAll(".navWrap .tab[data-tab]").forEach(b => { const on = b.dataset.tab === name; b.toggleAttribute("aria-current", on); if (on) b.setAttribute("aria-current", "page");
+    const im = b.querySelector("img"); im.src = on ? im.dataset.on : im.dataset.off; });
+  scrollTo(0, 0);
+  if (trips) tripsView.querySelectorAll(".tvCard").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 420, delay: 60 * i, easing: "cubic-bezier(.2,.9,.3,1)", fill: "backwards" }));
+  if (!fromPlan) haptic(6);
+}
+document.querySelectorAll(".navWrap .tab[data-tab]").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+tvList.addEventListener("click", e => { const c = e.target.closest(".tvCard"); if (!c) return;
+  if (e.target.closest(".tvMore")) { say("Trip options are coming next"); return; }
+  if (c.dataset.trip === "plan") { document.body.classList.add("locked"); if (location.hash !== "#plan") history.pushState({ plan: true }, "", "#plan"); showPlan(); }
+  else say("This trip opens in the full app"); });
 
 /* ---------- Plan Ready ---------- */
 const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1911,7 +2014,7 @@ function flightHTML(f){
 }
 const spotTile = st => `<div class="spot" data-sq="12.8"><img src="${st.img}" alt="${esc(st.n)}" loading="lazy"><b>${st.e}</b></div>`;
 function headerHTML(){
-  const avs = ["You", "Isha", "Priya", "Aman", "Arpit"];
+  const avs = SOLO ? ["You"] : ["You", "Isha", "Priya", "Aman", "Arpit"];
   return `<div class="prTop">
       <div class="covers">
         <div class="cv" data-sq="22"><img src="assets/cover-1.jpg" alt="" style="left:-21px;top:-45px;width:118px;height:178px;transform:rotate(-6deg)"></div>
