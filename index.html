@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "83";
+window.BUILD = "84";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -259,6 +259,10 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .secTitle.light .ln{font-weight:500}
 .secTitle.light .ln.b{font-weight:700}
 .grad{background:linear-gradient(90deg,#0040b7 0%,#489de2 44.18%,#d953ed 78.54%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+/* Figma 5:1509: 30px, "cafe hopping" in navy to blue to pink */
+.secTitle.because2{font-size:30px;gap:0}
+.secTitle.because2 .ln+.ln{letter-spacing:-.5px;line-height:39px}
+.gradCafe{background:linear-gradient(90deg,#283597 0%,#3543e6 56.25%,#fd4aab 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .secTitle .orb{width:24px;height:24px;object-fit:contain;flex:none;margin-top:2px}
 .seeAll{flex:none;display:flex;align-items:center;gap:4px;height:38px;padding:8px 8px 8px 14px;border:1px solid #e7e8eb;border-radius:12px;font-weight:700;font-size:16px;line-height:17px;letter-spacing:-.5px;color:#101010;text-decoration:none;background:#fff}
 .seeAll img{width:20px;height:20px;transform:scaleX(-1)}
@@ -1257,7 +1261,7 @@ b.grad2{font-weight:700}
 
       <section>
         <div class="secHead2">
-          <h2 class="secTitle"><span class="ln">Because you like</span><span class="ln"><span class="grad">cafe hopping</span><img class="orb" src="assets/ai-orb.png" alt=""></span></h2>
+          <h2 class="secTitle because2"><span class="ln">Because you like</span><span class="ln"><span class="gradCafe">cafe hopping</span><img class="orb" src="assets/ai-orb.png" alt=""></span></h2>
           <a class="seeAll" href="#">SEE ALL<img src="assets/chevron-right-dark.svg" alt=""></a>
         </div>
         <div style="height:28px"></div>
