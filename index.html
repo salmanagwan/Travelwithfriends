@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "74";
+window.BUILD = "75";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -260,14 +260,14 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .secTitle.light .ln.b{font-weight:700}
 .grad{background:linear-gradient(90deg,#0040b7 0%,#489de2 44.18%,#d953ed 78.54%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .secTitle .orb{width:24px;height:24px;object-fit:contain;flex:none;margin-top:2px}
-.seeAll{flex:none;display:flex;align-items:center;gap:4px;padding:10px 10px 10px 16px;border:1px solid #e7e8eb;border-radius:16px;font-weight:600;font-size:20px;line-height:17px;letter-spacing:-.5px;color:#101010;text-decoration:none;background:#fff}
+.seeAll{flex:none;display:flex;align-items:center;gap:4px;height:38px;padding:8px 8px 8px 14px;border:1px solid #e7e8eb;border-radius:12px;font-weight:700;font-size:16px;line-height:17px;letter-spacing:-.5px;color:#101010;text-decoration:none;background:#fff}
 .seeAll img{width:20px;height:20px;transform:scaleX(-1)}
 .seeAll:active{transform:scale(.96)}
 .clubs{position:relative}
 .decoClubs{top:-124px}
 .secHead3{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px;padding:10px 20px 0 28px}
-.because{display:flex;align-items:center;gap:8px;font-weight:500;font-size:16px;letter-spacing:-1px}
-.because .orb{width:16px;height:16px;object-fit:contain}
+.because{display:flex;align-items:center;gap:8px;font-weight:500;font-size:18px;letter-spacing:-.5px}
+.because .orb{width:20px;height:20px;object-fit:contain}
 
 /* ---------- Trending carousel ---------- */
 .carousel{position:relative;height:400px;width:100%;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
@@ -1210,7 +1210,7 @@ button.dvTag{padding-right:4px}
       <section>
         <div class="secHead2">
           <h2 class="secTitle"><span class="ln">Because you like</span><span class="ln"><span class="grad">cafe hopping</span><img class="orb" src="assets/ai-orb.png" alt=""></span></h2>
-          <a class="seeAll" href="#">See all<img src="assets/chevron-right-dark.svg" alt=""></a>
+          <a class="seeAll" href="#">SEE ALL<img src="assets/chevron-right-dark.svg" alt=""></a>
         </div>
         <div style="height:28px"></div>
         <div class="row" id="cafes"></div>
@@ -1220,7 +1220,7 @@ button.dvTag{padding-right:4px}
         <div class="deco decoClubs" aria-hidden="true"><img src="assets/deco-boat.webp" alt=""></div>
         <div class="secHead3">
           <h2 class="secTitle light"><span class="ln">Best Clubs in</span><span class="ln b">Koh Samui</span></h2>
-          <p class="because"><img class="orb" src="assets/ai-orb.png" alt=""><span class="grad">Because you like to party</span></p>
+          <p class="because"><img class="orb" src="assets/ai-orb.png" alt=""><span class="grad">Parties as you like</span></p>
         </div>
         <div style="height:28px"></div>
         <div class="deckWrap"><div class="deck" id="deck"></div></div>
