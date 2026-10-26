@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "60";
+window.BUILD = "61";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -2642,97 +2642,120 @@ const Reactions = (() => {
 const spawnEmoji = (type, container) => Reactions.spawn(type, container);
 
 /* =====================================================================
-   Flag Burst  (motion modelled on the wabi.ai manifesto orb)
-   Bubbles are born at a point, hang there for a beat, then accelerate up
-   and out in a plume while they grow, and drift off the top.
+   Flag Burst v2
+   Flags pop out of a point with a little overshoot, shoot up in a fan,
+   lose speed to air drag, then float up like released balloons. Each one
+   sways, tilts into its sway and flutters (a squash on x) so it reads as a
+   flag waving, not a sticker sliding. Three depths: small ones are slower
+   and softer, big ones fast and in front. A soft ring marks the pop.
 
-   triggerBubbleBurst(x, y, emoji?)     one tap: a burst of bubbles
-   triggerBubbleBurst(element, emoji?)  same, from the element's centre
-   BubbleBurst.stream(x, y, emoji, ms)  a steady stream for `ms` milliseconds
+   BubbleBurst.burst(x, y, emoji)         the pop: a fan of flags
+   BubbleBurst.stream(x, y, emoji, ms)    a lighter trickle after the pop
    ===================================================================== */
 const BubbleBurst = (() => {
   const CFG = {
-    burstCount: 12,        // extra bubbles on a tap
-    burstScale: .65,       // tap bubbles are a little smaller
-    streamEvery: 86,       // ms between bubbles in a stream
-    life: [2, 6],          // seconds a bubble takes to leave (1-3s, slowed 2x)
-    size: 64,              // full-grown bubble diameter, px
-    max: 400               // hard cap on live bubbles
+    burstCount: 13, streamEvery: 120, size: 44, max: 120,
+    speed: [440, 800],     // launch speed, px/s
+    spread: 0.85,          // half-angle of the fan, radians from straight up
+    drag: 2.7,             // how fast the launch speed bleeds off
+    lift: [170, 290],      // buoyancy once the launch has died down, px/s²
+    life: [1.8, 2.8]       // seconds before a flag is gone if it hasn't left the top
   };
   let cv, ctx, dpr = 1, W = 0, H = 0, raf = 0, last = 0;
-  const live = [], pool = [], sprites = new Map();
-  const map = (v, a, b, c, d) => c + (v - a) * (d - c) / (b - a);
-  const easeInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const live = [], pool = [], rings = [], sprites = new Map();
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const backOut = t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 
   function setup(){
     cv = document.createElement("canvas"); cv.className = "bb-canvas"; cv.setAttribute("aria-hidden", "true");
     document.body.appendChild(cv); ctx = cv.getContext("2d"); resize(); addEventListener("resize", resize);
   }
-  function resize(){ dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
-
-  // The emoji itself (a flag, by default), drawn once per emoji and reused
+  function resize(){ dpr = Math.min(3, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
   function sprite(emoji){
     if (sprites.has(emoji)) return sprites.get(emoji);
-    const S = 160, c = document.createElement("canvas"); c.width = c.height = S;
+    const S = 192, c = document.createElement("canvas"); c.width = c.height = S;
     const g = c.getContext("2d");
-    g.font = `${S * .82}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
-    g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(emoji, S / 2, S / 2 + S * .04);
+    g.font = `${S * .8}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(emoji, S / 2, S / 2 + S * .05);
     sprites.set(emoji, c); return c;
   }
+  const local = (x, y) => { const o = cv.getBoundingClientRect(); return [x - o.left, y - o.top]; };
 
-  // Born somewhere in the lower half of an imaginary square around the origin;
-  // low births start dead centre, higher ones spread wider -> a plume, not a curtain.
-  function add(x, y, emoji, scale = 1){
+  function add(x, y, emoji, opts = {}){
     if (!cv) setup();
-    const off = cv.getBoundingClientRect(); x -= off.left; y -= off.top;   // canvas sits over the phone column
+    [x, y] = local(x, y);
     const p = pool.pop() || {};
-    const sy = .5 + Math.random() * .5, margin = map(sy, 1, .5, .5, .05), sx = margin + Math.random() * (1 - 2 * margin);
-    p.ox = x; p.oy = y; p.sx = sx; p.sy = sy; p.ex = map(sx, 0, 1, -1, 2); p.ey = sy - 1;
-    p.age = 0; p.dur = CFG.life[0] + Math.random() * (CFG.life[1] - CFG.life[0]);
-    p.scale = scale; p.img = sprite(emoji); p.field = Math.min(W, H); p.lift = Math.max(p.field, y + CFG.size); // always clears the top
+    const depth = opts.depth != null ? opts.depth : Math.random();               // 0 = far, 1 = near
+    const k = .55 + depth * .6;                                                  // size and speed follow depth
+    const ang = -Math.PI / 2 + rnd(-1, 1) * CFG.spread * (opts.narrow ? .35 : 1);
+    const v = rnd(CFG.speed[0], CFG.speed[1]) * (.7 + depth * .45) * (opts.power || 1);
+    Object.assign(p, {
+      x: x + rnd(-10, 10), y: y + rnd(-4, 4), vx: Math.cos(ang) * v, vy: Math.sin(ang) * v,
+      lift: rnd(CFG.lift[0], CFG.lift[1]) * (.8 + depth * .4), size: CFG.size * k, depth,
+      sway: rnd(10, 22) * k, freq: rnd(1.1, 1.9), ph: rnd(0, 6.28), flut: rnd(5, 8), fph: rnd(0, 6.28),
+      tilt0: rnd(-.35, .35), age: 0, life: rnd(CFG.life[0], CFG.life[1]), img: sprite(emoji), oy: y
+    });
     if (live.length >= CFG.max) pool.push(live.shift());
-    live.push(p);
-    if (!raf){ last = performance.now(); raf = requestAnimationFrame(tick); }
+    live.push(p); live.sort((a, b) => a.depth - b.depth);                       // far ones drawn first
+    run();
   }
+  function run(){ if (!raf){ last = performance.now(); raf = requestAnimationFrame(tick); } }
 
   function tick(now){
-    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const dt = Math.min(.04, (now - last) / 1000); last = now;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    for (let i = 0; i < live.length; i++){
-      const p = live[i]; p.age += dt;
-      if (p.age > p.dur * 1.25){ pool.push(p); live.splice(i--, 1); continue; }
-      const t = p.age / p.dur, eased = t * t * t;                               // hang, then accelerate away (keeps going past 1)
-      const x = p.ox + (p.ex - p.sx) * eased * p.field;
-      const y = p.oy + (p.ey - p.sy) * eased * p.lift;
-      const s = CFG.size * p.scale * easeInOutCubic(Math.min(1, t));            // grows the whole way up
-      if (s < 1) continue;
-      if (y < -s){ pool.push(p); live.splice(i--, 1); continue; }
-      // fade out toward the top: solid as they leave the tile, gone by the top edge of the screen
-      const f = Math.min(1, Math.max(0, (y - 8) / Math.max(60, p.oy * .8 - 8)));
-      if (f <= 0) continue;
-      ctx.globalAlpha = f * f * (3 - 2 * f);
-      ctx.drawImage(p.img, x - s / 2, y - s / 2, s, s);
-      ctx.globalAlpha = 1;
+    // the pop ring
+    for (let i = rings.length - 1; i >= 0; i--){
+      const r = rings[i]; r.age += dt; const t = r.age / .55;
+      if (t >= 1){ rings.splice(i, 1); continue; }
+      const e = 1 - Math.pow(1 - t, 3);
+      ctx.globalAlpha = (1 - t) * .55; ctx.lineWidth = 3 * (1 - t) + .5; ctx.strokeStyle = "#6b2bf5";
+      ctx.beginPath(); ctx.ellipse(r.x, r.y, 14 + e * 70, 6 + e * 26, 0, 0, Math.PI * 2); ctx.stroke();
     }
-    raf = live.length ? requestAnimationFrame(tick) : 0;
-    if (!raf) ctx.clearRect(0, 0, W, H);
+    for (let i = live.length - 1; i >= 0; i--){
+      const p = live[i]; p.age += dt;
+      const drag = Math.exp(-CFG.drag * dt);
+      p.vx *= drag; p.vy = p.vy * drag - p.lift * dt;                            // launch dies off, buoyancy takes over
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      const settle = Math.min(1, p.age / .5);                                    // sway grows in after the launch
+      const swayV = Math.cos(p.age * p.freq * 6.283 + p.ph);
+      const sx = p.x + Math.sin(p.age * p.freq * 6.283 + p.ph) * p.sway * settle;
+      const pop = p.age < .28 ? backOut(p.age / .28) : 1;                         // overshoot on the way out
+      const s = p.size * pop;
+      // fade: quick in, then out over the top part of the screen or at end of life
+      const top = Math.min(1, Math.max(0, (p.y - 4) / Math.max(70, p.oy * .7)));
+      const end = Math.min(1, (p.life - p.age) / .4);
+      const a = Math.min(1, p.age / .06) * top * top * (3 - 2 * top) * Math.max(0, end) * (.7 + p.depth * .3);
+      if (a <= .01 || p.y < -s || p.age > p.life){ if (p.y < -s || p.age > p.life || top <= 0){ pool.push(p); live.splice(i, 1); } continue; }
+      const rot = p.tilt0 * (1 - settle) + swayV * .28 * settle + p.vx * .0006;   // leans into the sway
+      const flutter = .86 + .14 * Math.cos(p.age * p.flut * 6.283 + p.fph);       // flag waving
+      const c = Math.cos(rot), sn = Math.sin(rot);
+      ctx.globalAlpha = a;
+      ctx.setTransform(c * flutter * dpr, sn * flutter * dpr, -sn * dpr, c * dpr, sx * dpr, p.y * dpr);
+      ctx.drawImage(p.img, -s / 2, -s / 2, s, s);
+    }
+    ctx.globalAlpha = 1;
+    raf = live.length || rings.length ? requestAnimationFrame(tick) : 0;
+    if (!raf){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); }
   }
 
   const centre = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
   function burst(x, y, emoji = "🎉"){
     if (x instanceof Element){ emoji = y || emoji; [x, y] = centre(x); }
-    for (let i = 0; i < CFG.burstCount; i++) add(x, y, emoji, CFG.burstScale);
+    if (!cv) setup();
+    const [lx, ly] = local(x, y); rings.push({ x: lx, y: ly, age: 0 });
+    // a few big ones straight up first, then the fan fills in over ~120ms
+    for (let i = 0; i < 3; i++) add(x, y, emoji, { depth: .85 + Math.random() * .15, narrow: true, power: 1.1 });
+    for (let i = 0; i < CFG.burstCount - 3; i++) setTimeout(() => add(x, y, emoji), 20 + Math.random() * 120);
   }
-  function stream(x, y, emoji = "🎉", ms = 1000){
-    if (x instanceof Element){ ms = emoji === "🎉" ? 1000 : emoji; emoji = y; [x, y] = centre(x); }
+  function stream(x, y, emoji = "🎉", ms = 900){
+    if (x instanceof Element){ ms = emoji === "🎉" ? 900 : emoji; emoji = y; [x, y] = centre(x); }
     const n = Math.max(1, Math.round(ms / CFG.streamEvery));
-    for (let i = 0; i < n; i++) setTimeout(() => add(x, y, emoji), i * CFG.streamEvery);
+    for (let i = 0; i < n; i++) setTimeout(() => add(x, y, emoji, { depth: Math.random() * .7, narrow: true, power: .75 * (1 - i / n * .5) }), 160 + i * CFG.streamEvery);
   }
   return { burst, stream, add, config: CFG };
 })();
 const triggerBubbleBurst = (x, y, emoji) => BubbleBurst.burst(x, y, emoji);
-// the poll card sits high on the screen, so bubbles move a touch quicker here than on a full page
-BubbleBurst.config.life = [1.3, 3]; BubbleBurst.config.size = 58;
 
 
 /* ---------- Poll card outline (Figma 256:68784): rounded card with a folder-tab notch, plus the tab itself ---------- */
