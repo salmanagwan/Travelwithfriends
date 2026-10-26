@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "68";
+window.BUILD = "69";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -509,8 +509,10 @@ b.grad2{font-weight:700}
 .screen .mkSky canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 .screen .topGlow{position:absolute;left:0;right:0;top:0;height:97px;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,0));pointer-events:none}
 .mapBack{position:absolute;z-index:6;left:16px;top:calc(env(safe-area-inset-top,0px) + 16px);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
-  background:rgba(255,255,255,.45);box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.mapBack img{width:24px;height:24px;filter:invert(.35)}
+  /* iOS control tile glass (Figma 267:71130): lightened, frosted backdrop, bright rim, soft drop shadow */
+  background:rgba(255,255,255,.24);-webkit-backdrop-filter:blur(10px) brightness(1.1) saturate(.85);backdrop-filter:blur(10px) brightness(1.1) saturate(.85);
+  box-shadow:0 2px 16px rgba(0,0,0,.2),inset 1.2px 1.2px 0 rgba(255,255,255,.75),inset -1px -1px 0 rgba(255,255,255,.3),inset 0 0 12px rgba(255,255,255,.18)}
+.mapBack img{width:24px;height:24px;filter:none}
 .mapBack:active{transform:scale(.94)}
 .bigSheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:2}
 .bigSheet>.bg{position:absolute;inset:0;background:#fff}
@@ -1226,7 +1228,7 @@ b.grad2{font-weight:700}
 <section class="screen" id="making" hidden role="dialog" aria-label="Making your trip plan">
   <div class="mkSky" aria-hidden="true"><canvas id="globe" class="globeCv" data-cy="345" data-r="300"></canvas></div>
   <div class="topGlow"></div>
-  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
+  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left-grey.svg" alt=""></button>
   <div class="bigSheet">
     <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
     <div class="mkBody">
@@ -1253,7 +1255,7 @@ b.grad2{font-weight:700}
 <section class="screen" id="plan" hidden role="dialog" aria-label="Your trip plan">
   <div class="mkSky" aria-hidden="true"><canvas class="globeCv" id="planGlobe" data-cy="345" data-r="300"></canvas></div>
   <div class="topGlow"></div>
-  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left.svg" alt=""></button>
+  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left-grey.svg" alt=""></button>
   <div class="bigSheet" id="prSheet">
     <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
     <div class="prHandle"></div>
