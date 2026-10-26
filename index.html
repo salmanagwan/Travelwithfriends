@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "80";
+window.BUILD = "81";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -461,15 +461,14 @@ b.grad2{font-weight:700}
              radial-gradient(circle at 50% 50%,transparent 62%,rgba(120,220,255,.35) 80%,rgba(255,120,230,.55) 100%);
   box-shadow:inset 0 0 0 max(1px,calc(var(--s)*.025)) rgba(255,255,255,.5),inset calc(var(--s)*-.06) calc(var(--s)*-.1) calc(var(--s)*.2) rgba(8,0,80,.5)}
 .liq canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3}
-.liq.gl{background:none;overflow:visible}
+.liq.gl{background:none;overflow:visible;box-shadow:0 0 calc(var(--s)*.3) rgba(150,100,255,.28)}
 .liq.gl b,.liq.gl::after{display:none}
 @keyframes liqA{to{transform:rotate(360deg)}}
 @keyframes liqB{0%,100%{transform:translate(-8%,4%) rotate(-18deg)}50%{transform:translate(8%,-10%) rotate(16deg)}}
 @keyframes liqC{0%,100%{transform:translate(6%,8%) rotate(16deg)}50%{transform:translate(-8%,-6%) rotate(-18deg)}}
 @media (prefers-reduced-motion:reduce){.liq b{animation:none!important}}
 @keyframes orbIn{to{transform:scale(1)}}
-/* the liquid inside the globe only flows while it is working */
-.npAi:not(.busy) .liq b{animation-play-state:paused}
+
 @keyframes npSweep{from{background-position:120% 0}to{background-position:-120% 0}}
 @keyframes npSpin{to{transform:rotate(360deg)}}
 
@@ -3769,15 +3768,15 @@ void main(){
   float ca=.045+.06*r;                 // chromatic split grows at the edge
   vec2 g=normalize(vec2(.6,1.));
   float sr=sheen(p+g*ca,t,h), sg=sheen(p,t,h), sb=sheen(p-g*ca,t,h);
-  vec3 base=vec3(.11,.13,.98);
-  vec3 deep=vec3(.03,.02,.35);
+  vec3 base=vec3(.3,.42,1.);
+  vec3 deep=vec3(.13,.15,.86);
   vec3 col=mix(deep,base,smoothstep(-1.,.4,h));
   vec3 spec=vec3(sr,sg,sb);
   col+=max(spec,0.)*vec3(.95,.9,1.);
-  col*=1.+min(spec,0.)*.9;             // dark fold shadows
+  col*=1.+min(spec,0.)*.6;             // dark fold shadows
   col=mix(col,col*vec3(1.,.55,.6)+vec3(.15,0.,.05),smoothstep(.2,.9,sr-sb)*.6);
   // glass: darker edge, thin bright rim, soft top highlight
-  col*=mix(1.,.3,smoothstep(.72,.99,r));
+  col*=mix(1.,.62,smoothstep(.72,.99,r));
   col+=vec3(.5,.55,1.)*smoothstep(.93,.985,r)*(1.-smoothstep(.985,1.,r))*.8;
   col+=vec3(.35)*smoothstep(.5,0.,length(uv-vec2(-.35,.45)))*.5;
   gl_FragColor=vec4(clamp(col,0.,1.)*alpha,alpha);
@@ -3795,13 +3794,24 @@ const VS="attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
   gl.viewport(0,0,N,N);gl.uniform2f(gl.getUniformLocation(pr,"R"),N,N);const uT=gl.getUniformLocation(pr,"T");
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   const render=t=>{gl.uniform1f(uT,t);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);};
+  // every globe image in the app becomes a live globe at the same size and spot
+  function swap(img){
+    const cs=getComputedStyle(img), w=parseFloat(cs.width)||parseFloat(img.getAttribute("width"))||20, h=parseFloat(cs.height)||w, sz=Math.min(w,h);
+    const sp=document.createElement("span"); sp.className="liq "+img.className; sp.setAttribute("aria-hidden","true");
+    sp.style.cssText=`--s:${sz}px;margin:${cs.margin};align-self:${cs.alignSelf};flex:none;vertical-align:${cs.verticalAlign};position:${cs.position==="static"?"relative":cs.position};z-index:${cs.zIndex}`;
+    if(cs.display==="inline") sp.style.display="inline-block";
+    img.replaceWith(sp);
+  }
   function upgrade(){
+    document.querySelectorAll('img[src*="ai-orb"]').forEach(swap);
     document.querySelectorAll(".liq:not(.gl)").forEach(el=>{
       const c=document.createElement("canvas"); c.width=c.height=N; el.appendChild(c); el.classList.add("gl");
       el._ctx=c.getContext("2d"); el._drawn=false;
     });
   }
-  const live=el=>el.isConnected&&el.offsetParent!==null&&!(el.closest(".npAi")&&!el.closest(".npAi.busy"));
+  const live=el=>{ if(!el.isConnected||el.offsetParent===null) return false; const r=el.getBoundingClientRect(); return r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth; };
+  let queued=false; new MutationObserver(()=>{ if(queued) return; queued=true; queueMicrotask(()=>{queued=false;upgrade();}); }).observe(document.body,{childList:true,subtree:true});
+  upgrade();
   let last=0;
   function tick(now){
     if(now-last>400){upgrade();last=now;}
