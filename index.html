@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "72";
+window.BUILD = "73";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -417,7 +417,7 @@ body.locked{overflow:hidden}
 .npTab svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .npTab path{fill:#fff;stroke:#e7e8eb;stroke-width:1}
 .npTab .npInv{position:absolute;left:25px;top:2px;width:36px;height:36px;background:transparent;border-radius:12px;display:grid;place-items:center}
-.npTab .npInv img{width:24px;height:24px}
+.npTab .npInv img{width:auto;height:30px;object-fit:contain}
 .npTab .npInv:active{transform:scale(.9)}
 /* in the trip chat the card is a plain rounded card: no tab, no invite corner (Figma 253:58972) */
 .np.flat+.npTab{display:none}
@@ -512,12 +512,20 @@ b.grad2{font-weight:700}
 .screen .mkSky{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 28%,#f7fbff 0%,#e3efff 45%,#c9ddfb 100%)}
 .screen .mkSky canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 .screen .topGlow{position:absolute;left:0;right:0;top:0;height:97px;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,0));pointer-events:none}
-.mapBack{position:absolute;z-index:6;left:16px;top:calc(env(safe-area-inset-top,0px) + 16px);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
-  /* iOS control tile glass (Figma 267:71130): lightened, frosted backdrop, bright rim, soft drop shadow */
-  background:rgba(255,255,255,.24);-webkit-backdrop-filter:blur(10px) brightness(1.1) saturate(.85);backdrop-filter:blur(10px) brightness(1.1) saturate(.85);
-  box-shadow:0 2px 16px rgba(0,0,0,.2),inset 1.2px 1.2px 0 rgba(255,255,255,.75),inset -1px -1px 0 rgba(255,255,255,.3),inset 0 0 12px rgba(255,255,255,.18)}
-.mapBack img{width:24px;height:24px;filter:none}
-.mapBack:active{transform:scale(.94)}
+.mapBack{position:absolute;z-index:6;left:16px;top:calc(env(safe-area-inset-top,0px) + 12px);width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+.mapBack img{width:20px;height:20px}
+/* control tile glass (Figma 310:94247): frosted white, soft double shadow, a hairline rim that is purple at the ends */
+.ctl{background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(6px) brightness(1.1);backdrop-filter:blur(6px) brightness(1.1);
+  box-shadow:0 1.67px 13.3px rgba(0,0,0,.2),0 1px 8px rgba(0,0,0,.1),inset 0 0 15px rgba(0,0,0,.06)}
+.ctl::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.6px;pointer-events:none;
+  background:linear-gradient(135deg,#6b2cf3,rgba(107,44,243,0) 50%,#6b2cf3);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.prCtl{position:absolute;z-index:6;right:16px;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;align-items:flex-end;gap:12px;transition:opacity .3s}
+#plan:has(.bigSheet.isFull) .prCtl{opacity:0;pointer-events:none}
+.ctlPill{position:relative;height:40px;border-radius:40px;display:flex;align-items:center;gap:2px;padding:0 16px 0 10px;font:600 16px Inter,system-ui,sans-serif;color:#101010}
+.ctlPill img,.ctlBtn img{width:24px;height:24px}
+.ctlBtn{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+.ctl:active{transform:scale(.94)}
+
 .bigSheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:2}
 .bigSheet>.bg{position:absolute;inset:0;background:#fff}
 .bigSheet>.edge{position:absolute;inset:0;background:#efefef;pointer-events:none}
@@ -619,6 +627,15 @@ b.grad2{font-weight:700}
 @media (max-width:400px){.breakCard .what{font-size:13px}}
 .breakCard .what img{width:20px;height:20px;flex:none}
 .breakCard .what img.arr{width:16px;height:16px}
+.addDay{position:relative;margin:0;display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;text-align:left;-webkit-tap-highlight-color:transparent}
+.addDay svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.addDay:active{transform:scale(.98)}
+.adIc{width:46px;height:46px;flex:none;border-radius:12px;background:#f2f2f2;display:grid;place-items:center}
+.adIc img{width:24px;height:24px}
+.adTx{display:flex;flex-direction:column;gap:2px}
+.adTx b{font-weight:600;font-size:16px;color:#6b6f76}
+.adTx small{font-size:12px;color:#a0a4ab}
+.dayEmpty{padding:6px 8px 4px;font-size:13px;color:#969696}
 .breakCard .when{font-weight:600;font-size:12px;color:#686868;white-space:nowrap}
 .breakCard .cut{position:absolute;left:50%;top:0;bottom:0;width:0;margin-left:-1.5px;border-left:3px dashed #fff}
 .breakCard::before,.breakCard::after{content:"";position:absolute;left:50%;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:#fff;z-index:1}
@@ -1236,7 +1253,7 @@ b.grad2{font-weight:700}
 <section class="screen" id="making" hidden role="dialog" aria-label="Making your trip plan">
   <div class="mkSky" aria-hidden="true"><canvas id="globe" class="globeCv" data-cy="345" data-r="300"></canvas></div>
   <div class="topGlow"></div>
-  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left-grey.svg" alt=""></button>
+  <button class="mapBack ctl" data-close aria-label="Back"><img src="assets/chevron-left-dark.svg" alt=""></button>
   <div class="bigSheet">
     <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
     <div class="mkBody">
@@ -1263,7 +1280,8 @@ b.grad2{font-weight:700}
 <section class="screen" id="plan" hidden role="dialog" aria-label="Your trip plan">
   <div class="mkSky" aria-hidden="true"><canvas class="globeCv" id="planGlobe" data-cy="345" data-r="300"></canvas></div>
   <div class="topGlow"></div>
-  <button class="mapBack" data-close aria-label="Back"><img src="assets/chevron-left-grey.svg" alt=""></button>
+  <button class="mapBack ctl" data-close aria-label="Back"><img src="assets/chevron-left-dark.svg" alt=""></button>
+  <div class="prCtl"><button type="button" class="ctlPill ctl" id="prEdit" aria-label="Edit trip dates"><img src="assets/edit-fill.svg" alt="">Edit</button><button type="button" class="ctlBtn ctl" id="prLoc" aria-label="Show the trip on the map"><img src="assets/location-fill.svg" alt=""></button></div>
   <div class="bigSheet" id="prSheet">
     <div class="bg" data-sq="32"></div><div class="edge" data-ring="32"></div>
     <div class="prHandle"></div>
@@ -2290,10 +2308,12 @@ function headerHTML(){
 function overviewHTML(){
   let h = `<div class="prList">` + flightHTML({ from: TRIP.from, dates: fmtRange(TRIP.start, DAYS.length), price: TRIP.price, note: TRIP.note });
   DAYS.forEach((d, i) => {
-    h += cardHTML(`<div class="dayHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.stops.length} spots</span></div>
-      <div class="spots">${d.stops.map(spotTile).join("")}</div>`, `dayCard" data-day="${i}`, 20);
+    h += cardHTML(`<div class="dayHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km ? d.km + "<i></i>" : ""}${d.stops.length} spots</span></div>
+      ${d.stops.length ? `<div class="spots">${d.stops.map(spotTile).join("")}</div>` : `<p class="dayEmpty">Nothing planned yet. Add spots from Unplanned or ask AI.</p>`}`, `dayCard" data-day="${i}`, 20);
     if (i === BREAK_AFTER) h += breakHTML();
   });
+  h += `<button type="button" class="addDay" data-act="addDay" data-sq-dash="20"><svg aria-hidden="true"><path fill="none" stroke="#dcdcdc" stroke-width="1.5" stroke-dasharray="6 5" stroke-linecap="round"/></svg>
+    <span class="adIc"><img src="assets/plus-grey.svg" alt=""></span><span class="adTx"><b>Add a day</b><small>Extend your trip by one day</small></span></button>`;
   return h + `</div>`;
 }
 function breakHTML(){
@@ -2391,6 +2411,14 @@ function doAct(a){
   closeMenus();
   if (a === "invite") openInvite("trip");
   // Import Spots and Add Spots stay as visual options for now: tapping just closes the menu
+  else if (a === "addDay"){
+    const cols = ["#138cff", "#e8456b", "#f5a623", "#2ebd6b", "#8b5cf6", "#4fa8f5", "#ff6b3d"];
+    DAYS.push({ c: cols[DAYS.length % cols.length], place: "Free day", km: "", stops: [] });
+    const top = prScroll.scrollTop; renderPlan(); prScroll.scrollTop = top;
+    const cards = prScroll.querySelectorAll(".dayCard"), last = cards[cards.length - 1];
+    if (last){ last.scrollIntoView({ behavior: "smooth", block: "center" }); last.classList.add("flash"); }
+    say(`Day ${DAYS.length} added. Trip is now ${DAYS.length} days`); haptic(12);
+  }
   else if (a === "poll") openPoll("chat");
 }
 
@@ -2567,6 +2595,8 @@ function closeAI(){
 }
 document.getElementById("aiTab").addEventListener("click", () => openAI("home"));
 document.getElementById("prAi").addEventListener("click", () => openAI("plan"));
+document.getElementById("prEdit").addEventListener("click", () => { haptic(8); openDates(); });
+document.getElementById("prLoc").addEventListener("click", () => { haptic(8); const pg = document.getElementById("planGlobe"); if (pg && pg._zoomTo) pg._zoomTo(100.4, 10.8, 640, 110, 1400); say("Centred on your trip"); });
 aiScrim.addEventListener("click", closeAI);
 document.getElementById("aiGrab").addEventListener("click", closeAI);
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeAI(); });
@@ -3093,7 +3123,7 @@ function showPoll(q, labels, where = "home"){
       <div class="npAiW"><div><button type="button" class="npAi" aria-live="polite"><img class="orb" src="assets/ai-orb.png" alt=""><span class="npAiT"><span class="grad2">Check what the community has to say</span></span><img class="chev" src="assets/chevron-right-dark.svg" alt=""></button></div></div>
       <div class="npCta"><div></div></div>
     </div>
-    <div class="npTab"><svg aria-hidden="true"><path/></svg><button type="button" class="npInv" aria-label="Invite friends to vote"><img src="assets/people-add-grey.svg" alt=""></button></div>`;
+    <div class="npTab"><svg aria-hidden="true"><path/></svg><button type="button" class="npInv" aria-label="Invite friends to vote"><img src="assets/p3d-invite.png" alt=""></button></div>`;
   const np = wrap.querySelector(".np"), qEl2 = wrap.querySelector(".npQ"), pend = wrap.querySelector(".npPend");
   // the card outline with the folder-tab notch top right (Figma 256:68784), redrawn whenever the card changes height
   const shapePath = np.querySelector(".npShape path"), tabPath = wrap.querySelector(".npTab path");
