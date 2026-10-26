@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "81";
+window.BUILD = "82";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -3425,12 +3425,10 @@ const M = (() => {
   const tb = document.querySelector(".tabbar");
   tb.animate([{ transform: "translateY(40px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 800, delay: 500, easing: "cubic-bezier(.2,.9,.3,1.15)", fill: "backwards" });
   setTimeout(() => { M.sheen(document.querySelector(".capsule")); }, 1150);
-  setTimeout(() => { M.sheen(document.querySelector(".aiTab .disc")); M.sheen(document.querySelector(".aiBtn")); }, 1450);
-  // the AI button catches the light again every few seconds
-  setInterval(() => { if (!document.hidden) M.sheen(document.querySelector(".aiTab .disc")); }, 7000);
+  setTimeout(() => { M.sheen(document.querySelector(".aiBtn")); }, 1450);
 })();
 // glass reacts to your finger everywhere
-[".capsule", ".aiTab .disc", ".aiBtn"].forEach(q => document.querySelectorAll(q).forEach(M.lightUp));
+[".capsule", ".aiBtn"].forEach(q => document.querySelectorAll(q).forEach(M.lightUp));
 document.querySelectorAll(".aiBtn,.aiTab,.save,.tab").forEach(M.press);
 // the globe drifts a little slower than the page as you scroll
 (function parallax(){ if (M.reduce) return; const mf = document.querySelector(".mapfade"); let tk = false;
