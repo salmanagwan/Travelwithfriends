@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "79";
+window.BUILD = "80";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -460,6 +460,9 @@ b.grad2{font-weight:700}
   background:radial-gradient(ellipse 30% 22% at 33% 22%,rgba(255,255,255,.85),rgba(255,255,255,0) 100%),
              radial-gradient(circle at 50% 50%,transparent 62%,rgba(120,220,255,.35) 80%,rgba(255,120,230,.55) 100%);
   box-shadow:inset 0 0 0 max(1px,calc(var(--s)*.025)) rgba(255,255,255,.5),inset calc(var(--s)*-.06) calc(var(--s)*-.1) calc(var(--s)*.2) rgba(8,0,80,.5)}
+.liq canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3}
+.liq.gl{background:none;overflow:visible}
+.liq.gl b,.liq.gl::after{display:none}
 @keyframes liqA{to{transform:rotate(360deg)}}
 @keyframes liqB{0%,100%{transform:translate(-8%,4%) rotate(-18deg)}50%{transform:translate(8%,-10%) rotate(16deg)}}
 @keyframes liqC{0%,100%{transform:translate(6%,8%) rotate(16deg)}50%{transform:translate(-8%,-6%) rotate(-18deg)}}
@@ -719,23 +722,23 @@ button.dvTag{padding-right:4px}
 /* + menu over the plan and the chat */
 .fabMenu{position:absolute;inset:0;z-index:6;pointer-events:none}
 /* Figma 253:58217: a light 2px blur that fades from clear at the top to white at the bottom, inside the sheet's rounded corners */
-.fabMenu .wash{position:absolute;inset:0;border-radius:32px 32px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0) 12.94%,#fff 91.29%);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);opacity:0;transition:opacity .3s;
+.fabMenu .wash{position:absolute;inset:0;border-radius:32px 32px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0) 12.94%,#fff 91.29%);opacity:0;transition:opacity .25s;will-change:opacity;
   -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 14%);mask-image:linear-gradient(180deg,transparent 0%,#000 14%)}
 .fabMenu.open{pointer-events:auto}
 .fabMenu.open .wash{opacity:1}
 .fabMenu .pill{position:absolute;height:60px;display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:32px;background:rgba(255,255,255,.5);
   -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
   border:0;border-radius:63px;box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
-  opacity:0;transform-origin:100% 100%;transform:translate(14px,var(--from,80px)) scale(.35);
-  transition:opacity .28s var(--dc,0s),transform .62s cubic-bezier(.22,.9,.28,1.12) var(--dc,0s),translate .5s cubic-bezier(.2,.9,.25,1)}
+  opacity:0;transform-origin:100% 100%;transform:translate3d(8px,var(--from,80px),0) scale(.82);will-change:transform,opacity;
+  transition:opacity .16s var(--dc,0s),transform .26s cubic-bezier(.4,0,.7,1) var(--dc,0s),translate .5s cubic-bezier(.2,.9,.25,1)}
 .fabMenu .pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.5px;pointer-events:none;
   background:linear-gradient(135deg,#6b2cf3,rgba(107,44,243,0) 50%,#6b2cf3);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-.fabMenu.open .pill{transition:opacity .3s var(--do,0s),transform .7s cubic-bezier(.2,.9,.25,1.18) var(--do,0s),translate .5s cubic-bezier(.2,.9,.25,1)}
+.fabMenu.open .pill{transition:opacity .18s var(--do,0s),transform .44s cubic-bezier(.2,1,.3,1.06) var(--do,0s),translate .5s cubic-bezier(.2,.9,.25,1)}
 .fabMenu .pill img{height:34px;width:auto;max-width:48px;object-fit:contain;position:relative;z-index:1}
 .fabMenu .pill img.sm{height:30px}
 .fabMenu .pill img.p40{height:40px;max-width:none}
 .fabMenu .pill img.p32{height:32px;max-width:none}
-.fabMenu.open .pill{opacity:1;transform:none}
+.fabMenu.open .pill{opacity:1;transform:translate3d(0,0,0) scale(1)}
 .fabMenu .pill:active{transform:scale(.96)}
 #plan .prBtns{z-index:7}
 #plan .prBtns[hidden]{display:none}
@@ -1357,9 +1360,9 @@ button.dvTag{padding-right:4px}
     <div class="prFoot"></div>
     <div class="fabMenu" id="prMenu">
       <div class="wash"></div>
-      <button class="pill" data-act="invite" style="right:48px;bottom:296px;--from:256px;--do:0.14s;--dc:0.0s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
-      <button class="pill" data-act="import" style="right:47px;bottom:212px;--from:172px;--do:0.07s;--dc:0.05s"><img src="assets/p3d-import.png" class="p40" alt="">Import Spots</button>
-      <button class="pill" data-act="spots" style="right:21px;bottom:128px;--from:88px;--do:0.0s;--dc:0.1s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
+      <button class="pill" data-act="invite" style="right:48px;bottom:296px;--from:256px;--do:0.08s;--dc:0s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
+      <button class="pill" data-act="import" style="right:47px;bottom:212px;--from:172px;--do:0.04s;--dc:0.03s"><img src="assets/p3d-import.png" class="p40" alt="">Import Spots</button>
+      <button class="pill" data-act="spots" style="right:21px;bottom:128px;--from:88px;--do:0s;--dc:0.06s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
     </div>
     <div class="prFade" aria-hidden="true"></div>
     <div class="prBtns" id="prBtns">
@@ -1372,9 +1375,9 @@ button.dvTag{padding-right:4px}
       <div class="aiRow" id="aiRow"></div>
       <div class="fabMenu" id="chatMenu">
         <div class="wash"></div>
-        <button class="pill" data-act="poll" style="right:28px;bottom:268px;--from:228px;--do:0.14s;--dc:0.0s"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
-        <button class="pill" data-act="invite" style="right:48px;bottom:184px;--from:144px;--do:0.07s;--dc:0.05s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
-        <button class="pill" data-act="spots" style="right:21px;bottom:100px;--from:60px;--do:0.0s;--dc:0.1s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
+        <button class="pill" data-act="poll" style="right:28px;bottom:268px;--from:228px;--do:0.08s;--dc:0s"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
+        <button class="pill" data-act="invite" style="right:48px;bottom:184px;--from:144px;--do:0.04s;--dc:0.03s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
+        <button class="pill" data-act="spots" style="right:21px;bottom:100px;--from:60px;--do:0s;--dc:0.06s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
       </div>
       <form class="chatBar" id="chatBar" autocomplete="off">
         <div class="inBox"><input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send"><button type="submit" class="send" aria-label="Send"><img src="assets/send-purple.svg" alt=""></button></div>
@@ -3730,6 +3733,87 @@ document.querySelectorAll("canvas.globeCv").forEach(cv => (function(cv){
   io.observe(cv);
   document.addEventListener("visibilitychange", () => { if (document.hidden) running = false; else if (!running){ running = true; last = 0; requestAnimationFrame(tick); } });
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) running = false; else requestAnimationFrame(tick);
+})();
+</script>
+<script>
+/* Liquid glass globe. One shared WebGL renderer draws the frame, then each globe copies it.
+   The glass stays still; the folds inside flow. Falls back to the CSS globe if WebGL is missing. */
+(function(){
+const FS = `precision highp float;
+uniform vec2 R; uniform float T;
+float H(vec2 p,float t){
+  p += .32*vec2(sin(p.y*2.3+t*.9+.5), sin(p.x*1.9-t*.7));
+  p += .18*vec2(sin(p.y*4.1-t*1.1), sin(p.x*3.7+t*.8));
+  float a = sin(p.x*.8 + p.y*2.5 + t*.6);
+  float b = sin(-p.x*2.0 + p.y*1.6 - t*.5 + a*1.4);
+  return a*.55 + b*.45;
+}
+float sheen(vec2 p,float t,out float h){
+  float e=.01; h=H(p,t);
+  float dx=(H(p+vec2(e,0.),t)-h)/e, dy=(H(p+vec2(0.,e),t)-h)/e;
+  vec3 n=normalize(vec3(-dx,-dy,1.6));
+  vec3 L=normalize(vec3(-.35,.55,.75));
+  float s=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),6.);
+  float d=dot(n,L);
+  return s*1.3 + (d-.6)*.9;
+}
+void main(){
+  vec2 uv=(gl_FragCoord.xy*2.-R)/R.y; uv.y=uv.y;
+  float r=length(uv);
+  float aa=2.5/R.y;
+  float alpha=1.-smoothstep(1.-aa,1.,r);
+  if(alpha<=0.){gl_FragColor=vec4(0.);return;}
+  float z=sqrt(max(1.-r*r,0.));
+  vec2 p=uv/(.7+.3*z)*.95;          // fisheye: content bends at the edge
+  float t=T*.55, h;
+  float ca=.045+.06*r;                 // chromatic split grows at the edge
+  vec2 g=normalize(vec2(.6,1.));
+  float sr=sheen(p+g*ca,t,h), sg=sheen(p,t,h), sb=sheen(p-g*ca,t,h);
+  vec3 base=vec3(.11,.13,.98);
+  vec3 deep=vec3(.03,.02,.35);
+  vec3 col=mix(deep,base,smoothstep(-1.,.4,h));
+  vec3 spec=vec3(sr,sg,sb);
+  col+=max(spec,0.)*vec3(.95,.9,1.);
+  col*=1.+min(spec,0.)*.9;             // dark fold shadows
+  col=mix(col,col*vec3(1.,.55,.6)+vec3(.15,0.,.05),smoothstep(.2,.9,sr-sb)*.6);
+  // glass: darker edge, thin bright rim, soft top highlight
+  col*=mix(1.,.3,smoothstep(.72,.99,r));
+  col+=vec3(.5,.55,1.)*smoothstep(.93,.985,r)*(1.-smoothstep(.985,1.,r))*.8;
+  col+=vec3(.35)*smoothstep(.5,0.,length(uv-vec2(-.35,.45)))*.5;
+  gl_FragColor=vec4(clamp(col,0.,1.)*alpha,alpha);
+}`;
+const VS="attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+  const N=96, gc=document.createElement("canvas"); gc.width=gc.height=N;
+  const gl=gc.getContext("webgl",{premultipliedAlpha:true,alpha:true,preserveDrawingBuffer:true});
+  if(!gl) return;
+  const sh=(t,src)=>{const x=gl.createShader(t);gl.shaderSource(x,src);gl.compileShader(x);return x};
+  const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) return;
+  gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pr,"a");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  gl.viewport(0,0,N,N);gl.uniform2f(gl.getUniformLocation(pr,"R"),N,N);const uT=gl.getUniformLocation(pr,"T");
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const render=t=>{gl.uniform1f(uT,t);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);};
+  function upgrade(){
+    document.querySelectorAll(".liq:not(.gl)").forEach(el=>{
+      const c=document.createElement("canvas"); c.width=c.height=N; el.appendChild(c); el.classList.add("gl");
+      el._ctx=c.getContext("2d"); el._drawn=false;
+    });
+  }
+  const live=el=>el.isConnected&&el.offsetParent!==null&&!(el.closest(".npAi")&&!el.closest(".npAi.busy"));
+  let last=0;
+  function tick(now){
+    if(now-last>400){upgrade();last=now;}
+    const els=document.querySelectorAll(".liq.gl");let rendered=false;
+    els.forEach(el=>{
+      if(el._drawn&&(reduce||!live(el))) return;
+      if(!rendered){render(reduce?1.6:now/1000);rendered=true;}
+      el._ctx.clearRect(0,0,N,N);el._ctx.drawImage(gc,0,0);el._drawn=true;
+    });
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 })();
 </script>
 </body>
