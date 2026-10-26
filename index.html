@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "75";
+window.BUILD = "77";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -596,7 +596,7 @@ b.grad2{font-weight:700}
 #plan .bigSheet:not(.isFull) .prFade{translate:0 calc(-1 * var(--dy,180px))}
 #plan .bigSheet.drag .prFade{transition:none}
 #plan .bigSheet:has(#prChat:not([hidden])) .prFade{display:none}
-#plan .prBtns,#plan .fabMenu .pill{transition:translate .5s cubic-bezier(.2,.9,.25,1)}
+#plan .prBtns{transition:translate .5s cubic-bezier(.2,.9,.25,1)}
 #plan .bigSheet:not(.isFull) .prBtns,#plan .bigSheet:not(.isFull) .fabMenu .pill{translate:0 calc(-1 * var(--dy,180px))}
 #plan .bigSheet.drag .prBtns{transition:none}
 #plan{overflow:hidden}
@@ -706,8 +706,12 @@ button.dvTag{padding-right:4px}
 .fabMenu.open .wash{opacity:1}
 .fabMenu .pill{position:absolute;height:60px;display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:32px;background:rgba(255,255,255,.5);
   -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
-  border:.5px solid rgba(24,24,24,.9);box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
-  opacity:0;transform:translateY(24px) scale(.9);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.3)}
+  border:0;border-radius:63px;box-shadow:inset 0 0 15px rgba(0,0,0,.1),0 1px 8px rgba(0,0,0,.1);font-weight:600;font-size:20px;color:#101010;white-space:nowrap;
+  opacity:0;transform-origin:100% 100%;transform:translate(14px,var(--from,80px)) scale(.35);
+  transition:opacity .28s var(--dc,0s),transform .62s cubic-bezier(.22,.9,.28,1.12) var(--dc,0s),translate .5s cubic-bezier(.2,.9,.25,1)}
+.fabMenu .pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.5px;pointer-events:none;
+  background:linear-gradient(135deg,#6b2cf3,rgba(107,44,243,0) 50%,#6b2cf3);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.fabMenu.open .pill{transition:opacity .3s var(--do,0s),transform .7s cubic-bezier(.2,.9,.25,1.18) var(--do,0s),translate .5s cubic-bezier(.2,.9,.25,1)}
 .fabMenu .pill img{height:34px;width:auto;max-width:48px;object-fit:contain;position:relative;z-index:1}
 .fabMenu .pill img.sm{height:30px}
 .fabMenu .pill img.p40{height:40px;max-width:none}
@@ -812,6 +816,24 @@ button.dvTag{padding-right:4px}
 .aiMsg>img{width:28px;height:28px;flex:none;object-fit:contain;margin-top:2px}
 .aiMsg .aiTxt{font-size:16px;line-height:1.4;color:#101010;letter-spacing:.05px}
 .aiAct{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-left:38px}
+.aiBlock{display:flex;flex-direction:column;gap:16px}
+.aiDock{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:0 16px 16px}
+.aiDock:empty{display:none}
+.aiLog .flGroup .pCard{margin:0 10px}
+/* polls in the trip chat skip the community strip */
+.chatPoll .npAiW{display:none!important}
+/* skeleton while AI builds a poll in the chat */
+.pollSkel{position:relative;overflow:hidden;background:#fff;box-shadow:0 1px 20px rgba(0,0,0,.07);padding:16px;display:flex;flex-direction:column;gap:14px}
+.pollSkel i{display:block;border-radius:10px;background:linear-gradient(90deg,#f2f2f2 0%,#ececec 40%,#f7f4ff 50%,#ececec 60%,#f2f2f2 100%);background-size:220% 100%;animation:skel 1.2s linear infinite}
+.pollSkel .b1{width:110px;height:24px;border-radius:8px}
+.pollSkel .b2{width:62%;height:26px}
+.pollSkel .row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pollSkel .row i{height:72px;border-radius:16px}
+.pollSkel .b3{width:100%;height:34px;border-radius:40px}
+.pollSkel::after{content:"";position:absolute;inset:0;pointer-events:none;transform:translateX(-120%);
+  background:linear-gradient(105deg,transparent 25%,rgba(107,43,245,.10) 40%,rgba(255,255,255,.9) 50%,rgba(107,43,245,.10) 60%,transparent 75%);animation:skelSweep 1.6s cubic-bezier(.45,0,.2,1) infinite}
+@keyframes skel{to{background-position:-120% 0}}
+@keyframes skelSweep{to{transform:translateX(120%)}}
 .aiLog .msgCard{padding:0}
 .aiLog .aiLoad{padding:4px 0}
 .aiBar{padding:8px 16px 16px!important;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 40%)}
@@ -1067,6 +1089,9 @@ button.dvTag{padding-right:4px}
 .spark.orbIc img{position:absolute;inset:0;object-fit:contain}
 .spark.orbIc img.glow{filter:blur(6px);opacity:.9}
 .pollCta.shine .spark.orbIc img{animation:orbIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, orbPulse 2.6s 1.4s ease-in-out infinite}
+@keyframes ctaText{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.pollCta.shine #pollCtaText,.pollCta.shine .npCtaT{display:inline-block;animation:ctaText 2.6s 1.4s ease-in-out infinite}
+.pollCta:active .spark.orbIc img{animation:none;transform:scale(1.3);filter:drop-shadow(0 0 8px rgba(150,110,255,.95));transition:transform .2s}
 .pollCta.shine .spark.orbIc img.glow{animation:orbIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, orbGlow 2.6s 1.4s ease-in-out infinite}
 .spark.orbIc img{transform:scale(0)}
 .pollCard.result .spark.orbIc img{transform:scale(1)}
@@ -1312,9 +1337,9 @@ button.dvTag{padding-right:4px}
     <div class="prFoot"></div>
     <div class="fabMenu" id="prMenu">
       <div class="wash"></div>
-      <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
-      <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/p3d-import.png" class="p40" alt="">Import Spots</button>
-      <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
+      <button class="pill" data-act="invite" style="right:48px;bottom:296px;--from:256px;--do:0.14s;--dc:0.0s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
+      <button class="pill" data-act="import" style="right:47px;bottom:212px;--from:172px;--do:0.07s;--dc:0.05s"><img src="assets/p3d-import.png" class="p40" alt="">Import Spots</button>
+      <button class="pill" data-act="spots" style="right:21px;bottom:128px;--from:88px;--do:0.0s;--dc:0.1s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
     </div>
     <div class="prFade" aria-hidden="true"></div>
     <div class="prBtns" id="prBtns">
@@ -1327,9 +1352,9 @@ button.dvTag{padding-right:4px}
       <div class="aiRow" id="aiRow"></div>
       <div class="fabMenu" id="chatMenu">
         <div class="wash"></div>
-        <button class="pill" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
-        <button class="pill" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
-        <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
+        <button class="pill" data-act="poll" style="right:28px;bottom:268px;--from:228px;--do:0.14s;--dc:0.0s"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
+        <button class="pill" data-act="invite" style="right:48px;bottom:184px;--from:144px;--do:0.07s;--dc:0.05s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
+        <button class="pill" data-act="spots" style="right:21px;bottom:100px;--from:60px;--do:0.0s;--dc:0.1s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
       </div>
       <form class="chatBar" id="chatBar" autocomplete="off">
         <div class="inBox"><input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send"><button type="submit" class="send" aria-label="Send"><img src="assets/send-purple.svg" alt=""></button></div>
@@ -1342,6 +1367,7 @@ button.dvTag{padding-right:4px}
 <section class="aiSheet" id="aiSheet" hidden role="dialog" aria-label="Ask Sidequest AI">
   <button type="button" class="aiGrab" id="aiGrab" aria-label="Close"></button>
   <div class="aiBody" id="aiBody"><div class="aiSugs" id="aiSugs"></div><div class="aiLog" id="aiLog"></div></div>
+  <div class="aiDock" id="aiDock"></div>
   <form class="chatBar aiBar" id="aiBar" autocomplete="off">
     <div class="inBox"><input id="aiInput" type="text" placeholder="Ask me anything.." aria-label="Ask AI" enterkeyhint="send"><button type="submit" class="send" aria-label="Send"><img src="assets/send-purple.svg" alt=""></button></div>
     <button type="button" class="plus" data-soon="Attaching reels and screenshots" aria-label="Attach"><img src="assets/plus-grey.svg" alt=""></button>
@@ -2546,18 +2572,18 @@ function openChat(){
   } else scrollChat();
 }
 // AI drafts a dates poll: you say it in chat, the sheet opens already filled, you just tap Create Poll
+// AI makes the dates poll right in the chat: a "generating" line, a skeleton card that shimmers, then the real poll
 async function pollFromAI(){
   chatLeft = chatLeft.filter(c => c.onTap !== pollFromAI);
-  await typeAndSend("Isha, let me create poll");
-  await sleep(500); openPoll("chat"); await sleep(650);
+  aiLoading("Generating your poll"); await sleep(1500); aiRow.innerHTML = "";
+  const sk = document.createElement("div"); sk.className = "chatPoll msgIn";
+  sk.innerHTML = `<div class="pollSkel" data-sq="20"><i class="b1"></i><i class="b2"></i><div class="row"><i></i><i></i><i></i></div><i class="b3"></i></div>`;
+  msgsEl.appendChild(sk); watchSq(sk); scrollChat(); haptic(6);
+  await sleep(1900);
+  sk.remove();
+  showPoll("Choose a date for trip!", ["Dec 12 - 20", "Jan 10 - 22", "Feb 06 - 15"], "chat"); haptic(10);
   say("AI picked 3 windows around long weekends and cheaper flights");
-  const put = async (el, v) => { for (let k = 1; k <= v.length; k++){ el.value = v.slice(0, k); el.dispatchEvent(new Event("input", { bubbles: true })); await sleep(24); } };
-  await put(qEl, "Choose a date for trip!");
-  const opts = ["Dec 12 - 20", "Jan 10 - 22", "Feb 06 - 15"];
-  while (optsEl.querySelectorAll("input").length < opts.length) addOption();
-  const ins = [...optsEl.querySelectorAll("input")];
-  for (let i = 0; i < opts.length; i++) await put(ins[i], opts[i]);
-  document.activeElement && document.activeElement.blur && document.activeElement.blur();
+  setTimeout(() => offerNext(), 1100);
 }
 async function findFlights(){
   chatLeft = chatLeft ? chatLeft.filter(c => c.onTap !== findFlights) : [];
@@ -2601,6 +2627,7 @@ chatInp().addEventListener("input", syncBar);
 
 
 /* ---------- AI assistant: the globe orb on Home and on the trip opens it. It suggests, you tap, it acts. ---------- */
+const aiDock = document.getElementById("aiDock");
 const aiSheet = document.getElementById("aiSheet"), aiScrim = document.getElementById("aiScrim"), aiSugs = document.getElementById("aiSugs"), aiLog = document.getElementById("aiLog"),
   aiBody = document.getElementById("aiBody"), aiBar = document.getElementById("aiBar"), aiInput = document.getElementById("aiInput");
 let aiCtx = "home";
@@ -2623,7 +2650,7 @@ function aiSuggest(){
 }
 function openAI(ctx){
   aiCtx = ctx; closeMenus && closeMenus();
-  aiLog.innerHTML = ""; aiInput.value = ""; aiBar.classList.remove("has"); aiSuggest();
+  aiLog.innerHTML = ""; aiDock.innerHTML = ""; aiInput.value = ""; aiBar.classList.remove("has"); aiSuggest();
   aiScrim.classList.toggle("clear", ctx === "plan");
   aiScrim.hidden = false; aiSheet.hidden = false; watchSq(aiSheet);
   requestAnimationFrame(() => requestAnimationFrame(() => { aiScrim.classList.add("show"); aiSheet.classList.add("show"); }));
@@ -2647,7 +2674,7 @@ aiInput.addEventListener("input", () => aiBar.classList.toggle("has", !!aiInput.
 aiBar.addEventListener("submit", e => { e.preventDefault(); const t = aiInput.value.trim(); if (!t) return; aiInput.value = ""; aiBar.classList.remove("has"); aiUser(t); aiRoute(t); });
 
 function aiUser(t){
-  aiSugs.innerHTML = "";
+  aiSugs.innerHTML = ""; aiDock.innerHTML = "";
   const el = document.createElement("div"); el.className = "msg self msgIn";
   el.innerHTML = `<div class="bubble" data-sq="16"><b>You</b><p>${esc(t)}</p></div>`;
   aiLog.appendChild(el); watchSq(el); aiScroll();
@@ -2658,10 +2685,11 @@ async function aiThink(label = "Thinking"){
 }
 function aiSay(text, extra = "", acts = []){
   const el = document.createElement("div"); el.className = "aiBlock";
-  el.innerHTML = `<div class="aiMsg"><img src="assets/ai-orb.png" alt=""><div class="aiTxt">${text}</div></div>${extra ? `<div class="msgCard msgIn">${extra}</div>` : ""}${acts.length ? `<div class="aiAct">${acts.map((a, i) => chipHTML(a.t, i)).join("")}</div>` : ""}`;
+  el.innerHTML = `<div class="aiMsg"><img src="assets/ai-orb.png" alt=""><div class="aiTxt">${text}</div></div>${extra ? `<div class="msgCard msgIn">${extra}</div>` : ""}`;
   aiLog.appendChild(el); watchSq(el); bindSoon(el);
   const p = el.querySelector(".aiTxt"); M.words(p, 22, 60); M.play(p);
-  if (acts.length) bindChips(el.querySelector(".aiAct"), acts);
+  // the next step sits just above the input, where the thumb already is
+  aiDock.innerHTML = acts.map((a, i) => chipHTML(a.t, i)).join(""); if (acts.length) bindChips(aiDock, acts);
   aiScroll(); haptic(6); return el;
 }
 // What did they ask for? Simple intent matching is enough for a prototype; every answer ends in something you can tap.
@@ -2754,8 +2782,7 @@ async function aiWhere(){
 }
 function aiFallback(){
   aiSay("I can turn that into something the group can act on. Try one of these:");
-  const box = document.createElement("div"); box.className = "aiAct"; aiLog.appendChild(box);
-  aiSuggest(); [...aiSugs.children].forEach(c => box.appendChild(c)); aiSugs.innerHTML = ""; aiScroll();
+  aiSuggest(); aiDock.innerHTML = ""; [...aiSugs.children].forEach(c => aiDock.appendChild(c)); aiSugs.innerHTML = ""; aiScroll();
 }
 
 /* ---------- Trip dates: pick From or To on wheels; the trip keeps its length, and every date in the plan follows ---------- */
