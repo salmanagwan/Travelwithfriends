@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "65";
+window.BUILD = "66";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -347,6 +347,7 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .fCta{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:16px 19px;border-radius:46px;background:rgba(255,255,255,.2);
   font-weight:800;font-size:22px;line-height:28px;letter-spacing:-1px;color:#fff;font-variation-settings:"opsz" 14;white-space:nowrap}
 .fCta img{width:24px;height:24px}
+.fCta img.orbI{width:20px;height:20px;object-fit:contain;margin-right:4px}
 .fCta:active,.fSave:active,.backBtn:active{transform:scale(.96)}
 .soundTip{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,.55);font-size:13px;font-weight:600;transition:opacity .2s,transform .2s;pointer-events:none}
 .soundTip.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -562,6 +563,11 @@ b.grad2{font-weight:700}
 #plan .bigSheet.isFull{translate:0 0;clip-path:inset(0 0 0 0 round 32px 32px 0 0)}
 #plan .bigSheet.drag{transition:none}
 /* half-open: the sheet is slid down by --dy, so lift the + / AI buttons and the + menu back into view */
+#plan .prFade{position:absolute;left:0;right:0;bottom:0;height:159px;z-index:5;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,0) 12.9%,#fff 91.3%);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 45%);mask-image:linear-gradient(180deg,transparent 0,#000 45%);transition:translate .5s cubic-bezier(.2,.9,.25,1)}
+#plan .bigSheet:not(.isFull) .prFade{translate:0 calc(-1 * var(--dy,180px))}
+#plan .bigSheet.drag .prFade{transition:none}
+#plan .bigSheet:has(#prChat:not([hidden])) .prFade{display:none}
 #plan .prBtns,#plan .fabMenu .pill{transition:translate .5s cubic-bezier(.2,.9,.25,1)}
 #plan .bigSheet:not(.isFull) .prBtns,#plan .bigSheet:not(.isFull) .fabMenu .pill{translate:0 calc(-1 * var(--dy,180px))}
 #plan .bigSheet.drag .prBtns{transition:none}
@@ -586,15 +592,17 @@ b.grad2{font-weight:700}
 .dateChip.flash{animation:flashChip 1.6s ease-out}
 @keyframes flashChip{0%,30%{background:#efe7ff;color:var(--accent)}100%{background:#fff}}
 /* break in the itinerary: flight + hotel change ticket */
-.breakCard{position:relative;display:flex;background:#f2f2f2}
-.breakCard>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px}
-.breakCard .tag{padding:3px 10px;border-radius:30px;background:#686868;color:#fff;font-weight:600;font-size:12px}
-.breakCard .what{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;color:#101010;white-space:nowrap;letter-spacing:-.2px}
-.breakCard .what img{width:18px;height:18px}
-.breakCard .when{font-weight:500;font-size:13px;color:#686868}
-.breakCard .cut{flex:none;width:0;border-left:2px dashed #fff;margin:6px 0;padding:0}
-.breakCard::before,.breakCard::after{content:"";position:absolute;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#fff}
-.breakCard::before{top:-7px}.breakCard::after{bottom:-7px}
+.breakCard{position:relative;display:flex;background:#f2f2f2;border-radius:16px;min-height:87px;overflow:hidden}
+.breakCard .half{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 8px 12px}
+.breakCard .tag{padding:3px 8px;border-radius:0 0 10px 10px;background:linear-gradient(180deg,rgba(215,215,215,.35),#d7d7d7);color:#686868;font-weight:500;font-size:12px;line-height:16px}
+.breakCard .what{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 4px;font-weight:700;font-size:14px;line-height:20px;color:#101010;text-align:center;letter-spacing:-.1px;max-width:100%}
+@media (max-width:400px){.breakCard .what{font-size:13px}}
+.breakCard .what img{width:20px;height:20px;flex:none}
+.breakCard .what img.arr{width:16px;height:16px}
+.breakCard .when{font-weight:600;font-size:12px;color:#686868;white-space:nowrap}
+.breakCard .cut{position:absolute;left:50%;top:0;bottom:0;width:0;margin-left:-1.5px;border-left:3px dashed #fff}
+.breakCard::before,.breakCard::after{content:"";position:absolute;left:50%;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:#fff;z-index:1}
+.breakCard::before{top:-12px}.breakCard::after{bottom:-12px}
 /* a single day, drilled down */
 .dayView{padding:8px 16px 0;display:flex;flex-direction:column;gap:16px}
 .dvHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -697,8 +705,9 @@ b.grad2{font-weight:700}
 .flGroup .flHead{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;letter-spacing:-.3px}
 .flGroup .flHead img{width:20px;height:20px}
 .flGroup .flHead span{background:linear-gradient(90deg,#003dae 0%,#217ac3 56%,#bd2ad4 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-.flGroup .pCard{margin:0 20px;filter:none}
+.flGroup .pCard{margin:0 16px;filter:drop-shadow(0 0 2px rgba(0,0,0,.1))}
 .flGroup .pCard>.edge{display:none}
+.flGroup .flList{display:flex;flex-direction:column;gap:12px}
 .aiChip:active{transform:scale(.97)}
 .aiLoad{display:flex;align-items:center;gap:16px;padding:6px 20px;animation:msgIn .35s both}
 .aiLoad p{font-weight:600;font-size:20px;white-space:nowrap;background:linear-gradient(90deg,#686868 0%,#cecece 25%,#686868 50%,#cecece 75%,#686868 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1.8s linear infinite}
@@ -721,6 +730,30 @@ b.grad2{font-weight:700}
 .chatBar .send{display:none}
 /* Invite Friends sheet (Figma "Home 940-942") */
 .invScrim{z-index:130}
+/* AI assistant sheet (Figma 267:70929) */
+.aiScrim{z-index:125;background:rgba(16,16,16,.25)}
+.aiScrim.clear{background:transparent}
+.aiSheet{position:fixed;z-index:126;left:50%;bottom:8px;width:min(412px,calc(100vw - 16px));height:min(723px,calc(100dvh - 110px));transform:translate(-50%,calc(100% + 40px));
+  transition:transform .5s cubic-bezier(.2,.9,.25,1);background:#fff;border:.5px solid #efefef;border-radius:32px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -4px 30px rgba(0,0,0,.08)}
+.aiSheet.show{transform:translate(-50%,0)}
+.aiSheet[hidden]{display:none}
+.aiGrab{flex:none;height:30px;width:100%;position:relative}
+.aiGrab::after{content:"";position:absolute;left:50%;top:8px;width:72px;height:5px;margin-left:-36px;border-radius:50px;background:#c4c4c4}
+.aiBody{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:0 20px 12px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
+.aiBody::-webkit-scrollbar{display:none}
+.aiSugs{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.aiSugs:empty{display:none}
+.aiSheet .aiChip{height:auto;min-height:38px;white-space:normal;padding:8px 14px 8px 8px;border:.5px solid #c4c4c4;line-height:1.3;border-radius:22px}
+.aiSheet .aiChip img.orb{align-self:flex-start;margin-top:1px}
+.aiLog{display:flex;flex-direction:column;gap:14px}
+.aiLog .msg{padding:0}
+.aiMsg{display:flex;gap:10px;align-items:flex-start;animation:msgIn .4s cubic-bezier(.2,.9,.25,1) both}
+.aiMsg>img{width:28px;height:28px;flex:none;object-fit:contain;margin-top:2px}
+.aiMsg .aiTxt{font-size:16px;line-height:1.4;color:#101010;letter-spacing:.05px}
+.aiAct{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-left:38px}
+.aiLog .msgCard{padding:0}
+.aiLog .aiLoad{padding:4px 0}
+.aiBar{padding:8px 16px 16px!important;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 40%)}
 .invite{position:fixed;z-index:131;left:50%;bottom:8px;width:min(412px,calc(100vw - 16px));height:min(698px,calc(100dvh - 24px));transform:translate(-50%,calc(100% + 40px));transition:transform .5s cubic-bezier(.2,.9,.25,1);
   display:flex;flex-direction:column}
 .invite.show{transform:translate(-50%,0)}
@@ -762,8 +795,10 @@ b.grad2{font-weight:700}
 .invP[aria-pressed="true"] .badge{transform:scale(1)}
 .invP.new{animation:pop .45s cubic-bezier(.2,.9,.3,1.4)}
 .invFoot{flex:none;display:flex;gap:16px;padding:12px 24px 24px}
-.invFoot button{flex:1;height:58px;border-radius:16px;font-weight:700;font-size:20px;display:flex;align-items:center;justify-content:center;gap:4px}
-.invShare{background:#fff;border:.5px solid #ececec;color:#111214;box-shadow:inset 0 -1px 4px rgba(0,0,0,.1),0 1px 1.5px rgba(0,0,0,.1)}
+.invFoot button{flex:1;min-width:0;height:58px;white-space:nowrap;border-radius:16px;font-weight:700;font-size:20px;display:flex;align-items:center;justify-content:center;gap:4px}
+.invSend{flex:0 0 150px!important}
+@media (max-width:380px){.invSend{flex-basis:112px!important}.invFoot{gap:12px;padding-left:16px;padding-right:16px}}
+.invShare{background:#fff;border:.5px solid #c4c4c4;color:#111214;box-shadow:inset 0 -1px 4px rgba(0,0,0,.1),0 1px 1.5px rgba(0,0,0,.1)}
 .invShare img{width:24px;height:24px}
 .invSend{background:#101010;color:#fff;transition:background .25s}
 .invSend:disabled{background:#c4c4c4;cursor:default}
@@ -816,7 +851,14 @@ b.grad2{font-weight:700}
 .pCard{position:relative;filter:drop-shadow(0 0 2px rgba(0,0,0,.08))}
 .pCard>.box{position:relative;background:#fff;padding:4px 4px 8px;display:flex;flex-direction:column;gap:12px}
 .pCard>.edge{position:absolute;inset:0;background:#ececec;pointer-events:none}
-.flight .box{padding:4px;align-items:stretch}
+.flight .box{padding:4px;align-items:stretch;background:#f8f5ff;gap:12px}
+.flight .flTop{padding:6px 8px 0 4px}
+.flight .fPrice{font-size:18px;margin-top:6px}
+.flight .aiNote{border-radius:40px;padding:4px 8px;gap:4px;background:linear-gradient(90deg,rgba(0,64,183,.05),rgba(72,157,226,.05) 56%,rgba(217,83,237,.05)),#fff;border:.5px solid #e2e2e2;clip-path:none!important}
+.flight .aiNote img{width:14px;height:14px;object-fit:contain}
+.flight .aiNote p{background:none;color:#595959;-webkit-text-fill-color:#595959;letter-spacing:-.1px;animation:none}
+.flight.compact .box{background:#fff;padding:8px 4px 8px 8px}
+.flight.compact .flTop{padding:0 4px 0 0}
 .flTop{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 4px;gap:8px}
 .flTop>div:first-child{flex:1;min-width:0}
 .fRoute,.fPrice{overflow:hidden;text-overflow:ellipsis}
@@ -959,6 +1001,10 @@ b.grad2{font-weight:700}
 .pollCta.shine::after{animation:shine 1.1s .55s cubic-bezier(.4,0,.2,1)}
 @keyframes shine{to{left:130%}}
 .spark{position:relative;width:24px;height:24px;flex:none;display:block}
+.pollCta{gap:8px}
+.spark.orbIc,.spark.orbIc img{width:20px;height:20px}
+.spark.orbIc img{position:absolute;inset:0;object-fit:contain}
+.spark.orbIc img.glow{filter:blur(6px);opacity:.9}
 .spark img{width:24px;height:24px;transform:scale(0) rotate(-90deg)}
 .pollCta.shine .spark img{animation:starIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, twinkle 2.8s 1.6s ease-in-out infinite}
 @keyframes starIn{to{transform:scale(1) rotate(0)}}
@@ -1083,7 +1129,7 @@ b.grad2{font-weight:700}
             </div>
             <div class="track" id="track" role="radiogroup" aria-label="Your vote"></div>
             <div class="pollResult" id="pollResult" hidden><p class="prQ" id="prQ"></p><div class="prRow"><div class="prCol"><b class="prLabel">Poll Result</b><span class="prWin" id="prWin"></span></div><span class="prStack" id="prStack"></span></div></div>
-            <div class="pollCtaWrap"><div><button type="button" class="pollCta" id="pollCta" data-sq="16" tabindex="-1"><span id="pollCtaText">Make a trip</span><span class="spark" aria-hidden="true"><img src="assets/sparkle-white.svg" alt=""></span></button></div></div>
+            <div class="pollCtaWrap"><div><button type="button" class="pollCta" id="pollCta" data-sq="16" tabindex="-1"><span class="spark orbIc" aria-hidden="true"><img class="glow" src="assets/ai-orb.png" alt=""><img src="assets/ai-orb.png" alt=""></span><span id="pollCtaText">Make a trip</span></button></div></div>
           </div>
           <div class="pollEdge" data-ring="20"></div>
         </div>
@@ -1143,7 +1189,7 @@ b.grad2{font-weight:700}
         <button class="tab" data-soon="Collection"><img src="assets/tab-collection.svg" alt=""><span>Collection</span></button>
         <button class="tab" data-soon="Explore"><img src="assets/tab-explore.svg" alt=""><span>Explore</span></button>
       </div>
-      <button class="aiTab" data-soon="Smart search" aria-label="Smart search">
+      <button class="aiTab" id="aiTab" aria-label="Ask Sidequest AI">
         <img class="glow" src="assets/ai-glow.png" alt="">
         <span class="disc glass"><img class="orb" src="assets/ai-orb-lg.png" alt=""></span>
       </button>
@@ -1200,13 +1246,13 @@ b.grad2{font-weight:700}
     <div class="prFoot"></div>
     <div class="fabMenu" id="prMenu">
       <div class="wash"></div>
-      <button class="pill" data-act="stays" style="right:21px;bottom:380px"><img src="assets/i3d-stays.png" alt="">Add Stays</button>
       <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
       <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
       <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
     </div>
+    <div class="prFade" aria-hidden="true"></div>
     <div class="prBtns" id="prBtns">
-      <button class="ai" data-soon="Trip assistant" aria-label="Ask about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc glass"><img class="orb" src="assets/ai-orb-lg.png" alt=""></span></button>
+      <button class="ai" id="prAi" aria-label="Ask AI about this trip"><img class="glow" src="assets/ai-glow.png" alt=""><span class="disc glass"><img class="orb" src="assets/ai-orb-lg.png" alt=""></span></button>
       <button class="add" id="prAdd" aria-label="Add to this trip" aria-expanded="false"><img src="assets/plus-white.svg" alt=""></button>
     </div>
     <div class="prChat" id="prChat" hidden>
@@ -1225,6 +1271,15 @@ b.grad2{font-weight:700}
       </form>
     </div>
   </div>
+</section>
+<div class="scrim aiScrim" id="aiScrim" hidden></div>
+<section class="aiSheet" id="aiSheet" hidden role="dialog" aria-label="Ask Sidequest AI">
+  <button type="button" class="aiGrab" id="aiGrab" aria-label="Close"></button>
+  <div class="aiBody" id="aiBody"><div class="aiSugs" id="aiSugs"></div><div class="aiLog" id="aiLog"></div></div>
+  <form class="chatBar aiBar" id="aiBar" autocomplete="off">
+    <div class="inBox"><input id="aiInput" type="text" placeholder="Ask me anything.." aria-label="Ask AI" enterkeyhint="send"><button type="submit" class="send" aria-label="Send"><img src="assets/send-purple.svg" alt=""></button></div>
+    <button type="button" class="plus" data-soon="Attaching reels and screenshots" aria-label="Attach"><img src="assets/plus-grey.svg" alt=""></button>
+  </form>
 </section>
 <div class="scrim invScrim" id="invScrim" hidden></div>
 <div class="invite" id="invite" hidden role="dialog" aria-labelledby="invTitle">
@@ -1588,7 +1643,7 @@ function fullCard(x){
       </div>
       <div class="fActions">
         <button class="fSave glass" aria-label="Save reel" aria-pressed="false"><img src="assets/bookmark-24.svg" alt=""></button>
-        <button class="fCta glass">${tripLabel(x.d)}<img src="assets/sparkle-white.svg" alt=""></button>
+        <button class="fCta glass"><img class="orbI" src="assets/ai-orb.png" alt="">${tripLabel(x.d)}</button>
       </div>
     </div>`;
   const v = el.querySelector("video");
@@ -2189,10 +2244,10 @@ function chipsHTML(){
     <button data-v="chat" aria-pressed="${view === "chat"}">Chat</button><button data-v="unplanned" aria-pressed="${view === "unplanned"}">Unplanned</button>
     ${DAYS.map((d, i) => `<button data-v="day:${i}" aria-pressed="${view === "day:" + i}"><em>${fmtD(addDays(TRIP.start, i))}</em>Day ${i + 1}</button>`).join("")}`;
 }
-function flightHTML(f){
+function flightHTML(f, compact){
   return cardHTML(`<div class="flTop"><div style="min-width:0"><div class="fRoute"><span class="r"><img class="pl" src="assets/plane-fill.svg" alt="">${f.from}<img src="assets/return.svg" alt="return">Phuket</span><i></i><span class="dt">${f.dates}</span></div>
       <p class="fPrice"><span class="rs">₹</span><b>${f.price}</b> Return Flight</p></div><button class="bookBtn" data-sq="10" data-soon="Booking">Book</button></div>
-    <div class="aiNote" data-sq="12"><img src="assets/sparkle-green.svg" alt=""><p>${f.note}</p></div>`, "flight", 16);
+    ${compact ? "" : `<div class="aiNote"><img src="assets/ai-orb.png" alt=""><p>${f.note}</p></div>`}`, "flight" + (compact ? " compact" : ""), 16);
 }
 const spotTile = st => `<div class="spot" data-sq="12.8"><img src="${st.img}" alt="${esc(st.n)}" loading="lazy"><b>${st.e}</b></div>`;
 function headerHTML(){
@@ -2217,8 +2272,8 @@ function overviewHTML(){
 }
 function breakHTML(){
   const i = BREAK_AFTER, day = addDays(TRIP.start, i + 1);
-  return `<div class="breakCard" data-sq="20"><div><span class="tag">Flight Change</span><span class="what"><img src="assets/plane-fill.svg" alt="">Phuket → Koh Samui</span><span class="when">${fmtD(day)}, ${day.getFullYear()}</span></div>
-    <i class="cut"></i><div><span class="tag">Hotel Change</span><span class="what">🛏️ Koh Samui, Chaweng</span><span class="when">${fmtRange(day, DAYS.length - i - 1)}, ${day.getFullYear()}</span></div></div>`;
+  return `<div class="breakCard"><div class="half"><span class="tag">Flight Change</span><span class="what"><img src="assets/plane-break.svg" alt="">Phuket<img class="arr" src="assets/arrow-right-grey.svg" alt="to">Koh Samui</span><span class="when">${fmtD(day)}, ${day.getFullYear()}</span></div>
+    <i class="cut"></i><div class="half"><span class="tag">Hotel Change</span><span class="what"><img src="assets/hotel-green.svg" alt="">Koh Samui, Chaweng</span><span class="when">${fmtRange(day, DAYS.length - i - 1)}, ${day.getFullYear()}</span></div></div>`;
 }
 const swapIn = (old, html) => { const t = document.createElement("div"); t.innerHTML = html; const n = t.firstElementChild; old.replaceWith(n); watchSq(n); bindSoon(n); return n; };
 // Re-order a day's spots around the new dates: tiles slide to their new places
@@ -2309,8 +2364,7 @@ planEl.addEventListener("click", e => {
 function doAct(a){
   closeMenus();
   if (a === "invite") openInvite("trip");
-  else if (a === "spots" || a === "import"){ setView("unplanned"); say(a === "import" ? "Paste a reel or map link. Imported spots land in Unplanned." : "Pick a spot and add it to a day"); }
-  else if (a === "stays") say("Adding stays is coming next");
+  // Import Spots and Add Spots stay as visual options for now: tapping just closes the menu
   else if (a === "poll") openPoll("chat");
 }
 
@@ -2414,7 +2468,7 @@ async function findFlights(){
   const opts = [{ from: "Mumbai", dates: "Jan 9 - 15", price: "23,350", note: "Cheapest flight in January from Mumbai" },
                 { from: "Delhi", dates: JAN(), price: "18,350", note: "Cheapest flight in January from Delhi" }];
   const w = document.createElement("div"); w.className = "msgCard msgIn";
-  w.innerHTML = `<div class="flGroup" data-sq="24"><div class="flHead"><img src="assets/ai-orb.png" alt=""><span>Cheapest flights in january</span></div>${opts.map(flightHTML).join("")}</div>`;
+  w.innerHTML = `<div class="flGroup" data-sq="24"><div class="flHead"><img src="assets/ai-orb.png" alt=""><span>Cheapest flights in january</span></div><div class="flList">${opts.map(o => flightHTML(o, true)).join("")}</div></div>`;
   msgsEl.appendChild(w); watchSq(w); bindSoon(w); scrollChat(); haptic(8);
   await sleep(1300);
   await typeAndSend(`Guys this ${JAN()} flights looks very cheap.`);
@@ -2425,9 +2479,9 @@ async function findFlights(){
 async function changeDates(){
   chatLeft = (chatLeft || []).filter(c => c.onTap !== changeDates);
   aiLoading("Updating your trip dates.."); await sleep(2000); aiRow.innerHTML = "";
-  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest flight in January from Delhi";
-  chatStage = 4;
-  await sleep(300);
+  chatStage = 4; await sleep(300); applyJanDates();
+}
+async function applyJanDates(){
   // land on the overview as it was, then let the changes play out in place
   TRIP.start = new Date(2026, 11, 24); TRIP.from = "Mumbai"; TRIP.price = "23,350"; TRIP.note = "Cheapest flight in the month of December from Mumbai";
   renderPlan(); setView("overview"); setFull(false);
@@ -2448,6 +2502,162 @@ async function changeDates(){
 chatBarEl.addEventListener("submit", e => { e.preventDefault(); const inp = chatInp(), t = inp.value.trim(); if (!t) return; inp.value = ""; syncBar(); bubble("You", t); haptic(6); });
 chatInp().addEventListener("input", syncBar);
 
+
+/* ---------- AI assistant: the globe orb on Home and on the trip opens it. It suggests, you tap, it acts. ---------- */
+const aiSheet = document.getElementById("aiSheet"), aiScrim = document.getElementById("aiScrim"), aiSugs = document.getElementById("aiSugs"), aiLog = document.getElementById("aiLog"),
+  aiBody = document.getElementById("aiBody"), aiBar = document.getElementById("aiBar"), aiInput = document.getElementById("aiInput");
+let aiCtx = "home";
+const aiScroll = () => requestAnimationFrame(() => aiBody.scrollTo({ top: aiBody.scrollHeight, behavior: "smooth" }));
+const chipHTML = (t, i) => `<button type="button" class="aiChip" data-i="${i}"><img class="orb" src="assets/ai-orb.png" alt=""><span>${esc(t)}</span></button>`;
+function bindChips(box, list){ box.querySelectorAll(".aiChip").forEach(b => b.addEventListener("click", () => { haptic(8); const c = list[+b.dataset.i]; if (c.say !== false) aiUser(c.t); c.run(); }, { once: true })); }
+function aiSuggest(){
+  const list = aiCtx === "plan" ? [
+    { t: "Give cheapest flights in January 2027", run: aiFlights },
+    { t: `Make it a ${DAYS.length + 2} day trip`, run: aiLonger },
+    { t: "Add a club party on day 5", run: aiClub },
+    { t: `Isha’s budget is low, trim the trip to ${Math.max(3, DAYS.length - 1)} days`, run: aiTrim },
+    { t: "Send a poll: which beach day should we keep?", run: () => aiPoll("Send a poll like Kata Beach, Maya Bay or Chaweng Beach") }
+  ] : [
+    { t: "Send a poll with Thailand, Bali or Vietnam", run: () => aiPoll("poll like Thailand, Bali, Vietnam") },
+    { t: "Plan a 4-day trip from my saved reels", run: aiFromReels },
+    { t: "Where should we go in December?", run: aiWhere }
+  ];
+  aiSugs.innerHTML = list.map((c, i) => chipHTML(c.t, i)).join(""); bindChips(aiSugs, list);
+}
+function openAI(ctx){
+  aiCtx = ctx; closeMenus && closeMenus();
+  aiLog.innerHTML = ""; aiInput.value = ""; aiBar.classList.remove("has"); aiSuggest();
+  aiScrim.classList.toggle("clear", ctx === "plan");
+  aiScrim.hidden = false; aiSheet.hidden = false; watchSq(aiSheet);
+  requestAnimationFrame(() => requestAnimationFrame(() => { aiScrim.classList.add("show"); aiSheet.classList.add("show"); }));
+  aiSugs.querySelectorAll(".aiChip").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 420, delay: 160 + i * 60, easing: "cubic-bezier(.2,.9,.3,1.2)", fill: "backwards" }));
+  document.body.classList.add("locked"); haptic(10);
+}
+function closeAI(){
+  if (aiSheet.hidden) return;
+  aiInput.blur(); aiScrim.classList.remove("show"); aiSheet.classList.remove("show");
+  setTimeout(() => { if (!aiSheet.classList.contains("show")){ aiSheet.hidden = true; aiScrim.hidden = true; } }, 500);
+  if (viewer.hidden && making.hidden && planEl.hidden) document.body.classList.remove("locked");
+}
+document.getElementById("aiTab").addEventListener("click", () => openAI("home"));
+document.getElementById("prAi").addEventListener("click", () => openAI("plan"));
+aiScrim.addEventListener("click", closeAI);
+document.getElementById("aiGrab").addEventListener("click", closeAI);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeAI(); });
+aiInput.addEventListener("input", () => aiBar.classList.toggle("has", !!aiInput.value.trim()));
+aiBar.addEventListener("submit", e => { e.preventDefault(); const t = aiInput.value.trim(); if (!t) return; aiInput.value = ""; aiBar.classList.remove("has"); aiUser(t); aiRoute(t); });
+
+function aiUser(t){
+  aiSugs.innerHTML = "";
+  const el = document.createElement("div"); el.className = "msg self msgIn";
+  el.innerHTML = `<div class="bubble" data-sq="16"><b>You</b><p>${esc(t)}</p></div>`;
+  aiLog.appendChild(el); watchSq(el); aiScroll();
+}
+async function aiThink(label = "Thinking"){
+  const el = document.createElement("div"); el.className = "aiLoad"; el.innerHTML = `<img class="spin big" src="assets/loader-28.svg" alt=""><p>${esc(label)}</p>`;
+  aiLog.appendChild(el); aiScroll(); await sleep(1300 + Math.random() * 500); el.remove();
+}
+function aiSay(text, extra = "", acts = []){
+  const el = document.createElement("div"); el.className = "aiBlock";
+  el.innerHTML = `<div class="aiMsg"><img src="assets/ai-orb.png" alt=""><div class="aiTxt">${text}</div></div>${extra ? `<div class="msgCard msgIn">${extra}</div>` : ""}${acts.length ? `<div class="aiAct">${acts.map((a, i) => chipHTML(a.t, i)).join("")}</div>` : ""}`;
+  aiLog.appendChild(el); watchSq(el); bindSoon(el);
+  const p = el.querySelector(".aiTxt"); M.words(p, 22, 60); M.play(p);
+  if (acts.length) bindChips(el.querySelector(".aiAct"), acts);
+  aiScroll(); haptic(6); return el;
+}
+// What did they ask for? Simple intent matching is enough for a prototype; every answer ends in something you can tap.
+function aiRoute(t){
+  const s = t.toLowerCase();
+  if (/\bpoll\b|\bvote\b/.test(s)) return aiPoll(t);
+  if (aiCtx === "plan"){
+    if (/flight|fly|cheap/.test(s)) return aiFlights();
+    if (/club|party|night ?out|nightlife/.test(s)) return aiClub();
+    if (/budget|trim|shorter|cut|expensive|less days|fewer days/.test(s)) return aiTrim();
+    if (/longer|extend|more days|add (a |\d+ )?days?|\d+\s*-?\s*day/.test(s)) return aiLonger();
+  } else {
+    if (/reel|saved|4.?day/.test(s)) return aiFromReels();
+    if (/where|destination|december|suggest/.test(s)) return aiWhere();
+  }
+  return aiFallback();
+}
+function pollOptions(t){
+  let tail = "";
+  for (const re of [/\blike\b\s+(.+)$/i, /:\s*(.+)$/, /\bbetween\b\s+(.+)$/i, /\b(?:with|for|of)\b\s+(.+)$/i]) { const m = t.match(re); if (m){ tail = m[1]; break; } }
+  const clean = x => x.replace(/^(the|a|an)\s+/i, "").replace(/[?.!]+$/, "").trim();
+  let opts = tail.split(/,|\/|\bor\b|\band\b|&/i).map(clean).filter(x => x && x.length <= 28 && !/\b(three|top|best|destinations?|places?|countries|options?)\b/i.test(x));
+  if (opts.length < 2){
+    const stop = /^(send|create|make|start|poll|a|the|with|like|and|or|i|we|let|lets|let’s|please|can|could|top|three|which|where|guys)$/i;
+    opts = (t.match(/\b[A-Z][a-zA-Z’']+(?:\s[A-Z][a-zA-Z’']+)?/g) || []).filter(w => !stop.test(w.split(" ")[0]));
+  }
+  opts = [...new Set(opts.map(o => o.charAt(0).toUpperCase() + o.slice(1)))].slice(0, 4);
+  const dates = /\bdate|when|month|weekend/i.test(t);
+  if (opts.length < 2) opts = dates ? ["Dec 12 - 20", "Jan 10 - 22", "Feb 06 - 15"] : ["Thailand", "Bali", "Vietnam"];
+  const q = dates ? "Which dates work for everyone?" : /beach/i.test(t) ? "Which beach day should we keep?" : "Where should we go guys?";
+  return { q, labels: dates ? opts : opts.map(withFlag) };
+}
+async function aiPoll(t){
+  const { q, labels } = pollOptions(t);
+  await aiThink("Creating your poll");
+  const list = labels.map(l => `<b>${esc(splitLabel(l)[0])}</b>`).join(", ").replace(/, ([^,]*)$/, " or $1");
+  if (aiCtx === "plan"){
+    aiSay(`Done. I posted “${esc(q)}” in the trip chat with ${list}.`);
+    await sleep(1100); closeAI(); await sleep(250);
+    if (!chatStage){ chatStage = 2; chatLeft = []; msgsEl.innerHTML = ""; aiRow.innerHTML = "";
+      bubble("Isha", "Guys, these dates are not working for me.", false); bubble("Priya", "Isha these are the dates where we are getting cheapest flight prices", false); }
+    setView("chat"); await sleep(400); showPoll(q, labels, "chat"); say("Poll posted in the trip chat");
+  } else {
+    aiSay(`Here’s your poll: “${esc(q)}” with ${list}. Pick who should vote.`);
+    await sleep(1100); closeAI(); await sleep(350);
+    openInvite("poll", { q, labels, target: "home" });
+  }
+}
+async function aiFlights(){
+  await aiThink("Fetching flights details");
+  const opts = [{ from: "Mumbai", dates: "Jan 9 - 15", price: "23,350" }, { from: "Delhi", dates: JAN(), price: "18,350" }];
+  aiSay("Cheapest return flights in January from everyone’s home cities. Delhi works best for the group.",
+    `<div class="flGroup" data-sq="24"><div class="flHead"><img src="assets/ai-orb.png" alt=""><span>Cheapest flights in january</span></div><div class="flList">${opts.map(o => flightHTML(o, true)).join("")}</div></div>`,
+    [{ t: `Change trip dates to ${JAN()}`, run: async () => { await aiThink("Updating your trip dates.."); closeAI(); await sleep(300); applyJanDates(); } }]);
+}
+async function aiClub(){
+  await aiThink("Finding a club night");
+  const d = Math.min(4, DAYS.length - 1);
+  aiSay(`I’d add <b>Green Mango</b> in Chaweng on Day ${d + 1}. It’s the group’s most saved club, and Day ${d + 2} starts late so nobody suffers.`, "",
+    [{ t: `Add it to Day ${d + 1}`, run: async () => {
+      DAYS[d].stops.push(S("10:30 PM", "Club night at Green Mango", "🪩", "posters/club-green-mango.jpg", "Added by AI. Most saved club in the group."));
+      await aiThink("Adding to your plan"); closeAI(); await sleep(300); renderPlan(); setView("day:" + d); say(`Club night added to Day ${d + 1}`); haptic(14); } }]);
+}
+async function aiLonger(){
+  await aiThink("Stretching the trip");
+  aiSay(`I can add 2 easy days on Koh Samui: a Koh Tao snorkel day and a slow day in Chaweng. Flights move by 2 days, everything else stays.`, "",
+    [{ t: `Make it ${DAYS.length + 2} days`, run: async () => {
+      DAYS.push({ c: "#00a3a3", place: "Koh Tao day trip", km: "60 KM", stops: [S("8:00 AM", "Ferry to Koh Tao", "⛴️", "posters/blue-ocean.jpg", "About 2 hours from Samui."), S("11:00 AM", "Snorkel at Shark Bay", "🐠", "posters/sea-breeze.jpg", "Turtles if you’re lucky."), S("6:00 PM", "Back to Chaweng", "🌅", "posters/samui-cafes.jpg", "Dinner on the beach.")] },
+                { c: "#e8456b", place: "Slow day in Chaweng", km: "8 KM", stops: [S("10:30 AM", "Late breakfast", "☕", "posters/hidden-cafe.jpg", "Sleep in."), S("1:00 PM", "Beach and massage", "💆", "posters/sea-breeze.jpg", "Nothing planned on purpose."), S("8:00 PM", "Fire show at the bar", "🔥", "posters/fire-show.jpg", "Last night together.")] });
+      await aiThink("Updating your plan"); closeAI(); await sleep(300); renderPlan(); setView("overview"); setFull(false); say(`Trip is now ${DAYS.length} days`); haptic(14); } }]);
+}
+async function aiTrim(){
+  if (DAYS.length <= 3) return aiSay("The trip is already short. I’d keep it as it is and swap one paid activity instead.");
+  await aiThink("Checking the budget");
+  const last = DAYS[DAYS.length - 1];
+  aiSay(`Cutting the last day (<b>${esc(last.place)}</b>) saves one night’s stay and food for everyone. Its spots move to Unplanned, so nothing is lost.`, "",
+    [{ t: `Trim to ${DAYS.length - 1} days`, run: async () => {
+      const d = DAYS.pop(); d.stops.forEach(st => UNPLANNED.push({ n: st.n, e: st.e, img: st.img, by: "AI" }));
+      await aiThink("Updating your plan"); closeAI(); await sleep(300); renderPlan(); setView("overview"); setFull(false); say(`Trip trimmed to ${DAYS.length} days`); haptic(14); } }]);
+}
+async function aiFromReels(){
+  await aiThink("Reading your saved reels");
+  aiSay("You’ve saved 18 spots in Thailand: cafés, beaches and two clubs. I can turn them into a 4-day trip around Phuket.", "",
+    [{ t: "Create the 4-day trip", run: async () => { closeAI(); await sleep(350); openMaking("Thailand", { solo: true }); } }]);
+}
+async function aiWhere(){
+  await aiThink("Looking at December");
+  aiSay("Based on what your group saves: <b>Thailand</b> for beaches and nightlife, <b>Vietnam</b> for food and cheaper stays, <b>Bali</b> for cafés and slow days. Want the group to pick?", "",
+    [{ t: "Send a poll with these 3", run: () => aiPoll("poll like Thailand, Vietnam, Bali") }]);
+}
+function aiFallback(){
+  aiSay("I can turn that into something the group can act on. Try one of these:");
+  const box = document.createElement("div"); box.className = "aiAct"; aiLog.appendChild(box);
+  aiSuggest(); [...aiSugs.children].forEach(c => box.appendChild(c)); aiSugs.innerHTML = ""; aiScroll();
+}
 
 /* ---------- Trip dates: pick From or To on wheels; the trip keeps its length, and every date in the plan follows ---------- */
 const dp = document.getElementById("dpSheet"), dpScrim = document.getElementById("dpScrim");
