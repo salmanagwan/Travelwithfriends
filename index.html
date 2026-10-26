@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "67";
+window.BUILD = "68";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -81,6 +81,20 @@ img,video{display:block}
 .aiBtn span{width:31.5px;height:32px;position:relative;overflow:hidden;display:block}
 .aiBtn img{position:absolute;height:131.17%;width:133.83%;left:-17.93%;top:-16.32%;max-width:none}
 .me{width:40px;height:40px;border-radius:50%;object-fit:cover}
+/* poll button intro (Figma 276:89733): opens into "Create a poll", a shimmer passes, it folds back, the icon pops up and back in */
+#pollBtn{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:0 0 0 6.25px;overflow:hidden;flex:none;
+  transition:width .6s cubic-bezier(.2,.9,.25,1.08),box-shadow .4s}
+#pollBtn .pbIc{flex:none}
+#pollBtn.ex{box-shadow:0 1.1px 10px rgba(0,0,0,.25)}
+#pollBtn.glass{-webkit-backdrop-filter:blur(.6px) saturate(1.6) brightness(1.08);backdrop-filter:blur(.6px) saturate(1.6) brightness(1.08)}
+.pbTxt{flex:none;font-weight:700;font-size:20px;line-height:36px;letter-spacing:-1px;white-space:nowrap;padding-right:18px;
+  background:linear-gradient(90deg,#520bb3 0%,#101010 47.2%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.2)}
+#pollBtn.ex .pbTxt{opacity:1;transform:none;transition-delay:.18s,.18s}
+.pbShine{position:absolute;top:0;bottom:0;left:-60%;width:45%;pointer-events:none;z-index:3;transform:skewX(-18deg);
+  background:linear-gradient(100deg,transparent 0%,rgba(150,105,255,.28) 30%,rgba(255,255,255,.95) 50%,rgba(150,105,255,.28) 70%,transparent 100%)}
+#pollBtn.shine .pbShine{animation:pbShine .9s cubic-bezier(.4,0,.2,1)}
+@keyframes pbShine{to{left:130%}}
 
 .sections{display:flex;flex-direction:column;gap:48px}
 h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-height:1.3;font-variation-settings:"opsz" 14}
@@ -853,7 +867,7 @@ b.grad2{font-weight:700}
 .pCard{position:relative;filter:drop-shadow(0 0 2px rgba(0,0,0,.08))}
 .pCard>.box{position:relative;background:#fff;padding:4px 4px 8px;display:flex;flex-direction:column;gap:12px}
 .pCard>.edge{position:absolute;inset:0;background:#ececec;pointer-events:none}
-.flight .box{padding:4px;align-items:stretch;background:#f8f5ff;gap:12px}
+.flight .box{padding:4px;align-items:stretch;background:#fff;gap:12px}
 .flight .flTop{padding:6px 8px 0 4px}
 .flight .fPrice{font-size:18px;margin-top:6px}
 .flight .aiNote{border-radius:40px;padding:4px 8px;gap:4px;background:linear-gradient(90deg,rgba(0,64,183,.05),rgba(72,157,226,.05) 56%,rgba(217,83,237,.05)),#fff;border:.5px solid #e2e2e2;clip-path:none!important}
@@ -1114,7 +1128,7 @@ b.grad2{font-weight:700}
       <header class="header">
         <div class="logo"><img src="assets/logo-v3.svg" alt="Sidequest"></div>
         <div class="actions">
-          <button class="aiBtn glass disperse strong ring" id="pollBtn" aria-label="Create a poll" aria-haspopup="dialog"><span><img src="assets/ai-badge-v2.png" alt=""></span></button>
+          <button class="aiBtn glass disperse strong ring" id="pollBtn" aria-label="Create a poll" aria-haspopup="dialog"><span class="pbIc"><img src="assets/ai-badge-v2.png" alt=""></span><b class="pbTxt">Create a poll</b><i class="pbShine" aria-hidden="true"></i></button>
           <img class="me" src="assets/avatar.png" alt="Your profile">
         </div>
       </header>
@@ -3385,6 +3399,22 @@ function closePoll(fromPop){
   if (!fromPop && location.hash === "#poll") history.back();
 }
 document.getElementById("pollBtn").addEventListener("click", () => openPoll("home"));
+(function pollIntro(){
+  const b = document.getElementById("pollBtn"), ic = b.querySelector(".pbIc"), tx = b.querySelector(".pbTxt");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  async function play(){
+    if (document.hidden || !homeContent || homeContent.hidden || !b.offsetParent) return;
+    b.style.width = "44px"; await wait(30);
+    b.style.width = (6.25 + 31.5 + 8 + tx.scrollWidth) + "px"; b.classList.add("ex"); haptic(6);
+    await wait(750); b.classList.add("shine"); await wait(950); b.classList.remove("shine");
+    await wait(900); b.classList.remove("ex"); b.style.width = "44px";
+    await wait(650);
+    await ic.animate([{ transform: "translateY(0)" }, { transform: "translateY(-44px)" }], { duration: 260, easing: "cubic-bezier(.5,0,.75,0)" }).finished;
+    ic.animate([{ transform: "translateY(44px)" }, { transform: "translateY(-4px)", offset: .7 }, { transform: "translateY(0)" }], { duration: 520, easing: "cubic-bezier(.2,.9,.3,1)" });
+  }
+  setTimeout(play, 2600);
+})();
 scrim.addEventListener("click", () => closePoll());
 window.addEventListener("popstate", () => closePoll(true));
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePoll(); });
