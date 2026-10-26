@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "66";
+window.BUILD = "67";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -180,8 +180,8 @@ h1{font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;line-hei
 .tvMenu>.edge{position:absolute;inset:0;background:rgba(0,0,0,.1);pointer-events:none}
 .tvMenu button{position:relative;display:flex;align-items:center;gap:12px;font:600 18px var(--sans);color:#101010;white-space:nowrap;text-align:left;-webkit-tap-highlight-color:transparent;transition:transform .15s}
 .tvMenu button:active{transform:scale(.96)}
-.tvMenu .ic{position:relative;height:32px;flex:none;overflow:hidden}
-.tvMenu .ic img{position:absolute;max-width:none}
+.tvMenu .ic{height:32px;flex:none;display:flex;align-items:center}
+.tvMenu .ic img{height:32px;width:auto}
 .tvMenu hr{position:relative;border:0;height:.8px;min-width:182.5px;background:#e7e8eb;margin:0}
 .tvCard.gone{animation:tvOut .36s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes tvOut{to{opacity:0;transform:scale(.92)}}
@@ -651,6 +651,8 @@ b.grad2{font-weight:700}
   opacity:0;transform:translateY(24px) scale(.9);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.3)}
 .fabMenu .pill img{height:34px;width:auto;max-width:48px;object-fit:contain;position:relative;z-index:1}
 .fabMenu .pill img.sm{height:30px}
+.fabMenu .pill img.p40{height:40px;max-width:none}
+.fabMenu .pill img.p32{height:32px;max-width:none}
 .fabMenu.open .pill{opacity:1;transform:none}
 .fabMenu .pill:active{transform:scale(.96)}
 #plan .prBtns{z-index:7}
@@ -1172,11 +1174,11 @@ b.grad2{font-weight:700}
       <div class="tvList" id="tvList"></div>
       <div class="tvMenu" id="tvMenu" role="menu" hidden>
         <i class="bg" data-sq="24"></i><i class="edge" data-ring="24"></i>
-        <button type="button" role="menuitem" data-act="invite"><span class="ic" style="width:32.29px"><img src="assets/menu-icons.png" alt="" style="height:131.16%;left:-20.47%;top:-20.11%;width:389.95%"></span>Invite Friend</button>
+        <button type="button" role="menuitem" data-act="invite"><span class="ic"><img src="assets/p3d-invite.png" alt=""></span>Invite Friend</button>
         <hr>
-        <button type="button" role="menuitem" data-act="dup"><span class="ic" style="width:36.058px"><img src="assets/menu-icons.png" alt="" style="height:131.16%;left:-129.1%;top:-20.11%;width:349.2%"></span>Duplicate Trip</button>
+        <button type="button" role="menuitem" data-act="dup"><span class="ic"><img src="assets/p3d-duplicate.png" alt=""></span>Duplicate Trip</button>
         <hr>
-        <button type="button" role="menuitem" data-act="del"><span class="ic" style="width:31.652px"><img src="assets/menu-icons.png" alt="" style="height:131.16%;left:-283.88%;top:-20.11%;width:397.8%"></span>Delete Trip</button>
+        <button type="button" role="menuitem" data-act="del"><span class="ic"><img src="assets/p3d-delete.png" alt=""></span>Delete Trip</button>
       </div>
       <button type="button" class="tvAdd" data-soon="New trip" data-sq-dash="14"><svg aria-hidden="true"><path fill="none" stroke="#969696" stroke-width="1.5" stroke-dasharray="6 5" stroke-linecap="round"/></svg><img src="assets/plus-grey.svg" alt="">Add new trip</button>
     </div>
@@ -1246,9 +1248,9 @@ b.grad2{font-weight:700}
     <div class="prFoot"></div>
     <div class="fabMenu" id="prMenu">
       <div class="wash"></div>
-      <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
-      <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/i3d-import.png" alt="">Import Spots</button>
-      <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
+      <button class="pill" data-act="invite" style="right:48px;bottom:296px;transition-delay:.04s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
+      <button class="pill" data-act="import" style="right:47px;bottom:212px;transition-delay:.08s"><img src="assets/p3d-import.png" class="p40" alt="">Import Spots</button>
+      <button class="pill" data-act="spots" style="right:21px;bottom:128px;transition-delay:.12s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
     </div>
     <div class="prFade" aria-hidden="true"></div>
     <div class="prBtns" id="prBtns">
@@ -1262,8 +1264,8 @@ b.grad2{font-weight:700}
       <div class="fabMenu" id="chatMenu">
         <div class="wash"></div>
         <button class="pill" data-act="poll" style="right:28px;bottom:268px"><img src="assets/poll-3d-v2.png" alt="">Add Poll</button>
-        <button class="pill" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/i3d-invite.png" class="sm" alt="">Invite Friends</button>
-        <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
+        <button class="pill" data-act="invite" style="right:48px;bottom:184px;transition-delay:.05s"><img src="assets/p3d-invite.png" class="p40" alt="">Invite Friends</button>
+        <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/p3d-addspots.png" class="p32" alt="">Add Spots</button>
       </div>
       <form class="chatBar" id="chatBar" autocomplete="off">
         <div class="inBox"><input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send"><button type="submit" class="send" aria-label="Send"><img src="assets/send-purple.svg" alt=""></button></div>
