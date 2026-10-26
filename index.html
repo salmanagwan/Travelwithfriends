@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "73";
+window.BUILD = "74";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -641,22 +641,44 @@ b.grad2{font-weight:700}
 .breakCard::before,.breakCard::after{content:"";position:absolute;left:50%;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:#fff;z-index:1}
 .breakCard::before{top:-12px}.breakCard::after{bottom:-12px}
 /* a single day, drilled down */
-.dayView{padding:8px 16px 0;display:flex;flex-direction:column;gap:16px}
-.dvHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.dvHead .l{display:flex;align-items:center;gap:8px;min-width:0}
-.dvHead h3{font-weight:700;font-size:20px;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dvSub{font-size:14px;color:#686868;font-weight:500;margin-top:-8px}
-.stops{display:flex;flex-direction:column}
-.stop{display:flex;gap:12px;position:relative}
-.stop .time{width:58px;flex:none;font-weight:600;font-size:13px;color:#686868;padding-top:6px;text-align:right}
-.stop .rail{width:12px;flex:none;position:relative;display:flex;justify-content:center}
-.stop .rail i{width:12px;height:12px;border-radius:50%;border:3px solid var(--dc,#138cff);background:#fff;margin-top:8px;position:relative;z-index:1}
-.stop .rail::after{content:"";position:absolute;top:20px;bottom:-8px;width:2px;background:#ececec}
-.stop:last-child .rail::after{display:none}
-.stop .body{flex:1;min-width:0;display:flex;gap:12px;align-items:center;padding:4px;margin-bottom:12px;background:#fff;border:.7px solid #ececec;border-radius:16px}
-.stop .body .spot{width:64px;height:64px}
-.stop .body h4{font-weight:600;font-size:16px;color:#101010;letter-spacing:-.2px}
-.stop .body p{font-size:13px;color:#686868;margin-top:2px;line-height:1.3}
+.dayView{padding:4px 16px 0;display:flex;flex-direction:column;gap:18px}
+.dvTop{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:16px;color:#969696;letter-spacing:-.08px}
+.dvTop .m{display:flex;align-items:center;gap:8px;font-weight:500}
+.dvTop .m i{width:4px;height:4px;border-radius:50%;background:#c4c4c4}
+.dvLine{position:relative;display:flex;flex-direction:column;gap:13px}
+.dvLine::before{content:"";position:absolute;left:17px;top:22px;bottom:0;width:16px;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,#ececec 0 2px,transparent 2px 10px);border-radius:2px}
+.dvStart{position:relative;display:flex;align-items:center;gap:12px;height:38px;padding-left:17px}
+.dvStart .tick{width:26px;height:2px;border-radius:2px;background:#686868;flex:none}
+.dvStart>span{font-weight:600;font-size:16px;color:#686868;letter-spacing:-.08px;flex:1}
+.dvPill{display:flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:999px;background:#f2f2f2;font-weight:600;font-size:16px;color:#101010;white-space:nowrap}
+.dvPill img{width:24px;height:24px}
+.dvPill img.ex{width:20px;height:20px}
+.dvPill i{width:4px;height:4px;border-radius:50%;background:#c4c4c4}
+.dvPill span{color:#969696}
+.dvPill b{font-weight:600}
+.dvPill:active,.dvGo:active,.dvTag:active{transform:scale(.96)}
+.dvRow{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dvTime{position:relative;z-index:1;flex:none;padding:3px 6px;border-radius:30px;background:#00a5ff;color:#fff;font-weight:700;font-size:14px;letter-spacing:-.2px;white-space:nowrap}
+.dvCard{flex:none;width:min(295px,calc(100% - 82px));min-width:0;display:flex;align-items:center;gap:12px;padding:8px 4px 8px 8px;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.1)}
+.dvThumb{position:relative;width:72px;height:72px;flex:none;overflow:hidden;background:#eee}
+.dvThumb img{width:100%;height:100%;object-fit:cover}
+.dvThumb em{position:absolute;right:4px;top:4px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:600;font-size:13px;color:#fff;
+  background:linear-gradient(180deg,rgba(32,32,32,.6),rgba(70,69,69,.6) 65%,rgba(90,90,90,.6));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid #000;box-shadow:inset 0 1px 1px rgba(255,255,255,.25)}
+.dvInfo{min-width:0;display:flex;flex-direction:column;gap:8px}
+.dvInfo h4{font-weight:600;font-size:18px;color:#101010;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dvTags{display:flex;gap:8px;flex-wrap:wrap}
+.dvTag{display:flex;align-items:center;gap:2px;height:26px;padding:0 8px 0 4px;border-radius:30px;font-weight:600;font-size:14px;letter-spacing:-.2px;white-space:nowrap}
+.dvTag img{width:20px;height:20px}
+.dvTag.blue{background:rgba(0,165,255,.15);color:#00a5ff}
+.dvTag.orange{background:rgba(255,150,0,.1);color:#ff9600;padding-left:6px;padding-right:10px}
+button.dvTag{padding-right:4px}
+.dvDrive{display:flex;align-items:center;justify-content:space-between;padding-left:85px}
+.dvDrive .dvPill{gap:4px}
+.dvDrive .dvPill b{margin-left:2px}
+.dvGo{width:56px;height:38px;flex:none;border-radius:66px;background:#00a5ff;display:grid;place-items:center}
+.dvGo img{width:24px;height:24px}
+@media (max-width:380px){.dvDrive{padding-left:72px}.dvInfo h4{font-size:16px}.dvTime{font-size:12px}}
 .addFrom{display:flex;align-items:center;justify-content:center;gap:6px;height:52px;margin:4px 0 0 82px;border:1.5px dashed #c4c4c4;border-radius:16px;font-weight:600;font-size:15px;color:#686868}
 /* Unplanned */
 .unView{padding:8px 16px 0;display:flex;flex-direction:column;gap:12px}
@@ -2334,12 +2356,29 @@ function shuffleDay(card, i){
       { duration: 640, delay: j * 35, easing: "cubic-bezier(.3,.7,.3,1)" }); });
   card.querySelector(".dayHead").animate([{ opacity: .4 }, { opacity: 1 }], { duration: 500 });
 }
+// Day view (Figma 300:93878): a timeline. Day start, then each stop with its time, a card, and the drive to the next one.
+const CAT = e => /🍜|🍲|🍽|🍛|🥘|🍤|🦐|🍝|🍕|☕|🍹|🍸/.test(e) ? { k: "food", t: /☕/.test(e) ? "Café" : "Restaurant" }
+  : /🏖|🌊|🐠|🚤|🛶|⛴/.test(e) ? { k: "spot", t: "Beach" } : /🛕|🙏/.test(e) ? { k: "spot", t: "Temple" } : /🛍/.test(e) ? { k: "spot", t: "Shopping" }
+  : /🪩|🎉|🔥|🍻/.test(e) ? { k: "spot", t: "Nightlife" } : { k: "spot", t: "Sightseeing" };
+const DUR = ["30m", "1h", "1h 30m", "2h", "3h"];
 function dayHTML(i){
-  const d = DAYS[i], date = addDays(TRIP.start, i);
+  const d = DAYS[i], km = parseFloat(d.km) || 0;
+  const startT = d.stops[0] ? d.stops[0].t.replace(":00", "") : "9 AM";
+  const rows = d.stops.map((st, k) => {
+    const c = CAT(st.e), dur = st.dur || (c.k === "food" ? "1h" : c.t === "Beach" ? "2h" : "1h");
+    const mins = 12 + ((k * 7 + i * 5) % 24), dist = (km ? Math.max(1.2, km / Math.max(1, d.stops.length) * (0.7 + ((k * 3 + i) % 5) / 10)) : 3 + k).toFixed(1);
+    const drive = k < d.stops.length - 1 ? `<div class="dvDrive"><button type="button" class="dvPill" data-soon="Other ways to get there"><img src="assets/car-blue.svg" alt=""><b>${mins}m</b><i></i><span>${dist}km</span><img class="ex" src="assets/expand-grey.svg" alt=""></button><button type="button" class="dvGo" data-go="${k}" aria-label="Show the route"><img src="assets/recenter-white.svg" alt=""></button></div>` : "";
+    return `<div class="dvRow"><span class="dvTime">${st.t}</span>
+      <div class="dvCard" data-sq="20"><span class="dvThumb" data-sq="12"><img src="${st.img}" alt="" loading="lazy"><em>${k + 1}</em></span>
+        <div class="dvInfo"><h4>${esc(st.n)}</h4><div class="dvTags"><button type="button" class="dvTag blue" data-dur="${i}:${k}"><img src="assets/clock-blue.svg" alt=""><span>${dur}</span><img src="assets/expand-blue.svg" alt=""></button>
+          <span class="dvTag ${c.k === "food" ? "orange" : "blue"}"><img src="assets/${c.k === "food" ? "restaurant-orange" : "attraction-blue"}.svg" alt="">${c.t}</span></div></div></div></div>${drive}`;
+  }).join("");
   return `<div class="dayView" style="--dc:${d.c}">
-    <div class="dvHead"><div class="l"><span class="dayPill" style="background:${d.c}">Day ${i + 1}</span><h3>${d.place}</h3></div><span class="dayMeta">${d.km}<i></i>${d.stops.length} spots</span></div>
-    <p class="dvSub">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()]}, ${fmtD(date)} · relaxed pace, about ${d.stops.length + 2} hours out</p>
-    <div class="stops">${d.stops.map(st => `<div class="stop"><span class="time">${st.t}</span><span class="rail"><i></i></span><div class="body" data-sq="16">${spotTile(st)}<div style="min-width:0"><h4>${esc(st.n)}</h4><p>${esc(st.note || "")}</p></div></div></div>`).join("")}</div>
+    <div class="dvTop"><span>${esc(d.place)}</span><span class="m">${d.km ? d.km + "<i></i>" : ""}${d.stops.length} spots</span></div>
+    <div class="dvLine">
+      <div class="dvStart"><i class="tick"></i><span>Day starts</span><button type="button" class="dvPill start" data-start="${i}"><img src="assets/sunrise-orange.svg" alt=""><b>${startT}</b><img class="ex" src="assets/expand-grey.svg" alt=""></button></div>
+      ${rows || `<p class="dayEmpty">Nothing planned yet. Add spots from Unplanned or ask AI.</p>`}
+    </div>
     <button class="addFrom" data-v="unplanned">+ Add a spot from Unplanned</button>
   </div>`;
 }
@@ -2397,6 +2436,10 @@ function showPlan(){
 planEl.addEventListener("click", e => {
   const chip = e.target.closest("[data-v]"); if (chip){ setView(chip.dataset.v); haptic(6); return; }
   const day = e.target.closest(".dayCard"); if (day){ setView("day:" + day.dataset.day); return; }
+  const du = e.target.closest("[data-dur]"); if (du){ const [di, k] = du.dataset.dur.split(":").map(Number), st = DAYS[di].stops[k], cur = du.querySelector("span").textContent;
+    st.dur = DUR[(DUR.indexOf(cur) + 1) % DUR.length]; du.querySelector("span").textContent = st.dur; haptic(6); return; }
+  const sb = e.target.closest("[data-start]"); if (sb){ const b = sb.querySelector("b"), opts = ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM"], n = opts[(opts.indexOf(b.textContent) + 1) % opts.length]; b.textContent = n; haptic(6); say(`Day now starts at ${n}`); return; }
+  const go = e.target.closest("[data-go]"); if (go){ haptic(8); setFull(false); const pg = document.getElementById("planGlobe"); if (pg && pg._zoomTo) pg._zoomTo(98.35, 7.9, 900, 110, 1200); say("Route shown on the map"); return; }
   const act = e.target.closest("[data-act]"); if (act){ doAct(act.dataset.act); return; }
   const add = e.target.closest(".unRow .add");
   if (add){ const it = add.closest(".unItem"), open = !it.classList.contains("open"); prScroll.querySelectorAll(".unItem.open").forEach(x => { x.classList.remove("open"); x.querySelector(".add").setAttribute("aria-expanded", "false"); });
