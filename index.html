@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "64";
+window.BUILD = "65";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -685,20 +685,35 @@ b.grad2{font-weight:700}
 .aiRow{padding:0 20px;flex:none;min-height:0}
 .aiRow:not(:empty){padding:12px 20px 12px}
 /* same AI strip as the poll card: glassy orb, soft blue-to-pink gradient, gradient text, chevron */
-.aiChip{position:relative;display:inline-flex;align-items:center;gap:8px;max-width:100%;height:32px;padding:8px 32px 8px 8px;border-radius:40px;text-align:left;
-  background:linear-gradient(90deg,rgba(0,64,183,.1) 0%,rgba(72,157,226,.1) 44.18%,rgba(217,83,237,.1) 78.54%);
-  font-weight:500;font-size:14px;letter-spacing:-.5px;white-space:nowrap;animation:msgIn .45s cubic-bezier(.2,.9,.3,1.3) both}
-.aiChip img.orb{width:16px;height:16px;flex:none;object-fit:contain}
-.aiChip img.chev{position:absolute;right:8px;top:50%;width:16.8px;height:16.8px;margin-top:-8.4px;transform:scaleX(-1)}
-.aiChip span{overflow:hidden;text-overflow:ellipsis;min-width:0;background:linear-gradient(90deg,#003dae 0%,#217ac3 44.18%,#bd2ad4 78.54%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-@keyframes aiShine{0%,100%{background-position:0 0}50%{background-position:-30% 0}}
+.aiRow:not(:empty){display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+/* chat AI suggestions (Figma 253:58614): glassy orb, faint blue-to-pink wash, gradient text */
+.aiChip{position:relative;display:inline-flex;align-items:center;gap:8px;max-width:100%;height:38px;padding:8px 14px 8px 8px;border-radius:40px;text-align:left;
+  background:linear-gradient(90deg,rgba(0,64,183,.05) 0%,rgba(72,157,226,.05) 56%,rgba(217,83,237,.05) 100%),#fff;border:.5px solid #dcdcdc;box-shadow:inset 0 1px 0 #fff,0 1px 3px rgba(0,0,0,.04);
+  font-weight:500;font-size:16px;letter-spacing:-.3px;white-space:nowrap;animation:msgIn .45s cubic-bezier(.2,.9,.3,1.3) both}
+.aiChip+.aiChip{animation-delay:.08s}
+.aiChip img.orb{width:20px;height:20px;flex:none;object-fit:contain}
+.aiChip span{overflow:hidden;text-overflow:ellipsis;min-width:0;background:linear-gradient(90deg,#003dae 0%,#217ac3 56%,#bd2ad4 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.flGroup{display:flex;flex-direction:column;gap:16px;padding:20px 0 12px;border-radius:24px;background:linear-gradient(125deg,#fcf5fd 0%,rgba(146,203,255,.32) 62%,rgba(146,203,255,.2) 100%)}
+.flGroup .flHead{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;letter-spacing:-.3px}
+.flGroup .flHead img{width:20px;height:20px}
+.flGroup .flHead span{background:linear-gradient(90deg,#003dae 0%,#217ac3 56%,#bd2ad4 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.flGroup .pCard{margin:0 20px;filter:none}
+.flGroup .pCard>.edge{display:none}
 .aiChip:active{transform:scale(.97)}
 .aiLoad{display:flex;align-items:center;gap:16px;padding:6px 20px;animation:msgIn .35s both}
 .aiLoad p{font-weight:600;font-size:20px;white-space:nowrap;background:linear-gradient(90deg,#686868 0%,#cecece 25%,#686868 50%,#cecece 75%,#686868 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1.8s linear infinite}
 .chatBar{flex:none;display:flex;gap:16px;align-items:center;padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));position:relative;z-index:7}
 .chatBar input{flex:1;min-width:0;height:56px;border:1px solid #ececec;border-radius:16px;padding:0 16px;font:500 18px var(--sans);color:#101010;outline:0;caret-color:var(--accent)}
 .chatBar input::placeholder{color:#a0a4ab}
-.chatBar input:focus{border-color:#d9ccff}
+.chatBar .inBox{position:relative;flex:1;min-width:0;display:flex}
+.chatBar .inBox input{flex:1}
+.chatBar input:focus,.chatBar.has input{border-color:#6b2bf5}
+.chatBar.has input{padding-right:62px;letter-spacing:-.5px;color:#111214}
+.chatBar .inBox .send{display:grid;place-items:center;position:absolute;right:6px;top:6px;width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.5);border:.5px solid #6b2cf3;box-shadow:0 1px 8px rgba(0,0,0,.1);
+  opacity:0;transform:scale(.6);pointer-events:none;transition:opacity .2s,transform .3s cubic-bezier(.2,.9,.3,1.4)}
+.chatBar .inBox .send img{width:24px;height:24px}
+.chatBar.has .inBox .send{opacity:1;transform:none;pointer-events:auto}
+.chatBar .inBox .send:active,.chatBar .inBox .send.tap{transform:scale(.88)}
 .chatBar .plus{width:56px;height:56px;flex:none;border-radius:28px;background:#f2f2f2;display:grid;place-items:center;transition:background .25s}
 .chatBar .plus img{width:28px;height:28px;transition:transform .35s cubic-bezier(.2,.9,.3,1.3),filter .25s}
 .chatBar.open .plus{background:#101010}
@@ -1205,7 +1220,7 @@ b.grad2{font-weight:700}
         <button class="pill" data-act="spots" style="right:21px;bottom:100px;transition-delay:.1s"><img src="assets/i3d-addspots.png" class="sm" alt="">Add Spots</button>
       </div>
       <form class="chatBar" id="chatBar" autocomplete="off">
-        <input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send">
+        <div class="inBox"><input id="chatInput" type="text" placeholder="Write your message..." aria-label="Message" enterkeyhint="send"><button type="submit" class="send" aria-label="Send"><img src="assets/send-purple.svg" alt=""></button></div>
         <button type="button" class="plus" id="chatPlus" aria-label="Add to chat" aria-expanded="false"><img src="assets/plus-grey.svg" alt=""></button>
       </form>
     </div>
@@ -2344,12 +2359,26 @@ async function typing(who, ms){
   el.innerHTML = `<img src="${PEOPLE[who]}" alt=""><div class="bubble" data-sq="16"><i></i><i></i><i></i></div>`;
   msgsEl.appendChild(el); watchSq(el); scrollChat(); await sleep(ms); el.remove();
 }
-function aiChip(text, onTap){
-  aiRow.innerHTML = `<button class="aiChip"><img class="orb" src="assets/ai-orb.png" alt=""><span>${esc(text)}</span><img class="chev" src="assets/chevron-right-dark.svg" alt=""></button>`;
-  aiRow.querySelector("button").addEventListener("click", () => { aiRow.innerHTML = ""; haptic(10); onTap(); }, { once: true });
+function aiChips(list){
+  aiRow.innerHTML = list.map((c, i) => `<button class="aiChip" data-i="${i}"><img class="orb" src="assets/ai-orb.png" alt=""><span>${esc(c.text)}</span></button>`).join("");
+  aiRow.querySelectorAll(".aiChip").forEach(b => b.addEventListener("click", () => { const c = list[+b.dataset.i]; aiRow.innerHTML = ""; haptic(10); c.onTap(); }, { once: true }));
   scrollChat();
 }
+const aiChip = (text, onTap) => aiChips([{ text, onTap }]);
 function aiLoading(text){ aiRow.innerHTML = `<div class="aiLoad"><img class="spin big" src="assets/loader-28.svg" alt=""><p>${esc(text)}</p></div>`; scrollChat(); }
+const chatInp = () => document.getElementById("chatInput");
+function syncBar(){ chatBarEl.classList.toggle("has", !!chatInp().value.trim()); }
+// you type into the box (purple border, send button), then it sends
+async function typeAndSend(line){
+  const inp = chatInp();
+  for (let k = 1; k <= line.length; k++){ inp.value = line.slice(0, k); syncBar(); await sleep(26); }
+  await sleep(350); const sb = chatBarEl.querySelector(".send"); sb.classList.add("tap"); haptic(6); await sleep(160); sb.classList.remove("tap");
+  inp.value = ""; syncBar(); bubble("You", line);
+}
+// the dates the plan would move to: the cheapest January window, same trip length
+const JAN = () => fmtRange(new Date(2027, 0, 4), DAYS.length);
+let chatLeft = null;   // the suggestions still on offer
+function offerNext(){ if (chatLeft && chatLeft.length) aiChips(chatLeft); }
 function openChat(){
   prChat.hidden = false; document.getElementById("prBtns").hidden = true; setFull(true); syncChips();
   if (!chatStage){
@@ -2360,35 +2389,50 @@ function openChat(){
     const id = ++chatRun;
     (async () => { await sleep(900); if (id !== chatRun || prChat.hidden) { chatStage = 0; return; }
       await typing("Isha", 1300); bubble("Isha", "I am free in January first half."); chatStage = 2;
-      await sleep(500); aiChip("Give cheapest flights in January 2027", findFlights); })();
+      await sleep(500);
+      chatLeft = [{ text: "Generate a poll for next 3 best time slots", onTap: pollFromAI }, { text: "Give cheapest flights in January 2027", onTap: findFlights }];
+      offerNext(); })();
   } else scrollChat();
 }
+// AI drafts a dates poll: you say it in chat, the sheet opens already filled, you just tap Create Poll
+async function pollFromAI(){
+  chatLeft = chatLeft.filter(c => c.onTap !== pollFromAI);
+  await typeAndSend("Isha, let me create poll");
+  await sleep(500); openPoll("chat"); await sleep(650);
+  say("AI picked 3 windows around long weekends and cheaper flights");
+  const put = async (el, v) => { for (let k = 1; k <= v.length; k++){ el.value = v.slice(0, k); el.dispatchEvent(new Event("input", { bubbles: true })); await sleep(24); } };
+  await put(qEl, "Choose a date for trip!");
+  const opts = ["Dec 12 - 20", "Jan 10 - 22", "Feb 06 - 15"];
+  while (optsEl.querySelectorAll("input").length < opts.length) addOption();
+  const ins = [...optsEl.querySelectorAll("input")];
+  for (let i = 0; i < opts.length; i++) await put(ins[i], opts[i]);
+  document.activeElement && document.activeElement.blur && document.activeElement.blur();
+}
 async function findFlights(){
+  chatLeft = chatLeft ? chatLeft.filter(c => c.onTap !== findFlights) : [];
   aiLoading("Fetching flights details"); await sleep(2200); aiRow.innerHTML = "";
-  const opts = [{ from: "Mumbai", dates: "Jan 9 - 15", price: "23,350", note: "Cheapest return flight from Mumbai in January" },
-                { from: "Delhi", dates: "Jan 4 - 10", price: "18,350", note: "Cheapest return flight from Delhi in January" }];
-  for (const o of opts){ const w = document.createElement("div"); w.className = "msgCard msgIn"; w.innerHTML = flightHTML(o); msgsEl.appendChild(w); watchSq(w); bindSoon(w); scrollChat(); haptic(6); await sleep(450); }
-  await sleep(900);
-  // you type your reaction into the box, then it sends
-  const inp = document.getElementById("chatInput"), line = "Guys this Jan 4 - 10 flights looks very cheap.";
-  for (let k = 1; k <= line.length; k++){ inp.value = line.slice(0, k); await sleep(22); }
-  await sleep(300); inp.value = ""; bubble("You", line);
-  await typing("Priya", 1000); bubble("Priya", "Works for me 👍");
-  await typing("Aman", 900); bubble("Aman", "I’m in!");
-  await typing("Isha", 900); bubble("Isha", "Perfect, thank you guys ❤️");
-  chatStage = 3; await sleep(500);
-  aiChip("Change trip dates to Jan 4 - 10", changeDates);
+  const opts = [{ from: "Mumbai", dates: "Jan 9 - 15", price: "23,350", note: "Cheapest flight in January from Mumbai" },
+                { from: "Delhi", dates: JAN(), price: "18,350", note: "Cheapest flight in January from Delhi" }];
+  const w = document.createElement("div"); w.className = "msgCard msgIn";
+  w.innerHTML = `<div class="flGroup" data-sq="24"><div class="flHead"><img src="assets/ai-orb.png" alt=""><span>Cheapest flights in january</span></div>${opts.map(flightHTML).join("")}</div>`;
+  msgsEl.appendChild(w); watchSq(w); bindSoon(w); scrollChat(); haptic(8);
+  await sleep(1300);
+  await typeAndSend(`Guys this ${JAN()} flights looks very cheap.`);
+  chatStage = 3; await sleep(600);
+  chatLeft = [{ text: `Change trip dates to ${JAN()}`, onTap: changeDates }, ...chatLeft];
+  offerNext();
 }
 async function changeDates(){
+  chatLeft = (chatLeft || []).filter(c => c.onTap !== changeDates);
   aiLoading("Updating your trip dates.."); await sleep(2000); aiRow.innerHTML = "";
-  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest return flight from Delhi in January";
-  bubble("You", "Done! Trip moved to Jan 4 - 10 ✈️"); chatStage = 4;
-  await sleep(700);
+  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest flight in January from Delhi";
+  chatStage = 4;
+  await sleep(300);
   // land on the overview as it was, then let the changes play out in place
   TRIP.start = new Date(2026, 11, 24); TRIP.from = "Mumbai"; TRIP.price = "23,350"; TRIP.note = "Cheapest flight in the month of December from Mumbai";
   renderPlan(); setView("overview"); setFull(false);
   await sleep(650);
-  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest return flight from Delhi in January";
+  TRIP.start = new Date(2027, 0, 4); TRIP.from = "Delhi"; TRIP.price = "18,350"; TRIP.note = "Cheapest flight in January from Delhi";
   const dc = document.getElementById("prDates"); dc.innerHTML = `<img src="assets/calendar-fill.svg" alt="">${fmtRange(TRIP.start, DAYS.length, true)}`; dc.classList.add("flash");
   syncChips();
   const list = prScroll.querySelector(".prList");
@@ -2399,9 +2443,10 @@ async function changeDates(){
   list.prepend(note); watchSq(note);
   const br = prScroll.querySelector(".breakCard"); if (br) swapIn(br, breakHTML()).classList.add("flash");
   prScroll.querySelectorAll(".dayCard").forEach((card, i) => setTimeout(() => shuffleDay(card, i), 300 + i * 120));
-  say("Trip dates updated to Jan 4 - 10"); haptic(18);
+  say(`Trip dates updated to ${fmtRange(TRIP.start, DAYS.length)}`); haptic(18);
 }
-chatBarEl.addEventListener("submit", e => { e.preventDefault(); const inp = document.getElementById("chatInput"), t = inp.value.trim(); if (!t) return; inp.value = ""; bubble("You", t); haptic(6); });
+chatBarEl.addEventListener("submit", e => { e.preventDefault(); const inp = chatInp(), t = inp.value.trim(); if (!t) return; inp.value = ""; syncBar(); bubble("You", t); haptic(6); });
+chatInp().addEventListener("input", syncBar);
 
 
 /* ---------- Trip dates: pick From or To on wheels; the trip keeps its length, and every date in the plan follows ---------- */
@@ -3188,7 +3233,7 @@ sheet.addEventListener("submit", e => {
   const labels = [...optsEl.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
   // next step from Figma: invite friends to vote, then the poll goes live
   // in the trip chat everyone is already in, so the poll posts straight away
-  if (pollTarget === "chat"){ closePoll(); setTimeout(() => { showPoll(q, labels, "chat"); say("Poll shared in the trip chat"); }, 300); return; }
+  if (pollTarget === "chat"){ closePoll(); setTimeout(() => { showPoll(q, labels, "chat"); say("Poll shared in the trip chat"); setTimeout(() => typeof offerNext === "function" && offerNext(), 900); }, 300); return; }
   openInvite("poll", { q, labels, target: pollTarget });
 });
 </script>
