@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "62";
+window.BUILD = "63";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -2723,7 +2723,8 @@ const BubbleBurst = (() => {
       const pop = p.age < .28 ? backOut(p.age / .28) : 1;                         // overshoot on the way out
       const s = p.size * pop;
       // fade: quick in, then out over the top part of the screen or at end of life
-      const top = Math.min(1, Math.max(0, (p.y - 4) / Math.max(70, p.oy * .7)));
+      const gone = Math.max(60, p.oy * .25), from = Math.max(gone + 80, p.oy * .8);   // fully gone well before the top edge
+      const top = Math.min(1, Math.max(0, (p.y - gone) / (from - gone)));
       const end = Math.min(1, (p.life - p.age) / .4);
       const a = Math.min(1, p.age / .06) * top * top * (3 - 2 * top) * Math.max(0, end) * (.7 + p.depth * .3);
       if (a <= .01 || p.y < -s || p.age > p.life){ if (p.y < -s || p.age > p.life || top <= 0){ pool.push(p); live.splice(i, 1); } continue; }
