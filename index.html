@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "70";
+window.BUILD = "71";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -3410,11 +3410,12 @@ document.getElementById("pollBtn").addEventListener("click", () => openPoll("hom
     b.style.width = "44px"; await wait(30);
     b.style.width = (6.25 + 31.5 + 8 + tx.scrollWidth) + "px"; b.classList.add("ex"); haptic(6);
     // about 4.9s end to end: open 1s, shimmer 1.2s, hold, fold 0.8s, icon out and back 1s
-    await wait(1000); b.classList.add("shine"); await wait(1200); b.classList.remove("shine");
-    await wait(950); b.classList.remove("ex"); b.style.width = "44px";
-    await wait(800);
-    await ic.animate([{ transform: "translateY(0)" }, { transform: "translateY(-44px)" }], { duration: 340, easing: "cubic-bezier(.5,0,.75,0)" }).finished;
-    ic.animate([{ transform: "translateY(44px)" }, { transform: "translateY(-4px)", offset: .7 }, { transform: "translateY(0)" }], { duration: 650, easing: "cubic-bezier(.2,.9,.3,1)" });
+    await wait(850); b.classList.add("shine"); await wait(1200); b.classList.remove("shine");
+    await wait(700); b.classList.remove("ex"); b.style.width = "44px";
+    await wait(650);
+    // the icon floats up and out, then rises back in from below: slower, so it reads
+    await ic.animate([{ transform: "translateY(0)" }, { transform: "translateY(-44px)" }], { duration: 600, easing: "cubic-bezier(.45,0,.7,.2)" }).finished;
+    ic.animate([{ transform: "translateY(44px)" }, { transform: "translateY(-3px)", offset: .75 }, { transform: "translateY(0)" }], { duration: 1000, easing: "cubic-bezier(.25,.8,.3,1)" });
   }
   setTimeout(play, 2600);
 })();
