@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "69";
+window.BUILD = "70";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -83,17 +83,17 @@ img,video{display:block}
 .me{width:40px;height:40px;border-radius:50%;object-fit:cover}
 /* poll button intro (Figma 276:89733): opens into "Create a poll", a shimmer passes, it folds back, the icon pops up and back in */
 #pollBtn{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:0 0 0 6.25px;overflow:hidden;flex:none;
-  transition:width .6s cubic-bezier(.2,.9,.25,1.08),box-shadow .4s}
+  transition:width .8s cubic-bezier(.2,.9,.25,1.06),box-shadow .5s}
 #pollBtn .pbIc{flex:none}
 #pollBtn.ex{box-shadow:0 1.1px 10px rgba(0,0,0,.25)}
 #pollBtn.glass{-webkit-backdrop-filter:blur(.6px) saturate(1.6) brightness(1.08);backdrop-filter:blur(.6px) saturate(1.6) brightness(1.08)}
 .pbTxt{flex:none;font-weight:700;font-size:20px;line-height:36px;letter-spacing:-1px;white-space:nowrap;padding-right:18px;
   background:linear-gradient(90deg,#520bb3 0%,#101010 47.2%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
-  opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .45s cubic-bezier(.2,.9,.3,1.2)}
-#pollBtn.ex .pbTxt{opacity:1;transform:none;transition-delay:.18s,.18s}
+  opacity:0;transform:translateX(-6px);transition:opacity .35s,transform .6s cubic-bezier(.2,.9,.3,1.2)}
+#pollBtn.ex .pbTxt{opacity:1;transform:none;transition-delay:.25s,.25s}
 .pbShine{position:absolute;top:0;bottom:0;left:-60%;width:45%;pointer-events:none;z-index:3;transform:skewX(-18deg);
   background:linear-gradient(100deg,transparent 0%,rgba(150,105,255,.28) 30%,rgba(255,255,255,.95) 50%,rgba(150,105,255,.28) 70%,transparent 100%)}
-#pollBtn.shine .pbShine{animation:pbShine .9s cubic-bezier(.4,0,.2,1)}
+#pollBtn.shine .pbShine{animation:pbShine 1.2s cubic-bezier(.4,0,.2,1)}
 @keyframes pbShine{to{left:130%}}
 
 .sections{display:flex;flex-direction:column;gap:48px}
@@ -3409,11 +3409,12 @@ document.getElementById("pollBtn").addEventListener("click", () => openPoll("hom
     if (document.hidden || !homeContent || homeContent.hidden || !b.offsetParent) return;
     b.style.width = "44px"; await wait(30);
     b.style.width = (6.25 + 31.5 + 8 + tx.scrollWidth) + "px"; b.classList.add("ex"); haptic(6);
-    await wait(750); b.classList.add("shine"); await wait(950); b.classList.remove("shine");
-    await wait(900); b.classList.remove("ex"); b.style.width = "44px";
-    await wait(650);
-    await ic.animate([{ transform: "translateY(0)" }, { transform: "translateY(-44px)" }], { duration: 260, easing: "cubic-bezier(.5,0,.75,0)" }).finished;
-    ic.animate([{ transform: "translateY(44px)" }, { transform: "translateY(-4px)", offset: .7 }, { transform: "translateY(0)" }], { duration: 520, easing: "cubic-bezier(.2,.9,.3,1)" });
+    // about 4.9s end to end: open 1s, shimmer 1.2s, hold, fold 0.8s, icon out and back 1s
+    await wait(1000); b.classList.add("shine"); await wait(1200); b.classList.remove("shine");
+    await wait(950); b.classList.remove("ex"); b.style.width = "44px";
+    await wait(800);
+    await ic.animate([{ transform: "translateY(0)" }, { transform: "translateY(-44px)" }], { duration: 340, easing: "cubic-bezier(.5,0,.75,0)" }).finished;
+    ic.animate([{ transform: "translateY(44px)" }, { transform: "translateY(-4px)", offset: .7 }, { transform: "translateY(0)" }], { duration: 650, easing: "cubic-bezier(.2,.9,.3,1)" });
   }
   setTimeout(play, 2600);
 })();
