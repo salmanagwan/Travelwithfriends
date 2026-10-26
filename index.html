@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "84";
+window.BUILD = "85";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -701,10 +701,13 @@ b.grad2{font-weight:700}
 .dvTag.dur{gap:2px;padding:3px 4px}
 .dvTag.blue{background:rgba(0,165,255,.15);color:#00a5ff}
 .dvTag.orange{background:rgba(255,150,0,.1);color:#ff9600;padding-left:6px;padding-right:10px}
-.dvDrive{display:flex;align-items:center;justify-content:space-between;padding-left:85px;height:38px}
+.dvTag .ic{width:20px;height:20px;flex:none;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+.dvTags{min-width:0}.dvTag.cat{flex:0 1 auto;min-width:0}.dvTag .tx{overflow:hidden;text-overflow:ellipsis}
+.dvTag.cat{background:color-mix(in srgb,var(--tc) 13%,#fff);color:var(--tc)}
+.dvDrive{display:flex;align-items:center;justify-content:space-between;padding-left:max(85px,calc(100% - 295px));height:38px}
 .dvGo{height:38px;flex:none;padding:0 12px 2px;border-radius:66px;background:#00a5ff;display:flex;align-items:center}
 .dvGo img{width:24px;height:24px}
-@media (max-width:380px){.dvDrive{padding-left:72px}.dvCard{width:calc(100% - 72px)}.dvInfo h4{font-size:16px}.dvTime{font-size:12px}}
+@media (max-width:380px){.dvDrive{padding-left:72px!important}.dvCard{width:calc(100% - 72px)}.dvInfo h4{font-size:16px}.dvTime{font-size:12px}}
 .addFrom{display:flex;align-items:center;justify-content:center;gap:6px;height:52px;margin:4px 0 0 82px;border:1.5px dashed #c4c4c4;border-radius:16px;font-weight:600;font-size:15px;color:#686868}
 /* Unplanned */
 .unView{padding:8px 16px 0;display:flex;flex-direction:column;gap:12px}
@@ -2470,6 +2473,10 @@ const CAT = e => /🍜|🍲|🍽|🍛|🥘|🍤|🦐|🍝|🍕|☕|🍹|🍸/.te
   : /🪩|🎉|🔥|🍻/.test(e) ? { k: "spot", t: "Nightlife" } : { k: "spot", t: "Sightseeing" };
 const DUR = ["30m", "1h", "1h 30m", "2h", "3h"];
 const FOOD = /Café|Restaurant|Street food|Bar|Tasting/;
+// each kind of stop gets its own colour so a day doesn't read as all blue
+const TAGC = { "Café": "#ff9600", Restaurant: "#ff9600", "Street food": "#f2711c", Bar: "#e0559a", Tasting: "#c9822b",
+  Beach: "#00a99d", Boat: "#0094c6", Temple: "#8b5cf6", Viewpoint: "#22a861", Sightseeing: "#3aa655",
+  Shopping: "#e8458b", Activity: "#6b5cff", Spa: "#d16bd8", Show: "#b04ae0", Nightlife: "#c03fd1" };
 const mins = t => { const m = /(\d+)(?::(\d+))?\s*(AM|PM)/i.exec(t || "") || [0, 9, 0, "AM"]; return (+m[1] % 12 + (/pm/i.test(m[3]) ? 12 : 0)) * 60 + (+m[2] || 0); };
 const durMin = d => { const h = /(\d+)h/.exec(d), m = /(\d+)m/.exec(d); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0); };
 const clock = m => { m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m / 60), mm = m % 60; return `${h % 12 || 12}:${String(mm).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
@@ -2492,7 +2499,7 @@ function dayHTML(i){
     return `<div class="dvRow"><span class="dvTime">${st.t}</span>
       <div class="dvCard"><span class="dvThumb"><img src="${st.img}" alt="" loading="lazy"><em>${k + 1}</em></span>
         <div class="dvInfo"><h4>${esc(st.n)}</h4><div class="dvTags"><button type="button" class="dvTag blue dur" data-dur="${i}:${k}"><img src="assets/clock-blue.svg" alt=""><span>${st.dur}</span><img src="assets/expand-blue.svg" alt=""></button>
-          <span class="dvTag ${food ? "orange" : "blue"}"><img src="assets/${food ? "restaurant-orange" : "attraction-blue"}.svg" alt="">${esc(st.cat)}</span></div></div></div></div>${drive}`;
+          <span class="dvTag cat${food ? " orange" : ""}" style="--tc:${TAGC[st.cat] || "#00a5ff"}"><i class="ic" style="--m:url(assets/${food ? "restaurant-orange" : "attraction-blue"}.svg)"></i><span class="tx">${esc(st.cat)}</span></span></div></div></div></div>${drive}`;
   }).join("");
   return `<div class="dayView" style="--dc:${d.c}">
     <div class="dvTop"><span>${esc(d.place)}</span><span class="m">${d.km ? d.km + "<i></i>" : ""}${d.stops.length} spots</span></div>
