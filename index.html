@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "71";
+window.BUILD = "72";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -443,7 +443,11 @@ b.grad2{font-weight:700}
 .greyG{background:linear-gradient(90deg,#111214,#6b6f76);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 /* while it looks things up, a light sweep runs across the strip and the orb spins */
 .npAi.busy::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);background-size:220% 100%;animation:npSweep 1.2s linear infinite}
-.npAi.busy .orb{animation:npSpin 1.1s linear infinite}
+/* the globe never spins on its side: it breathes and glows, so the light on it stays in place */
+@keyframes orbPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(140,100,255,0)) saturate(1)}50%{transform:scale(1.18);filter:drop-shadow(0 0 5px rgba(140,100,255,.9)) saturate(1.35)}}
+@keyframes orbGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.45)}}
+@keyframes orbIn{to{transform:scale(1)}}
+.npAi.busy .orb{animation:orbPulse 1.1s ease-in-out infinite}
 @keyframes npSweep{from{background-position:120% 0}to{background-position:-120% 0}}
 @keyframes npSpin{to{transform:rotate(360deg)}}
 
@@ -1023,6 +1027,10 @@ b.grad2{font-weight:700}
 .spark.orbIc,.spark.orbIc img{width:20px;height:20px}
 .spark.orbIc img{position:absolute;inset:0;object-fit:contain}
 .spark.orbIc img.glow{filter:blur(6px);opacity:.9}
+.pollCta.shine .spark.orbIc img{animation:orbIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, orbPulse 2.6s 1.4s ease-in-out infinite}
+.pollCta.shine .spark.orbIc img.glow{animation:orbIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, orbGlow 2.6s 1.4s ease-in-out infinite}
+.spark.orbIc img{transform:scale(0)}
+.pollCard.result .spark.orbIc img{transform:scale(1)}
 .spark img{width:24px;height:24px;transform:scale(0) rotate(-90deg)}
 .pollCta.shine .spark img{animation:starIn .7s .45s cubic-bezier(.2,.9,.3,1.6) forwards, twinkle 2.8s 1.6s ease-in-out infinite}
 @keyframes starIn{to{transform:scale(1) rotate(0)}}
