@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script>
 /* Phones keep old copies of this page (Safari restores tabs from memory). Check the live build and reload if this copy is stale. */
-window.BUILD = "77";
+window.BUILD = "78";
 (function(){
   function check(){
     fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
@@ -2615,9 +2615,6 @@ async function applyJanDates(){
   const list = prScroll.querySelector(".prList");
   const fl = swapIn(prScroll.querySelector(".flight"), flightHTML({ from: TRIP.from, dates: fmtRange(TRIP.start, DAYS.length), price: TRIP.price, note: TRIP.note }));
   fl.querySelector(".box").classList.add("flash");
-  const note = document.createElement("div"); note.className = "updNote prIn"; note.dataset.sq = "14";
-  note.innerHTML = `<img src="assets/sparkle-green.svg" alt=""><p>Plan updated for ${fmtRange(TRIP.start, DAYS.length)}. Spots re-ordered around the new flight times.</p>`;
-  list.prepend(note); watchSq(note);
   const br = prScroll.querySelector(".breakCard"); if (br) swapIn(br, breakHTML()).classList.add("flash");
   prScroll.querySelectorAll(".dayCard").forEach((card, i) => setTimeout(() => shuffleDay(card, i), 300 + i * 120));
   say(`Trip dates updated to ${fmtRange(TRIP.start, DAYS.length)}`); haptic(18);
